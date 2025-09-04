@@ -1,0 +1,39 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import '../../theme/app_theme.dart';
+
+class LoyaltyPage extends ConsumerWidget {
+  const LoyaltyPage({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Программа лояльности'),
+      ),
+      body: const Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.card_giftcard_outlined,
+              size: 64,
+              color: AppTheme.primaryColor,
+            ),
+            SizedBox(height: 16),
+            Text(
+              'Бонусная программа',
+              style: TextStyle(fontSize: 24),
+            ),
+            SizedBox(height: 8),
+            Text(
+              'В разработке...',
+              style: TextStyle(color: AppTheme.textSecondaryColor),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
