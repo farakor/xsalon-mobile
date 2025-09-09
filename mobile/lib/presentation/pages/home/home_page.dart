@@ -5,7 +5,10 @@ import 'package:go_router/go_router.dart';
 import '../../../core/constants/app_constants.dart';
 import '../../theme/app_theme.dart';
 import '../../providers/auth_provider.dart';
+import '../../providers/appointments_provider.dart';
+import '../../../data/models/appointment.dart';
 import '../schedule/staff_schedule_page.dart';
+import '../schedule/widgets/appointment_details_bottom_sheet.dart';
 import '../clients/staff_clients_page.dart';
 import '../services/services_page.dart';
 import '../profile/staff_profile_page.dart';
@@ -488,28 +491,7 @@ class _StaffHomeTab extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             
-            Row(
-              children: [
-                Expanded(
-                  child: _StatsCard(
-                    icon: Icons.event,
-                    title: '8',
-                    subtitle: 'Записей',
-                    color: Colors.blue,
-                    onTap: () => onTabChanged(1), // Переход на таб "Расписание"
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: _StatsCard(
-                    icon: Icons.attach_money,
-                    title: '₽12,500',
-                    subtitle: 'Доход',
-                    color: Colors.orange,
-                  ),
-                ),
-              ],
-            ),
+            _TodayStatsRow(onTabChanged: onTabChanged),
             
             const SizedBox(height: 24),
             
@@ -558,9 +540,7 @@ class _StaffHomeTab extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             
-            const _TodayAppointmentCard(),
-            const SizedBox(height: 12),
-            const _TodayAppointmentCard(),
+            const _TodayAppointmentsList(),
           ],
         ),
       ),
@@ -571,6 +551,67 @@ class _StaffHomeTab extends StatelessWidget {
 
 
 
+
+// Строка статистики на сегодня
+class _TodayStatsRow extends ConsumerWidget {
+  final ValueChanged<int> onTabChanged;
+
+  const _TodayStatsRow({required this.onTabChanged});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final appointmentsState = ref.watch(appointmentsProvider);
+    
+    // Подсчитываем записи на сегодня
+    final todayAppointments = appointmentsState.appointments
+        .where((appointment) => _isSameDay(appointment.startTime, DateTime.now()))
+        .toList();
+    
+    // Подсчитываем доход на сегодня
+    final todayRevenue = todayAppointments
+        .where((appointment) => appointment.status == AppointmentStatus.completed)
+        .fold<double>(0, (sum, appointment) => sum + appointment.price);
+
+    return Row(
+      children: [
+        Expanded(
+          child: _StatsCard(
+            icon: Icons.event,
+            title: todayAppointments.length.toString(),
+            subtitle: 'Записей',
+            color: Colors.blue,
+            onTap: () => onTabChanged(1), // Переход на таб "Расписание"
+          ),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: _StatsCard(
+            icon: Icons.attach_money,
+            title: todayRevenue > 0 ? '₽${_formatPrice(todayRevenue)}' : '₽0',
+            subtitle: 'Доход',
+            color: Colors.orange,
+          ),
+        ),
+      ],
+    );
+  }
+
+  bool _isSameDay(DateTime date1, DateTime date2) {
+    return date1.year == date2.year &&
+           date1.month == date2.month &&
+           date1.day == date2.day;
+  }
+
+  String _formatPrice(double price) {
+    if (price >= 1000000) {
+      return '${(price / 1000000).toStringAsFixed(1)}M';
+    } else if (price >= 1000) {
+      return '${(price / 1000).toStringAsFixed(1)}K';
+    } else {
+      return price.toInt().toString();
+    }
+  }
+}
 
 // Карточка статистики
 class _StatsCard extends StatelessWidget {
@@ -666,68 +707,274 @@ class _StaffActionCard extends StatelessWidget {
   }
 }
 
-// Карточка записи на сегодня
-class _TodayAppointmentCard extends StatelessWidget {
-  const _TodayAppointmentCard();
+// Список записей на сегодня
+class _TodayAppointmentsList extends ConsumerStatefulWidget {
+  const _TodayAppointmentsList();
+
+  @override
+  ConsumerState<_TodayAppointmentsList> createState() => _TodayAppointmentsListState();
+}
+
+class _TodayAppointmentsListState extends ConsumerState<_TodayAppointmentsList> {
+  @override
+  void initState() {
+    super.initState();
+    // Загружаем записи на сегодня при инициализации
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(appointmentsProvider.notifier).loadAppointmentsForDate(DateTime.now());
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Row(
-          children: [
-            Container(
-              width: 4,
-              height: 60,
-              decoration: BoxDecoration(
-                color: AppTheme.primaryColor,
-                borderRadius: BorderRadius.circular(2),
+    final appointmentsState = ref.watch(appointmentsProvider);
+    
+    if (appointmentsState.isLoading) {
+      return const Center(
+        child: Padding(
+          padding: EdgeInsets.all(20),
+          child: CircularProgressIndicator(),
+        ),
+      );
+    }
+
+    if (appointmentsState.errorMessage != null) {
+      return Card(
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            children: [
+              Icon(
+                Icons.error_outline,
+                color: Colors.red,
+                size: 32,
               ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    '14:00 - 15:30',
-                    style: AppTheme.titleSmall.copyWith(
-                      color: AppTheme.primaryColor,
+              const SizedBox(height: 8),
+              Text(
+                'Ошибка загрузки записей',
+                style: AppTheme.titleSmall,
+              ),
+              Text(
+                appointmentsState.errorMessage!,
+                style: AppTheme.bodySmall.copyWith(color: Colors.red),
+                textAlign: TextAlign.center,
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    final todayAppointments = appointmentsState.appointments
+        .where((appointment) => _isSameDay(appointment.startTime, DateTime.now()))
+        .toList();
+
+    if (todayAppointments.isEmpty) {
+      return Card(
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            children: [
+              Icon(
+                Icons.event_available,
+                color: Colors.grey,
+                size: 32,
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'Нет записей на сегодня',
+                style: AppTheme.titleSmall,
+              ),
+              Text(
+                'Сегодня у вас свободный день',
+                style: AppTheme.bodySmall.copyWith(color: Colors.grey),
+              ),
+              const SizedBox(height: 12),
+              TextButton.icon(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const AddBookingPage(),
                     ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    'Женская стрижка',
-                    style: AppTheme.titleSmall,
-                  ),
-                  Text(
-                    'Анна Иванова • +998 90 123 45 67',
-                    style: AppTheme.bodySmall,
-                  ),
-                ],
+                  ).then((result) {
+                    if (result == true) {
+                      // Запись была создана, перезагружаем данные
+                      ref.read(appointmentsProvider.notifier).loadAppointmentsForDate(DateTime.now());
+                    }
+                  });
+                },
+                icon: const Icon(Icons.add),
+                label: const Text('Добавить запись'),
               ),
-            ),
-            Container(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 8,
-                vertical: 4,
-              ),
-              decoration: BoxDecoration(
-                color: Colors.green.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Text(
-                'Подтверждено',
-                style: AppTheme.bodySmall.copyWith(
-                  color: Colors.green,
+            ],
+          ),
+        ),
+      );
+    }
+
+    return Column(
+      children: todayAppointments
+          .map((appointment) => Padding(
+                padding: const EdgeInsets.only(bottom: 12),
+                child: _TodayAppointmentCard(
+                  appointment: appointment,
+                  onAppointmentUpdated: () {
+                    // Перезагружаем записи после изменения
+                    ref.read(appointmentsProvider.notifier).loadAppointmentsForDate(DateTime.now());
+                  },
+                ),
+              ))
+          .toList(),
+    );
+  }
+
+  bool _isSameDay(DateTime date1, DateTime date2) {
+    return date1.year == date2.year &&
+           date1.month == date2.month &&
+           date1.day == date2.day;
+  }
+}
+
+// Карточка записи на сегодня
+class _TodayAppointmentCard extends StatelessWidget {
+  final Appointment appointment;
+  final VoidCallback? onAppointmentUpdated;
+  
+  const _TodayAppointmentCard({
+    required this.appointment,
+    this.onAppointmentUpdated,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final timeFormat = '${_formatTime(appointment.startTime)} - ${_formatTime(appointment.endTime)}';
+    
+    return Card(
+      child: InkWell(
+        onTap: () => _showAppointmentDetails(context, appointment),
+        borderRadius: BorderRadius.circular(12),
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Row(
+            children: [
+              Container(
+                width: 4,
+                height: 60,
+                decoration: BoxDecoration(
+                  color: _getStatusColor(appointment.status),
+                  borderRadius: BorderRadius.circular(2),
                 ),
               ),
-            ),
-          ],
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      timeFormat,
+                      style: AppTheme.titleSmall.copyWith(
+                        color: _getStatusColor(appointment.status),
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      appointment.serviceName,
+                      style: AppTheme.titleSmall,
+                    ),
+                    Text(
+                      '${appointment.clientName} • ${appointment.clientPhone}',
+                      style: AppTheme.bodySmall,
+                    ),
+                  ],
+                ),
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 8,
+                  vertical: 4,
+                ),
+                decoration: BoxDecoration(
+                  color: _getStatusColor(appointment.status).withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Text(
+                  _getStatusText(appointment.status),
+                  style: AppTheme.bodySmall.copyWith(
+                    color: _getStatusColor(appointment.status),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Icon(
+                Icons.arrow_forward_ios,
+                size: 16,
+                color: Colors.grey,
+              ),
+            ],
+          ),
         ),
       ),
     );
+  }
+
+  void _showAppointmentDetails(BuildContext context, Appointment appointment) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => DraggableScrollableSheet(
+        initialChildSize: 0.85,
+        minChildSize: 0.6,
+        maxChildSize: 0.95,
+        builder: (context, scrollController) => AppointmentDetailsBottomSheet(
+          appointment: appointment,
+        ),
+      ),
+    ).then((_) {
+      // После закрытия модального окна обновляем данные
+      if (onAppointmentUpdated != null) {
+        onAppointmentUpdated!();
+      }
+    });
+  }
+
+  String _formatTime(DateTime dateTime) {
+    return '${dateTime.hour.toString().padLeft(2, '0')}:${dateTime.minute.toString().padLeft(2, '0')}';
+  }
+
+  Color _getStatusColor(AppointmentStatus status) {
+    switch (status) {
+      case AppointmentStatus.pending:
+        return Colors.orange;
+      case AppointmentStatus.confirmed:
+        return Colors.green;
+      case AppointmentStatus.inProgress:
+        return Colors.blue;
+      case AppointmentStatus.completed:
+        return Colors.purple;
+      case AppointmentStatus.cancelled:
+        return Colors.red;
+      case AppointmentStatus.noShow:
+        return Colors.grey;
+    }
+  }
+
+  String _getStatusText(AppointmentStatus status) {
+    switch (status) {
+      case AppointmentStatus.pending:
+        return 'Ожидает';
+      case AppointmentStatus.confirmed:
+        return 'Подтверждено';
+      case AppointmentStatus.inProgress:
+        return 'В процессе';
+      case AppointmentStatus.completed:
+        return 'Завершено';
+      case AppointmentStatus.cancelled:
+        return 'Отменено';
+      case AppointmentStatus.noShow:
+        return 'Не пришел';
+    }
   }
 }
 

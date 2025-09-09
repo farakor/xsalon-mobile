@@ -108,13 +108,13 @@ class ProfileHeader extends StatelessWidget {
                     Row(
                       children: [
                         Icon(
-                          Icons.verified,
+                          Icons.star,
                           color: Colors.white.withValues(alpha: 0.8),
                           size: 16,
                         ),
                         const SizedBox(width: 4),
                         Text(
-                          'Верифицированный сотрудник',
+                          'Топовый мастер',
                           style: AppTheme.bodySmall.copyWith(
                             color: Colors.white.withValues(alpha: 0.8),
                           ),
@@ -126,74 +126,11 @@ class ProfileHeader extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 20),
-          // Achievement Badges
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              _buildAchievementBadge(
-                Icons.star,
-                'Топ мастер',
-                'Высокий рейтинг',
-              ),
-              _buildAchievementBadge(
-                Icons.favorite,
-                'Любимец клиентов',
-                '90% повторных записей',
-              ),
-              _buildAchievementBadge(
-                Icons.trending_up,
-                'Растущий доход',
-                '+25% за месяц',
-              ),
-            ],
-          ),
         ],
       ),
     );
   }
 
-  Widget _buildAchievementBadge(IconData icon, String title, String subtitle) {
-    return Expanded(
-      child: Container(
-        margin: const EdgeInsets.symmetric(horizontal: 4),
-        padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(
-          color: Colors.white.withValues(alpha: 0.15),
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(
-            color: Colors.white.withValues(alpha: 0.3),
-          ),
-        ),
-        child: Column(
-          children: [
-            Icon(
-              icon,
-              color: Colors.white,
-              size: 20,
-            ),
-            const SizedBox(height: 4),
-            Text(
-              title,
-              style: AppTheme.bodySmall.copyWith(
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-              ),
-              textAlign: TextAlign.center,
-            ),
-            Text(
-              subtitle,
-              style: AppTheme.bodySmall.copyWith(
-                color: Colors.white.withValues(alpha: 0.8),
-                fontSize: 10,
-              ),
-              textAlign: TextAlign.center,
-            ),
-          ],
-        ),
-      ),
-    );
-  }
 
   String _getInitials(String name) {
     final names = name.split(' ');

@@ -9,7 +9,8 @@ class Appointment {
   final DateTime endTime;
   final AppointmentStatus status;
   final double price;
-  final String? notes;
+  final String? notes; // client notes
+  final String? masterNotes; // master notes
   final String? clientAvatarUrl;
 
   const Appointment({
@@ -24,6 +25,7 @@ class Appointment {
     required this.status,
     required this.price,
     this.notes,
+    this.masterNotes,
     this.clientAvatarUrl,
   });
 
@@ -45,6 +47,7 @@ class Appointment {
       ),
       price: (json['price'] as num).toDouble(),
       notes: json['notes'] as String?,
+      masterNotes: json['master_notes'] as String?,
       clientAvatarUrl: json['client_avatar_url'] as String?,
     );
   }
@@ -62,6 +65,7 @@ class Appointment {
       'status': status.name,
       'price': price,
       'notes': notes,
+      'master_notes': masterNotes,
       'client_avatar_url': clientAvatarUrl,
     };
   }
@@ -78,6 +82,7 @@ class Appointment {
     AppointmentStatus? status,
     double? price,
     String? notes,
+    String? masterNotes,
     String? clientAvatarUrl,
   }) {
     return Appointment(
@@ -92,6 +97,7 @@ class Appointment {
       status: status ?? this.status,
       price: price ?? this.price,
       notes: notes ?? this.notes,
+      masterNotes: masterNotes ?? this.masterNotes,
       clientAvatarUrl: clientAvatarUrl ?? this.clientAvatarUrl,
     );
   }

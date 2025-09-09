@@ -252,22 +252,112 @@ class BookingService {
           .from('bookings')
           .select('''
             id,
+            client_id,
+            service_id,
             start_time,
             end_time,
             status,
             total_price,
-            clients!inner(full_name, phone)
+            final_price,
+            client_notes,
+            master_notes,
+            clients!inner(full_name, phone),
+            services!inner(name, duration_minutes)
           ''')
           .eq('master_id', masterId)
-          .gte('start_time', startOfDay.toIso8601String())
-          .lt('start_time', endOfDay.toIso8601String())
+          .gte('start_time', TimezoneUtils.samarkandToUtc(startOfDay).toIso8601String())
+          .lt('start_time', TimezoneUtils.samarkandToUtc(endOfDay).toIso8601String())
           .neq('status', 'cancelled')
           .order('start_time');
 
-      return List<Map<String, dynamic>>.from(response);
+      // Конвертируем время обратно в самаркандское
+      final convertedResponse = response.map((booking) {
+        return {
+          ...booking,
+          'start_time': TimezoneUtils.toSamarkandTime(DateTime.parse(booking['start_time'])).toIso8601String(),
+          'end_time': TimezoneUtils.toSamarkandTime(DateTime.parse(booking['end_time'])).toIso8601String(),
+        };
+      }).toList();
+
+      return List<Map<String, dynamic>>.from(convertedResponse);
     } catch (e) {
       print('BookingService: Error getting master bookings: $e');
       return [];
+    }
+  }
+
+  /// Получить все записи мастера на диапазон дат
+  Future<List<Map<String, dynamic>>> getMasterBookingsForDateRange({
+    required String masterId,
+    required DateTime startDate,
+    required DateTime endDate,
+  }) async {
+    try {
+      final response = await _supabase
+          .from('bookings')
+          .select('''
+            id,
+            client_id,
+            service_id,
+            start_time,
+            end_time,
+            status,
+            total_price,
+            final_price,
+            client_notes,
+            master_notes,
+            clients!inner(full_name, phone),
+            services!inner(name, duration_minutes)
+          ''')
+          .eq('master_id', masterId)
+          .gte('start_time', TimezoneUtils.samarkandToUtc(startDate).toIso8601String())
+          .lte('start_time', TimezoneUtils.samarkandToUtc(endDate).toIso8601String())
+          .neq('status', 'cancelled')
+          .order('start_time');
+
+      // Конвертируем время обратно в самаркандское
+      final convertedResponse = response.map((booking) {
+        return {
+          ...booking,
+          'start_time': TimezoneUtils.toSamarkandTime(DateTime.parse(booking['start_time'])).toIso8601String(),
+          'end_time': TimezoneUtils.toSamarkandTime(DateTime.parse(booking['end_time'])).toIso8601String(),
+        };
+      }).toList();
+
+      return List<Map<String, dynamic>>.from(convertedResponse);
+    } catch (e) {
+      print('BookingService: Error getting master bookings for date range: $e');
+      return [];
+    }
+  }
+
+  /// Обновить статус записи
+  Future<void> updateBookingStatus({
+    required String bookingId,
+    required String newStatus,
+  }) async {
+    try {
+      await _supabase
+          .from('bookings')
+          .update({'status': newStatus})
+          .eq('id', bookingId);
+    } catch (e) {
+      throw ServerFailure('Ошибка обновления статуса записи: $e');
+    }
+  }
+
+  /// Обновить заметки мастера для записи
+  Future<void> updateBookingNotes({
+    required String bookingId,
+    required String notes,
+  }) async {
+    try {
+      await _supabase
+          .from('bookings')
+          .update({'master_notes': notes})
+          .eq('id', bookingId);
+    } catch (e) {
+      throw ServerFailure('Ошибка обновления заметок: $e');
     }
   }
 }

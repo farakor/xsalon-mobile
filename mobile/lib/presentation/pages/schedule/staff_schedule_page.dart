@@ -4,9 +4,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/constants/app_constants.dart';
 import '../../../data/models/appointment.dart';
 import '../../theme/app_theme.dart';
+import '../../providers/appointments_provider.dart';
 import 'widgets/day_schedule_view.dart';
 import 'widgets/week_schedule_view.dart';
 import 'widgets/month_schedule_view.dart';
+import 'widgets/appointment_details_bottom_sheet.dart';
 import '../booking/add_booking_page.dart';
 
 enum ScheduleViewType { day, week, month }
@@ -22,57 +24,32 @@ class _StaffSchedulePageState extends ConsumerState<StaffSchedulePage> {
   ScheduleViewType _currentView = ScheduleViewType.day;
   DateTime _selectedDate = DateTime.now();
 
-  // Тестовые данные - в реальном приложении будут загружаться из API
-  List<Appointment> get _mockAppointments => [
-    Appointment(
-      id: '1',
-      clientId: 'client1',
-      clientName: 'Анна Иванова',
-      clientPhone: '+998 90 123 45 67',
-      serviceId: 'service1',
-      serviceName: 'Женская стрижка',
-      startTime: DateTime.now().copyWith(hour: 9, minute: 0, second: 0),
-      endTime: DateTime.now().copyWith(hour: 10, minute: 30, second: 0),
-      status: AppointmentStatus.confirmed,
-      price: 150000,
-    ),
-    Appointment(
-      id: '2',
-      clientId: 'client2',
-      clientName: 'Мария Петрова',
-      clientPhone: '+998 90 987 65 43',
-      serviceId: 'service2',
-      serviceName: 'Окрашивание волос',
-      startTime: DateTime.now().copyWith(hour: 11, minute: 0, second: 0),
-      endTime: DateTime.now().copyWith(hour: 13, minute: 30, second: 0),
-      status: AppointmentStatus.pending,
-      price: 300000,
-    ),
-    Appointment(
-      id: '3',
-      clientId: 'client3',
-      clientName: 'Елена Сидорова',
-      clientPhone: '+998 90 555 44 33',
-      serviceId: 'service3',
-      serviceName: 'Укладка',
-      startTime: DateTime.now().copyWith(hour: 14, minute: 0, second: 0),
-      endTime: DateTime.now().copyWith(hour: 15, minute: 0, second: 0),
-      status: AppointmentStatus.inProgress,
-      price: 80000,
-    ),
-    Appointment(
-      id: '4',
-      clientId: 'client4',
-      clientName: 'Ольга Козлова',
-      clientPhone: '+998 90 111 22 33',
-      serviceId: 'service4',
-      serviceName: 'Маникюр',
-      startTime: DateTime.now().copyWith(hour: 16, minute: 0, second: 0),
-      endTime: DateTime.now().copyWith(hour: 17, minute: 30, second: 0),
-      status: AppointmentStatus.confirmed,
-      price: 120000,
-    ),
-  ];
+  @override
+  void initState() {
+    super.initState();
+    // Загружаем записи при инициализации
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _loadAppointments();
+    });
+  }
+
+  void _loadAppointments() {
+    switch (_currentView) {
+      case ScheduleViewType.day:
+        ref.read(appointmentsProvider.notifier).loadAppointmentsForDate(_selectedDate);
+        break;
+      case ScheduleViewType.week:
+        final startOfWeek = _selectedDate.subtract(Duration(days: _selectedDate.weekday - 1));
+        final endOfWeek = startOfWeek.add(const Duration(days: 6));
+        ref.read(appointmentsProvider.notifier).loadAppointmentsForDateRange(startOfWeek, endOfWeek);
+        break;
+      case ScheduleViewType.month:
+        final startOfMonth = DateTime(_selectedDate.year, _selectedDate.month, 1);
+        final endOfMonth = DateTime(_selectedDate.year, _selectedDate.month + 1, 0);
+        ref.read(appointmentsProvider.notifier).loadAppointmentsForDateRange(startOfMonth, endOfMonth);
+        break;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -147,6 +124,7 @@ class _StaffSchedulePageState extends ConsumerState<StaffSchedulePage> {
                           setState(() {
                             _currentView = selection.first;
                           });
+                          _loadAppointments();
                         },
                       ),
                     ),
@@ -218,7 +196,51 @@ class _StaffSchedulePageState extends ConsumerState<StaffSchedulePage> {
   }
 
   Widget _buildScheduleView() {
-    final appointments = _getAppointmentsForCurrentView();
+    final appointmentsState = ref.watch(appointmentsProvider);
+    
+    // Показываем индикатор загрузки
+    if (appointmentsState.isLoading) {
+      return const Center(
+        child: CircularProgressIndicator(),
+      );
+    }
+    
+    // Показываем ошибку
+    if (appointmentsState.errorMessage != null) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.error_outline,
+              size: 64,
+              color: Colors.red[300],
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'Ошибка загрузки',
+              style: AppTheme.titleMedium,
+            ),
+            const SizedBox(height: 8),
+            Text(
+              appointmentsState.errorMessage!,
+              style: AppTheme.bodyMedium,
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 16),
+            ElevatedButton(
+              onPressed: () {
+                ref.read(appointmentsProvider.notifier).clearError();
+                _loadAppointments();
+              },
+              child: const Text('Повторить'),
+            ),
+          ],
+        ),
+      );
+    }
+    
+    final appointments = _getAppointmentsForCurrentView(appointmentsState.appointments);
     
     switch (_currentView) {
       case ScheduleViewType.day:
@@ -244,9 +266,8 @@ class _StaffSchedulePageState extends ConsumerState<StaffSchedulePage> {
     }
   }
 
-  List<Appointment> _getAppointmentsForCurrentView() {
-    // В реальном приложении здесь будет фильтрация по дате из API
-    return _mockAppointments.where((appointment) {
+  List<Appointment> _getAppointmentsForCurrentView(List<Appointment> allAppointments) {
+    return allAppointments.where((appointment) {
       switch (_currentView) {
         case ScheduleViewType.day:
           return _isSameDay(appointment.startTime, _selectedDate);
@@ -276,6 +297,7 @@ class _StaffSchedulePageState extends ConsumerState<StaffSchedulePage> {
           break;
       }
     });
+    _loadAppointments();
   }
 
   void _nextPeriod() {
@@ -292,6 +314,7 @@ class _StaffSchedulePageState extends ConsumerState<StaffSchedulePage> {
           break;
       }
     });
+    _loadAppointments();
   }
 
   Future<void> _selectDate() async {
@@ -305,6 +328,7 @@ class _StaffSchedulePageState extends ConsumerState<StaffSchedulePage> {
       setState(() {
         _selectedDate = date;
       });
+      _loadAppointments();
     }
   }
 
@@ -318,39 +342,14 @@ class _StaffSchedulePageState extends ConsumerState<StaffSchedulePage> {
       ),
     ).then((result) {
       if (result == true) {
-        // Запись была создана, можно обновить данные
-        setState(() {
-          // В реальном приложении здесь будет перезагрузка данных
-        });
+        // Запись была создана, перезагружаем данные
+        _loadAppointments();
       }
     });
   }
 
   void _onAppointmentTap(Appointment appointment) {
-    // TODO: Show appointment details
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text(appointment.serviceName),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('Клиент: ${appointment.clientName}'),
-            Text('Телефон: ${appointment.clientPhone}'),
-            Text('Время: ${_formatTime(appointment.startTime)} - ${_formatTime(appointment.endTime)}'),
-            Text('Статус: ${appointment.status.displayName}'),
-            Text('Цена: ${_formatPrice(appointment.price)}'),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Закрыть'),
-          ),
-        ],
-      ),
-    );
+    showAppointmentDetails(context, appointment);
   }
 
   void _onDateTap(DateTime date) {
@@ -358,6 +357,7 @@ class _StaffSchedulePageState extends ConsumerState<StaffSchedulePage> {
       _selectedDate = date;
       _currentView = ScheduleViewType.day;
     });
+    _loadAppointments();
   }
 
   // Helper methods
@@ -377,13 +377,6 @@ class _StaffSchedulePageState extends ConsumerState<StaffSchedulePage> {
     return '${months[date.month - 1]} ${date.year}';
   }
 
-  String _formatTime(DateTime time) {
-    return '${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}';
-  }
-
-  String _formatPrice(double price) {
-    return '${(price / 1000).toStringAsFixed(0)} тыс. сум';
-  }
 
   DateTime _getWeekStart(DateTime date) {
     return date.subtract(Duration(days: date.weekday - 1));
