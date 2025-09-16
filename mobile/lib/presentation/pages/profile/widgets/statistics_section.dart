@@ -21,22 +21,22 @@ class _StatisticsSectionState extends State<StatisticsSection> {
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.fromLTRB(20, 20, 20, 100),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Period Selector
           _buildPeriodSelector(),
-          const SizedBox(height: 24),
+          const SizedBox(height: 20),
           // Main Statistics
           _buildMainStatistics(),
-          const SizedBox(height: 24),
+          const SizedBox(height: 16),
           // Performance Metrics
           _buildPerformanceMetrics(),
-          const SizedBox(height: 24),
+          const SizedBox(height: 16),
           // Service Statistics
           _buildServiceStatistics(),
-          const SizedBox(height: 24),
+          const SizedBox(height: 16),
           // Revenue Chart
           _buildRevenueChart(),
         ],
@@ -53,13 +53,17 @@ class _StatisticsSectionState extends State<StatisticsSection> {
     ];
 
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: AppTheme.borderColor,
+          width: 0.5,
+        ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
+            color: Colors.black.withValues(alpha: 0.02),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -68,13 +72,32 @@ class _StatisticsSectionState extends State<StatisticsSection> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'Период статистики',
-            style: AppTheme.titleMedium.copyWith(
-              fontWeight: FontWeight.bold,
-            ),
+          Row(
+            children: [
+              Container(
+                width: 32,
+                height: 32,
+                decoration: BoxDecoration(
+                  color: AppTheme.primaryColor.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Icon(
+                  Icons.date_range,
+                  color: AppTheme.primaryColor,
+                  size: 18,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Text(
+                'Период статистики',
+                style: AppTheme.titleMedium.copyWith(
+                  fontWeight: FontWeight.w600,
+                  color: AppTheme.textPrimaryColor,
+                ),
+              ),
+            ],
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 16),
           Wrap(
             spacing: 8,
             runSpacing: 8,
@@ -120,27 +143,46 @@ class _StatisticsSectionState extends State<StatisticsSection> {
 
   Widget _buildMainStatistics() {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [Colors.blue.withValues(alpha: 0.1), Colors.white],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
+        color: Colors.white,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.blue.withValues(alpha: 0.2)),
+        border: Border.all(
+          color: AppTheme.borderColor,
+          width: 0.5,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.02),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              const Icon(Icons.analytics, color: Colors.blue),
-              const SizedBox(width: 8),
+              Container(
+                width: 32,
+                height: 32,
+                decoration: BoxDecoration(
+                  color: AppTheme.primaryColor.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Icon(
+                  Icons.analytics,
+                  color: AppTheme.primaryColor,
+                  size: 18,
+                ),
+              ),
+              const SizedBox(width: 12),
               Text(
                 'Основная статистика',
                 style: AppTheme.titleMedium.copyWith(
-                  fontWeight: FontWeight.bold,
+                  fontWeight: FontWeight.w600,
+                  color: AppTheme.textPrimaryColor,
                 ),
               ),
             ],
@@ -196,13 +238,17 @@ class _StatisticsSectionState extends State<StatisticsSection> {
 
   Widget _buildPerformanceMetrics() {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: AppTheme.borderColor,
+          width: 0.5,
+        ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
+            color: Colors.black.withValues(alpha: 0.02),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -213,12 +259,25 @@ class _StatisticsSectionState extends State<StatisticsSection> {
         children: [
           Row(
             children: [
-              const Icon(Icons.trending_up, color: AppTheme.primaryColor),
-              const SizedBox(width: 8),
+              Container(
+                width: 32,
+                height: 32,
+                decoration: BoxDecoration(
+                  color: AppTheme.primaryColor.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Icon(
+                  Icons.trending_up,
+                  color: AppTheme.primaryColor,
+                  size: 18,
+                ),
+              ),
+              const SizedBox(width: 12),
               Text(
                 'Показатели эффективности',
                 style: AppTheme.titleMedium.copyWith(
-                  fontWeight: FontWeight.bold,
+                  fontWeight: FontWeight.w600,
+                  color: AppTheme.textPrimaryColor,
                 ),
               ),
             ],
@@ -249,13 +308,17 @@ class _StatisticsSectionState extends State<StatisticsSection> {
 
   Widget _buildServiceStatistics() {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: AppTheme.borderColor,
+          width: 0.5,
+        ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
+            color: Colors.black.withValues(alpha: 0.02),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -266,12 +329,25 @@ class _StatisticsSectionState extends State<StatisticsSection> {
         children: [
           Row(
             children: [
-              const Icon(Icons.design_services, color: AppTheme.primaryColor),
-              const SizedBox(width: 8),
+              Container(
+                width: 32,
+                height: 32,
+                decoration: BoxDecoration(
+                  color: AppTheme.primaryColor.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Icon(
+                  Icons.design_services,
+                  color: AppTheme.primaryColor,
+                  size: 18,
+                ),
+              ),
+              const SizedBox(width: 12),
               Text(
                 'Популярные услуги',
                 style: AppTheme.titleMedium.copyWith(
-                  fontWeight: FontWeight.bold,
+                  fontWeight: FontWeight.w600,
+                  color: AppTheme.textPrimaryColor,
                 ),
               ),
             ],
@@ -287,13 +363,17 @@ class _StatisticsSectionState extends State<StatisticsSection> {
 
   Widget _buildRevenueChart() {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: AppTheme.borderColor,
+          width: 0.5,
+        ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
+            color: Colors.black.withValues(alpha: 0.02),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -304,19 +384,33 @@ class _StatisticsSectionState extends State<StatisticsSection> {
         children: [
           Row(
             children: [
-              const Icon(Icons.bar_chart, color: AppTheme.primaryColor),
-              const SizedBox(width: 8),
+              Container(
+                width: 32,
+                height: 32,
+                decoration: BoxDecoration(
+                  color: AppTheme.primaryColor.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Icon(
+                  Icons.bar_chart,
+                  color: AppTheme.primaryColor,
+                  size: 18,
+                ),
+              ),
+              const SizedBox(width: 12),
               Text(
                 'Доход по месяцам',
                 style: AppTheme.titleMedium.copyWith(
-                  fontWeight: FontWeight.bold,
+                  fontWeight: FontWeight.w600,
+                  color: AppTheme.textPrimaryColor,
                 ),
               ),
             ],
           ),
           const SizedBox(height: 16),
-          SizedBox(
+          Container(
             height: 200,
+            width: double.infinity,
             child: _buildSimpleChart(),
           ),
         ],
@@ -430,36 +524,151 @@ class _StatisticsSectionState extends State<StatisticsSection> {
 
   Widget _buildSimpleChart() {
     final entries = widget.statistics.monthlyRevenue.entries.toList();
-    final maxRevenue = entries.map((e) => e.value).reduce((a, b) => a > b ? a : b);
-
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.end,
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-      children: entries.map((entry) {
-        final height = (entry.value / maxRevenue) * 160;
-        return Column(
-          mainAxisAlignment: MainAxisAlignment.end,
-          children: [
-            Container(
-              width: 30,
-              height: height,
-              decoration: BoxDecoration(
-                color: AppTheme.primaryColor,
-                borderRadius: const BorderRadius.vertical(
-                  top: Radius.circular(4),
+    
+    // Проверяем, есть ли данные
+    if (entries.isEmpty) {
+      return Container(
+        height: 200,
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                Icons.bar_chart,
+                size: 48,
+                color: Colors.grey[400],
+              ),
+              const SizedBox(height: 12),
+              Text(
+                'Нет данных для отображения',
+                style: AppTheme.bodyMedium.copyWith(
+                  color: Colors.grey[600],
                 ),
               ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              entry.key.substring(0, 3),
-              style: AppTheme.bodySmall.copyWith(
-                color: Colors.grey[600],
+            ],
+          ),
+        ),
+      );
+    }
+
+    // Находим максимальное значение, проверяем на валидность
+    final revenues = entries.map((e) => e.value).where((value) => value.isFinite && value > 0).toList();
+    if (revenues.isEmpty) {
+      return Container(
+        height: 200,
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                Icons.bar_chart,
+                size: 48,
+                color: Colors.grey[400],
               ),
+              const SizedBox(height: 12),
+              Text(
+                'Нет данных для отображения',
+                style: AppTheme.bodyMedium.copyWith(
+                  color: Colors.grey[600],
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    final maxRevenue = revenues.reduce((a, b) => a > b ? a : b);
+    
+    // Проверяем, что maxRevenue валидное число
+    if (maxRevenue <= 0 || !maxRevenue.isFinite) {
+      return Container(
+        height: 200,
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                Icons.error_outline,
+                size: 48,
+                color: Colors.grey[400],
+              ),
+              const SizedBox(height: 12),
+              Text(
+                'Ошибка в данных',
+                style: AppTheme.bodyMedium.copyWith(
+                  color: Colors.grey[600],
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.end,
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: entries.map((entry) {
+          // Безопасное вычисление высоты
+          double height = 20; // Минимальная высота
+          if (entry.value > 0 && entry.value.isFinite && maxRevenue > 0) {
+            height = ((entry.value / maxRevenue) * 160).clamp(20.0, 160.0);
+          }
+          
+          return Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 4),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                // Добавляем Tooltip для отображения точного значения
+                Tooltip(
+                  message: '${entry.key}: ${_formatPrice(entry.value)}',
+                  child: Container(
+                    width: 28,
+                    height: height,
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [
+                          AppTheme.primaryColor,
+                          AppTheme.primaryColor.withValues(alpha: 0.7),
+                        ],
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                      ),
+                      borderRadius: const BorderRadius.vertical(
+                        top: Radius.circular(6),
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: AppTheme.primaryColor.withValues(alpha: 0.3),
+                          blurRadius: 4,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 8),
+                SizedBox(
+                  width: 36,
+                  child: Text(
+                    entry.key.length >= 3 ? entry.key.substring(0, 3) : entry.key,
+                    style: AppTheme.bodySmall.copyWith(
+                      color: Colors.grey[600],
+                      fontSize: 10,
+                    ),
+                    textAlign: TextAlign.center,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ],
             ),
-          ],
-        );
-      }).toList(),
+          );
+        }).toList(),
+      ),
     );
   }
 

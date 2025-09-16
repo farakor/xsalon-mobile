@@ -16,42 +16,87 @@ class ServiceCategoryFilter extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      height: 50,
-      padding: const EdgeInsets.symmetric(horizontal: 16),
+    return SizedBox(
+      height: 40,
       child: ListView(
         scrollDirection: Axis.horizontal,
         children: [
           // Кнопка "Все"
           Padding(
             padding: const EdgeInsets.only(right: 8),
-            child: FilterChip(
-              label: const Text('Все'),
-              selected: selectedCategoryId == null,
-              onSelected: (selected) {
-                if (selected) {
-                  onCategorySelected(null);
-                }
-              },
-              selectedColor: AppTheme.primaryColor.withValues(alpha: 0.2),
-              checkmarkColor: AppTheme.primaryColor,
+            child: GestureDetector(
+              onTap: () => onCategorySelected(null),
+              child: Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 8,
+                ),
+                decoration: BoxDecoration(
+                  color: selectedCategoryId == null 
+                      ? AppTheme.primaryColor 
+                      : Colors.white,
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(
+                    color: selectedCategoryId == null 
+                        ? AppTheme.primaryColor 
+                        : AppTheme.borderColor,
+                    width: 1,
+                  ),
+                ),
+                child: Text(
+                  'Все',
+                  style: AppTheme.bodyMedium.copyWith(
+                    color: selectedCategoryId == null 
+                        ? Colors.white 
+                        : AppTheme.textSecondaryColor,
+                    fontWeight: selectedCategoryId == null 
+                        ? FontWeight.w500 
+                        : FontWeight.normal,
+                  ),
+                ),
+              ),
             ),
           ),
           // Категории
           ...categories.map((category) => Padding(
             padding: const EdgeInsets.only(right: 8),
-            child: FilterChip(
-              label: Text(category.name),
-              selected: selectedCategoryId == category.id,
-              onSelected: (selected) {
-                if (selected) {
-                  onCategorySelected(category.id);
-                } else {
+            child: GestureDetector(
+              onTap: () {
+                if (selectedCategoryId == category.id) {
                   onCategorySelected(null);
+                } else {
+                  onCategorySelected(category.id);
                 }
               },
-              selectedColor: AppTheme.primaryColor.withValues(alpha: 0.2),
-              checkmarkColor: AppTheme.primaryColor,
+              child: Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 8,
+                ),
+                decoration: BoxDecoration(
+                  color: selectedCategoryId == category.id 
+                      ? AppTheme.primaryColor 
+                      : Colors.white,
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(
+                    color: selectedCategoryId == category.id 
+                        ? AppTheme.primaryColor 
+                        : AppTheme.borderColor,
+                    width: 1,
+                  ),
+                ),
+                child: Text(
+                  category.name,
+                  style: AppTheme.bodyMedium.copyWith(
+                    color: selectedCategoryId == category.id 
+                        ? Colors.white 
+                        : AppTheme.textSecondaryColor,
+                    fontWeight: selectedCategoryId == category.id 
+                        ? FontWeight.w500 
+                        : FontWeight.normal,
+                  ),
+                ),
+              ),
             ),
           )),
         ],

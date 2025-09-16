@@ -1,13 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../core/constants/app_constants.dart';
-import '../../../data/models/staff_statistics.dart';
+import '../../../data/models/schedule_model.dart';
+import '../../../data/services/schedule_service.dart';
 import '../../theme/app_theme.dart';
 import '../../providers/auth_provider.dart';
+import '../../providers/staff_statistics_provider.dart';
 import 'widgets/profile_header.dart';
 import 'widgets/statistics_section.dart';
 import 'widgets/settings_section.dart';
+import 'widgets/quick_statistics_widget.dart';
 
 class StaffProfilePage extends ConsumerStatefulWidget {
   const StaffProfilePage({super.key});
@@ -19,40 +23,31 @@ class StaffProfilePage extends ConsumerStatefulWidget {
 class _StaffProfilePageState extends ConsumerState<StaffProfilePage>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
-
-  // Тестовые данные статистики
-  StaffStatistics get _mockStatistics => StaffStatistics(
-    totalAppointments: 156,
-    completedAppointments: 142,
-    cancelledAppointments: 8,
-    totalRevenue: 2850000,
-    averageRating: 4.8,
-    totalClients: 89,
-    repeatClients: 67,
-    serviceStats: {
-      'Женская стрижка': 45,
-      'Окрашивание волос': 32,
-      'Укладка': 28,
-      'Маникюр': 25,
-      'Косметология': 15,
-      'Массаж': 11,
-    },
-    monthlyRevenue: {
-      'Январь': 420000,
-      'Февраль': 380000,
-      'Март': 450000,
-      'Апрель': 520000,
-      'Май': 480000,
-      'Июнь': 600000,
-    },
-    periodStart: DateTime.now().subtract(const Duration(days: 180)),
-    periodEnd: DateTime.now(),
-  );
+  final ScheduleService _scheduleService = ScheduleService();
+  List<MasterSchedule> _masterSchedules = [];
+  bool _isLoadingSchedule = false;
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 3, vsync: this);
+    _loadMasterSchedule();
+  }
+
+  Future<void> _loadMasterSchedule() async {
+    try {
+      setState(() => _isLoadingSchedule = true);
+      
+      final masterId = await _scheduleService.getCurrentMasterId();
+      if (masterId != null) {
+        final schedules = await _scheduleService.getMasterSchedule(masterId);
+        setState(() => _masterSchedules = schedules);
+      }
+    } catch (e) {
+      print('Error loading master schedule: $e');
+    } finally {
+      setState(() => _isLoadingSchedule = false);
+    }
   }
 
   @override
@@ -75,100 +70,182 @@ class _StaffProfilePageState extends ConsumerState<StaffProfilePage>
     }
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Профиль'),
-        elevation: 0,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.edit),
-            onPressed: _editProfile,
-            tooltip: 'Редактировать профиль',
-          ),
-          PopupMenuButton<String>(
-            onSelected: (value) {
-              switch (value) {
-                case 'help':
-                  _showHelp();
-                  break;
-                case 'about':
-                  _showAbout();
-                  break;
-                case 'logout':
-                  _logout();
-                  break;
-              }
-            },
-            itemBuilder: (context) => [
-              const PopupMenuItem(
-                value: 'help',
-                child: Row(
-                  children: [
-                    Icon(Icons.help_outline),
-                    SizedBox(width: 8),
-                    Text('Помощь'),
-                  ],
-                ),
-              ),
-              const PopupMenuItem(
-                value: 'about',
-                child: Row(
-                  children: [
-                    Icon(Icons.info_outline),
-                    SizedBox(width: 8),
-                    Text('О приложении'),
-                  ],
-                ),
-              ),
-              const PopupMenuItem(
-                value: 'logout',
-                child: Row(
-                  children: [
-                    Icon(Icons.logout, color: Colors.red),
-                    SizedBox(width: 8),
-                    Text('Выйти'),
-                  ],
-                ),
-              ),
-            ],
+      backgroundColor: AppTheme.backgroundColor,
+      body: Column(
+        children: [
+          // Unified Header with Profile and Tabs
+          _buildUnifiedHeader(profile),
+          // Tab Content
+          Expanded(
+            child: TabBarView(
+              controller: _tabController,
+              children: [
+                _buildProfileTab(profile),
+                _buildStatisticsTab(),
+                _buildSettingsTab(),
+              ],
+            ),
           ),
         ],
-        bottom: TabBar(
-          controller: _tabController,
-          tabs: const [
-            Tab(text: 'Профиль', icon: Icon(Icons.person)),
-            Tab(text: 'Статистика', icon: Icon(Icons.analytics)),
-            Tab(text: 'Настройки', icon: Icon(Icons.settings)),
+      ),
+    );
+  }
+
+  Widget _buildUnifiedHeader(dynamic profile) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: const BorderRadius.only(
+          bottomLeft: Radius.circular(24),
+          bottomRight: Radius.circular(24),
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.04),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: SafeArea(
+        child: Column(
+          children: [
+            // Header with title and menu
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
+              child: Row(
+                children: [
+                  Text(
+                    'Профиль',
+                    style: AppTheme.headlineSmall.copyWith(
+                      fontWeight: FontWeight.w700,
+                      color: AppTheme.textPrimaryColor,
+                    ),
+                  ),
+                  const Spacer(),
+                  PopupMenuButton<String>(
+                    icon: Container(
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: AppTheme.backgroundColor,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: AppTheme.borderColor,
+                          width: 0.5,
+                        ),
+                      ),
+                      child: Icon(
+                        Icons.more_vert,
+                        color: AppTheme.textSecondaryColor,
+                        size: 18,
+                      ),
+                    ),
+                    onSelected: (value) {
+                      switch (value) {
+                        case 'help':
+                          _showHelp();
+                          break;
+                        case 'about':
+                          _showAbout();
+                          break;
+                        case 'logout':
+                          _logout();
+                          break;
+                      }
+                    },
+                    itemBuilder: (context) => [
+                      const PopupMenuItem(
+                        value: 'help',
+                        child: Row(
+                          children: [
+                            Icon(Icons.help_outline),
+                            SizedBox(width: 8),
+                            Text('Помощь'),
+                          ],
+                        ),
+                      ),
+                      const PopupMenuItem(
+                        value: 'about',
+                        child: Row(
+                          children: [
+                            Icon(Icons.info_outline),
+                            SizedBox(width: 8),
+                            Text('О приложении'),
+                          ],
+                        ),
+                      ),
+                      const PopupMenuItem(
+                        value: 'logout',
+                        child: Row(
+                          children: [
+                            Icon(Icons.logout, color: Colors.red),
+                            SizedBox(width: 8),
+                            Text('Выйти'),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+            // Profile Info
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 0, 20, 24),
+              child: ProfileHeader(profile: profile),
+            ),
+            // Tab Bar
+            Container(
+              margin: const EdgeInsets.fromLTRB(20, 0, 20, 20),
+              decoration: BoxDecoration(
+                color: AppTheme.backgroundColor,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(
+                  color: AppTheme.borderColor,
+                  width: 0.5,
+                ),
+              ),
+              child: TabBar(
+                controller: _tabController,
+                indicator: BoxDecoration(
+                  color: AppTheme.primaryColor,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                indicatorSize: TabBarIndicatorSize.tab,
+                dividerColor: Colors.transparent,
+                labelColor: Colors.white,
+                unselectedLabelColor: AppTheme.textSecondaryColor,
+                labelStyle: AppTheme.bodyMedium.copyWith(
+                  fontWeight: FontWeight.w500,
+                ),
+                unselectedLabelStyle: AppTheme.bodyMedium,
+                tabs: const [
+                  Tab(text: 'Профиль'),
+                  Tab(text: 'Статистика'),
+                  Tab(text: 'Настройки'),
+                ],
+              ),
+            ),
           ],
         ),
-      ),
-      body: TabBarView(
-        controller: _tabController,
-        children: [
-          _buildProfileTab(profile),
-          _buildStatisticsTab(),
-          _buildSettingsTab(),
-        ],
       ),
     );
   }
 
   Widget _buildProfileTab(dynamic profile) {
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.fromLTRB(20, 20, 20, 100),
       child: Column(
         children: [
-          // Profile Header
-          ProfileHeader(profile: profile),
-          const SizedBox(height: 24),
-          // Quick Stats
-          _buildQuickStats(),
-          const SizedBox(height: 24),
+          // Quick Stats (сохраняем оригинальный стиль)
+          const QuickStatisticsWidget(),
+          const SizedBox(height: 20),
           // Profile Information
           _buildProfileInfo(profile),
-          const SizedBox(height: 24),
+          const SizedBox(height: 16),
           // Working Hours
           _buildWorkingHours(),
-          const SizedBox(height: 24),
+          const SizedBox(height: 16),
           // Action Buttons
           _buildActionButtons(),
         ],
@@ -177,129 +254,68 @@ class _StaffProfilePageState extends ConsumerState<StaffProfilePage>
   }
 
   Widget _buildStatisticsTab() {
-    return StatisticsSection(statistics: _mockStatistics);
+    return Consumer(
+      builder: (context, ref, child) {
+        final statisticsAsync = ref.watch(staffStatisticsProvider);
+        
+        return statisticsAsync.when(
+          data: (statistics) => StatisticsSection(statistics: statistics),
+          loading: () => const Center(
+            child: Padding(
+              padding: EdgeInsets.all(32),
+              child: CircularProgressIndicator(),
+            ),
+          ),
+          error: (error, stack) => Center(
+            child: Padding(
+              padding: const EdgeInsets.all(32),
+              child: Column(
+                children: [
+                  Icon(
+                    Icons.error_outline,
+                    size: 64,
+                    color: Colors.red[400],
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    'Ошибка загрузки статистики',
+                    style: AppTheme.titleMedium,
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Попробуйте обновить страницу',
+                    style: AppTheme.bodyMedium.copyWith(
+                      color: Colors.grey[600],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
   }
 
   Widget _buildSettingsTab() {
     return const SettingsSection();
   }
 
-  Widget _buildQuickStats() {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [AppTheme.primaryColor.withValues(alpha: 0.1), Colors.white],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppTheme.primaryColor.withValues(alpha: 0.2)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Icon(Icons.trending_up, color: AppTheme.primaryColor),
-              const SizedBox(width: 8),
-              Text(
-                'Быстрая статистика',
-                style: AppTheme.titleMedium.copyWith(
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 16),
-          Row(
-            children: [
-              Expanded(
-                child: _buildQuickStatItem(
-                  'Записей сегодня',
-                  '8',
-                  Icons.event,
-                  Colors.blue,
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: _buildQuickStatItem(
-                  'Рейтинг',
-                  '${_mockStatistics.averageRating}',
-                  Icons.star,
-                  Colors.orange,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          Row(
-            children: [
-              Expanded(
-                child: _buildQuickStatItem(
-                  'Доход за месяц',
-                  _formatPrice(_mockStatistics.monthlyRevenue.values.last),
-                  Icons.attach_money,
-                  Colors.green,
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: _buildQuickStatItem(
-                  'Клиентов',
-                  '${_mockStatistics.totalClients}',
-                  Icons.people,
-                  Colors.purple,
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
 
-  Widget _buildQuickStatItem(String title, String value, IconData icon, Color color) {
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: color.withValues(alpha: 0.2)),
-      ),
-      child: Column(
-        children: [
-          Icon(icon, color: color, size: 20),
-          const SizedBox(height: 4),
-          Text(
-            value,
-            style: AppTheme.titleMedium.copyWith(
-              color: color,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          Text(
-            title,
-            style: AppTheme.bodySmall.copyWith(
-              color: Colors.grey[600],
-            ),
-            textAlign: TextAlign.center,
-          ),
-        ],
-      ),
-    );
-  }
 
   Widget _buildProfileInfo(dynamic profile) {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: AppTheme.borderColor,
+          width: 0.5,
+        ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
+            color: Colors.black.withValues(alpha: 0.02),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -310,12 +326,25 @@ class _StaffProfilePageState extends ConsumerState<StaffProfilePage>
         children: [
           Row(
             children: [
-              const Icon(Icons.info_outline, color: AppTheme.primaryColor),
-              const SizedBox(width: 8),
+              Container(
+                width: 32,
+                height: 32,
+                decoration: BoxDecoration(
+                  color: AppTheme.primaryColor.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Icon(
+                  Icons.info_outline,
+                  color: AppTheme.primaryColor,
+                  size: 18,
+                ),
+              ),
+              const SizedBox(width: 12),
               Text(
                 'Информация о профиле',
                 style: AppTheme.titleMedium.copyWith(
-                  fontWeight: FontWeight.bold,
+                  fontWeight: FontWeight.w600,
+                  color: AppTheme.textPrimaryColor,
                 ),
               ),
             ],
@@ -335,13 +364,17 @@ class _StaffProfilePageState extends ConsumerState<StaffProfilePage>
 
   Widget _buildWorkingHours() {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: AppTheme.borderColor,
+          width: 0.5,
+        ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
+            color: Colors.black.withValues(alpha: 0.02),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -352,29 +385,61 @@ class _StaffProfilePageState extends ConsumerState<StaffProfilePage>
         children: [
           Row(
             children: [
-              const Icon(Icons.schedule, color: AppTheme.primaryColor),
-              const SizedBox(width: 8),
+              Container(
+                width: 32,
+                height: 32,
+                decoration: BoxDecoration(
+                  color: AppTheme.primaryColor.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Icon(
+                  Icons.schedule,
+                  color: AppTheme.primaryColor,
+                  size: 18,
+                ),
+              ),
+              const SizedBox(width: 12),
               Text(
                 'Рабочие часы',
                 style: AppTheme.titleMedium.copyWith(
-                  fontWeight: FontWeight.bold,
+                  fontWeight: FontWeight.w600,
+                  color: AppTheme.textPrimaryColor,
                 ),
               ),
               const Spacer(),
-              TextButton(
-                onPressed: _editWorkingHours,
-                child: const Text('Изменить'),
+              Container(
+                height: 32,
+                decoration: BoxDecoration(
+                  color: AppTheme.backgroundColor,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: TextButton(
+                  onPressed: _editWorkingHours,
+                  style: TextButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                    minimumSize: Size.zero,
+                  ),
+                  child: Text(
+                    'Изменить',
+                    style: AppTheme.bodySmall.copyWith(
+                      color: AppTheme.primaryColor,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ),
               ),
             ],
           ),
           const SizedBox(height: 16),
-          _buildWorkingDayRow('Понедельник', '09:00 - 18:00'),
-          _buildWorkingDayRow('Вторник', '09:00 - 18:00'),
-          _buildWorkingDayRow('Среда', '09:00 - 18:00'),
-          _buildWorkingDayRow('Четверг', '09:00 - 18:00'),
-          _buildWorkingDayRow('Пятница', '09:00 - 18:00'),
-          _buildWorkingDayRow('Суббота', '10:00 - 16:00'),
-          _buildWorkingDayRow('Воскресенье', 'Выходной', isWorking: false),
+          if (_isLoadingSchedule)
+            const Center(
+              child: Padding(
+                padding: EdgeInsets.all(20),
+                child: CircularProgressIndicator(),
+              ),
+            )
+          else
+            ..._buildWorkingDaysFromSchedule(),
         ],
       ),
     );
@@ -385,15 +450,13 @@ class _StaffProfilePageState extends ConsumerState<StaffProfilePage>
       padding: const EdgeInsets.only(bottom: 8),
       child: Row(
         children: [
-          SizedBox(
-            width: 100,
-            child: Text(
-              day,
-              style: AppTheme.bodyMedium.copyWith(
-                fontWeight: FontWeight.w500,
-              ),
+          Text(
+            day,
+            style: AppTheme.bodyMedium.copyWith(
+              fontWeight: FontWeight.w500,
             ),
           ),
+          const Spacer(),
           Text(
             hours,
             style: AppTheme.bodyMedium.copyWith(
@@ -409,48 +472,37 @@ class _StaffProfilePageState extends ConsumerState<StaffProfilePage>
   Widget _buildActionButtons() {
     return Column(
       children: [
-        SizedBox(
+        Container(
           width: double.infinity,
-          child: ElevatedButton.icon(
-            onPressed: _editProfile,
-            icon: const Icon(Icons.edit),
-            label: const Text('Редактировать профиль'),
-            style: ElevatedButton.styleFrom(
-              padding: const EdgeInsets.all(16),
+          height: 52,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: Colors.red.withValues(alpha: 0.3),
+              width: 0.5,
             ),
           ),
-        ),
-        const SizedBox(height: 12),
-        Row(
-          children: [
-            Expanded(
-              child: OutlinedButton.icon(
-                onPressed: _changePassword,
-                icon: const Icon(Icons.lock),
-                label: const Text('Сменить пароль'),
-              ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: OutlinedButton.icon(
-                onPressed: _exportData,
-                icon: const Icon(Icons.download),
-                label: const Text('Экспорт данных'),
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 12),
-        SizedBox(
-          width: double.infinity,
           child: OutlinedButton.icon(
             onPressed: _logout,
-            icon: const Icon(Icons.logout, color: Colors.red),
-            label: const Text('Выйти из аккаунта'),
+            icon: const Icon(Icons.logout, color: Colors.red, size: 18),
+            label: Text(
+              'Выйти из аккаунта',
+              style: AppTheme.bodyMedium.copyWith(
+                color: Colors.red,
+                fontWeight: FontWeight.w500,
+                fontSize: 14,
+              ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
             style: OutlinedButton.styleFrom(
-              foregroundColor: Colors.red,
-              side: const BorderSide(color: Colors.red),
-              padding: const EdgeInsets.all(16),
+              backgroundColor: Colors.transparent,
+              side: BorderSide.none,
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
             ),
           ),
         ),
@@ -460,27 +512,42 @@ class _StaffProfilePageState extends ConsumerState<StaffProfilePage>
 
   Widget _buildInfoRow(IconData icon, String label, String value) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.only(bottom: 16),
       child: Row(
         children: [
-          Icon(icon, size: 20, color: Colors.grey[600]),
-          const SizedBox(width: 12),
-          Expanded(
-            flex: 2,
-            child: Text(
-              label,
-              style: AppTheme.bodyMedium.copyWith(
-                color: Colors.grey[600],
-              ),
+          Container(
+            width: 24,
+            height: 24,
+            decoration: BoxDecoration(
+              color: AppTheme.textSecondaryColor.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(6),
+            ),
+            child: Icon(
+              icon,
+              size: 14,
+              color: AppTheme.textSecondaryColor,
             ),
           ),
+          const SizedBox(width: 12),
           Expanded(
-            flex: 3,
-            child: Text(
-              value,
-              style: AppTheme.bodyMedium.copyWith(
-                fontWeight: FontWeight.w500,
-              ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  label,
+                  style: AppTheme.bodySmall.copyWith(
+                    color: AppTheme.textSecondaryColor,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  value,
+                  style: AppTheme.bodyMedium.copyWith(
+                    fontWeight: FontWeight.w500,
+                    color: AppTheme.textPrimaryColor,
+                  ),
+                ),
+              ],
             ),
           ),
         ],
@@ -509,32 +576,77 @@ class _StaffProfilePageState extends ConsumerState<StaffProfilePage>
     return '${_formatDate(dateTime)} в ${dateTime.hour.toString().padLeft(2, '0')}:${dateTime.minute.toString().padLeft(2, '0')}';
   }
 
-  String _formatPrice(double price) {
-    return '${(price / 1000).toStringAsFixed(0)} тыс. сум';
+  String _formatTimeWithoutSeconds(String time) {
+    // Убираем секунды из времени (например, "09:00:00" -> "09:00")
+    if (time.contains(':')) {
+      final parts = time.split(':');
+      if (parts.length >= 2) {
+        return '${parts[0]}:${parts[1]}';
+      }
+    }
+    return time;
   }
 
-  void _editProfile() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Редактирование профиля - в разработке')),
-    );
+
+  List<Widget> _buildWorkingDaysFromSchedule() {
+    // Порядок дней недели для отображения
+    const daysOrder = [
+      'monday', 'tuesday', 'wednesday', 'thursday', 
+      'friday', 'saturday', 'sunday'
+    ];
+    
+    const dayNames = {
+      'monday': 'Понедельник',
+      'tuesday': 'Вторник', 
+      'wednesday': 'Среда',
+      'thursday': 'Четверг',
+      'friday': 'Пятница',
+      'saturday': 'Суббота',
+      'sunday': 'Воскресенье',
+    };
+
+    if (_masterSchedules.isEmpty) {
+      // Показываем стандартное расписание, если данных нет
+      return [
+        _buildWorkingDayRow('Понедельник', '09:00 - 18:00'),
+        _buildWorkingDayRow('Вторник', '09:00 - 18:00'),
+        _buildWorkingDayRow('Среда', '09:00 - 18:00'),
+        _buildWorkingDayRow('Четверг', '09:00 - 18:00'),
+        _buildWorkingDayRow('Пятница', '09:00 - 18:00'),
+        _buildWorkingDayRow('Суббота', '10:00 - 16:00'),
+        _buildWorkingDayRow('Воскресенье', 'Выходной', isWorking: false),
+      ];
+    }
+
+    // Создаем карту расписания для быстрого поиска
+    final scheduleMap = <String, MasterSchedule>{};
+    for (final schedule in _masterSchedules) {
+      scheduleMap[schedule.dayOfWeek] = schedule;
+    }
+
+    // Строим виджеты для каждого дня
+    return daysOrder.map((englishDay) {
+      final dayName = dayNames[englishDay]!;
+      final schedule = scheduleMap[englishDay];
+      
+      if (schedule == null || !schedule.isWorking) {
+        return _buildWorkingDayRow(dayName, 'Выходной', isWorking: false);
+      }
+      
+      final startTime = _formatTimeWithoutSeconds(schedule.startTime ?? '09:00');
+      final endTime = _formatTimeWithoutSeconds(schedule.endTime ?? '18:00');
+      final hours = '$startTime - $endTime';
+      
+      return _buildWorkingDayRow(dayName, hours, isWorking: true);
+    }).toList();
   }
 
   void _editWorkingHours() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Изменение рабочих часов - в разработке')),
-    );
-  }
-
-  void _changePassword() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Смена пароля - в разработке')),
-    );
-  }
-
-  void _exportData() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Экспорт данных - в разработке')),
-    );
+    // Навигация к экрану настроек расписания
+    context.push(AppConstants.scheduleSettingsRoute).then((_) {
+      // Обновляем данные после возврата с экрана настроек
+      _loadMasterSchedule();
+    });
   }
 
   void _showHelp() {
@@ -584,20 +696,105 @@ class _StaffProfilePageState extends ConsumerState<StaffProfilePage>
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Выход из аккаунта'),
-        content: const Text('Вы уверены, что хотите выйти из аккаунта?'),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
+        title: Row(
+          children: [
+            Container(
+              width: 32,
+              height: 32,
+              decoration: BoxDecoration(
+                color: Colors.red.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: const Icon(
+                Icons.logout,
+                color: Colors.red,
+                size: 18,
+              ),
+            ),
+            const SizedBox(width: 12),
+            Text(
+              'Выход из аккаунта',
+              style: AppTheme.titleMedium.copyWith(
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ],
+        ),
+        content: Text(
+          'Вы уверены, что хотите выйти из аккаунта?',
+          style: AppTheme.bodyMedium.copyWith(
+            color: AppTheme.textSecondaryColor,
+          ),
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Отмена'),
+            style: TextButton.styleFrom(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
+            child: Text(
+              'Отмена',
+              style: AppTheme.bodyMedium.copyWith(
+                color: AppTheme.textSecondaryColor,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
           ),
           TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-              ref.read(authProvider.notifier).signOut();
+            onPressed: () async {
+              // Сохраняем ссылку на GoRouter перед любыми операциями
+              final router = GoRouter.of(context);
+              
+              Navigator.of(context).pop(); // Закрываем диалог подтверждения
+              
+              try {
+                // Выполняем выход из аккаунта
+                await ref.read(authProvider.notifier).signOut();
+                
+                // Ждем, пока состояние действительно изменится
+                int attempts = 0;
+                while (attempts < 10) {
+                  await Future.delayed(const Duration(milliseconds: 100));
+                  final authState = ref.read(authProvider);
+                  print('Попытка $attempts: состояние ${authState.status}');
+                  
+                  if (authState.status == AuthStatus.unauthenticated) {
+                    print('Состояние изменилось, переходим на экран авторизации');
+                    break;
+                  }
+                  attempts++;
+                }
+                
+                // Перенаправление на экран авторизации используя сохраненную ссылку
+                router.go(AppConstants.authRoute);
+              } catch (error) {
+                // Логируем ошибку, но не показываем пользователю
+                print('Ошибка при выходе из аккаунта: $error');
+                // В случае ошибки все равно пытаемся перейти на экран авторизации
+                router.go(AppConstants.authRoute);
+              }
             },
-            style: TextButton.styleFrom(foregroundColor: Colors.red),
-            child: const Text('Выйти'),
+            style: TextButton.styleFrom(
+              foregroundColor: Colors.white,
+              backgroundColor: Colors.red,
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
+            child: Text(
+              'Выйти',
+              style: AppTheme.bodyMedium.copyWith(
+                color: Colors.white,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
           ),
         ],
       ),

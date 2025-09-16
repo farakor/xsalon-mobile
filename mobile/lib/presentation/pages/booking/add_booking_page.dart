@@ -68,14 +68,24 @@ class _AddBookingPageState extends ConsumerState<AddBookingPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppTheme.backgroundColor,
       appBar: AppBar(
         title: const Text('Новая запись'),
+        backgroundColor: Colors.white,
         elevation: 0,
+        shadowColor: Colors.black.withValues(alpha: 0.02),
+        surfaceTintColor: Colors.white,
         actions: [
           if (_currentStep > 0)
             TextButton(
               onPressed: _previousStep,
-              child: const Text('Назад'),
+              child: Text(
+                'Назад',
+                style: AppTheme.bodyMedium.copyWith(
+                  color: AppTheme.primaryColor,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
             ),
         ],
       ),
@@ -105,13 +115,19 @@ class _AddBookingPageState extends ConsumerState<AddBookingPage> {
 
   Widget _buildProgressIndicator() {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Theme.of(context).scaffoldBackgroundColor,
+        color: Colors.white,
+        border: Border(
+          bottom: BorderSide(
+            color: AppTheme.borderColor,
+            width: 0.5,
+          ),
+        ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 4,
+            color: Colors.black.withValues(alpha: 0.02),
+            blurRadius: 8,
             offset: const Offset(0, 2),
           ),
         ],
@@ -144,7 +160,7 @@ class _AddBookingPageState extends ConsumerState<AddBookingPage> {
               );
             }),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 16),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: List.generate(_stepTitles.length, (index) {
@@ -157,8 +173,8 @@ class _AddBookingPageState extends ConsumerState<AddBookingPage> {
                   style: AppTheme.bodySmall.copyWith(
                     color: isCompleted || isCurrent
                         ? AppTheme.primaryColor
-                        : Colors.grey[600],
-                    fontWeight: isCurrent ? FontWeight.bold : FontWeight.normal,
+                        : AppTheme.textSecondaryColor,
+                    fontWeight: isCurrent ? FontWeight.w600 : FontWeight.normal,
                   ),
                   textAlign: TextAlign.center,
                 ),
@@ -172,58 +188,100 @@ class _AddBookingPageState extends ConsumerState<AddBookingPage> {
 
   Widget _buildClientStep() {
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.fromLTRB(20, 20, 20, 100),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'Шаг 1: Выберите клиента',
-            style: AppTheme.headlineSmall.copyWith(
-              fontWeight: FontWeight.bold,
-            ),
+          // Заголовок секции с иконкой
+          Row(
+            children: [
+              Container(
+                width: 32,
+                height: 32,
+                decoration: BoxDecoration(
+                  color: AppTheme.primaryColor.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: const Icon(
+                  Icons.person,
+                  color: AppTheme.primaryColor,
+                  size: 18,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Text(
+                'Выберите клиента',
+                style: AppTheme.titleMedium.copyWith(
+                  fontWeight: FontWeight.w600,
+                  color: AppTheme.textPrimaryColor,
+                ),
+              ),
+            ],
           ),
           const SizedBox(height: 8),
           Text(
             'Найдите существующего клиента или добавьте нового',
             style: AppTheme.bodyMedium.copyWith(
-              color: Colors.grey[600],
+              color: AppTheme.textSecondaryColor,
             ),
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: 16),
           
-          // Toggle between existing and new client
-          Row(
-            children: [
-              Expanded(
-                child: _buildToggleButton(
-                  'Существующий клиент',
-                  !_isNewClient,
-                  () => setState(() => _isNewClient = false),
-                ),
+          // Toggle between existing and new client в карточке
+          Container(
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(
+                color: AppTheme.borderColor,
+                width: 0.5,
               ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: _buildToggleButton(
-                  'Новый клиент',
-                  _isNewClient,
-                  () => setState(() => _isNewClient = true),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.02),
+                  blurRadius: 8,
+                  offset: const Offset(0, 2),
                 ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 24),
-          
-          if (_isNewClient)
-            _buildNewClientForm()
-          else
-            ClientSelector(
-              selectedClient: _selectedClient,
-              onClientSelected: (client) {
-                setState(() {
-                  _selectedClient = client;
-                });
-              },
+              ],
             ),
+            child: Column(
+              children: [
+                Row(
+                  children: [
+                    Expanded(
+                      child: _buildToggleButton(
+                        'Существующий клиент',
+                        !_isNewClient,
+                        () => setState(() => _isNewClient = false),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: _buildToggleButton(
+                        'Новый клиент',
+                        _isNewClient,
+                        () => setState(() => _isNewClient = true),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 20),
+                
+                if (_isNewClient)
+                  _buildNewClientForm()
+                else
+                  ClientSelector(
+                    selectedClient: _selectedClient,
+                    onClientSelected: (client) {
+                      setState(() {
+                        _selectedClient = client;
+                      });
+                    },
+                  ),
+              ],
+            ),
+          ),
         ],
       ),
     );
@@ -231,32 +289,70 @@ class _AddBookingPageState extends ConsumerState<AddBookingPage> {
 
   Widget _buildServiceStep() {
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.fromLTRB(20, 20, 20, 100),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'Шаг 2: Выберите услугу',
-            style: AppTheme.headlineSmall.copyWith(
-              fontWeight: FontWeight.bold,
-            ),
+          // Заголовок секции с иконкой
+          Row(
+            children: [
+              Container(
+                width: 32,
+                height: 32,
+                decoration: BoxDecoration(
+                  color: AppTheme.primaryColor.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: const Icon(
+                  Icons.design_services,
+                  color: AppTheme.primaryColor,
+                  size: 18,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Text(
+                'Выберите услугу',
+                style: AppTheme.titleMedium.copyWith(
+                  fontWeight: FontWeight.w600,
+                  color: AppTheme.textPrimaryColor,
+                ),
+              ),
+            ],
           ),
           const SizedBox(height: 8),
           Text(
             'Выберите услугу из доступных категорий',
             style: AppTheme.bodyMedium.copyWith(
-              color: Colors.grey[600],
+              color: AppTheme.textSecondaryColor,
             ),
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: 16),
           
-          ServiceSelector(
-            selectedServices: _selectedServices,
-            onServicesChanged: (services) {
-              setState(() {
-                _selectedServices = services;
-              });
-            },
+          Container(
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(
+                color: AppTheme.borderColor,
+                width: 0.5,
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.02),
+                  blurRadius: 8,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+            ),
+            child: ServiceSelector(
+              selectedServices: _selectedServices,
+              onServicesChanged: (services) {
+                setState(() {
+                  _selectedServices = services;
+                });
+              },
+            ),
           ),
         ],
       ),
@@ -265,39 +361,77 @@ class _AddBookingPageState extends ConsumerState<AddBookingPage> {
 
   Widget _buildTimeStep() {
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.fromLTRB(20, 20, 20, 100),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'Шаг 3: Выберите время',
-            style: AppTheme.headlineSmall.copyWith(
-              fontWeight: FontWeight.bold,
-            ),
+          // Заголовок секции с иконкой
+          Row(
+            children: [
+              Container(
+                width: 32,
+                height: 32,
+                decoration: BoxDecoration(
+                  color: AppTheme.primaryColor.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: const Icon(
+                  Icons.schedule,
+                  color: AppTheme.primaryColor,
+                  size: 18,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Text(
+                'Выберите время',
+                style: AppTheme.titleMedium.copyWith(
+                  fontWeight: FontWeight.w600,
+                  color: AppTheme.textPrimaryColor,
+                ),
+              ),
+            ],
           ),
           const SizedBox(height: 8),
           Text(
             'Выберите удобную дату и время для записи',
             style: AppTheme.bodyMedium.copyWith(
-              color: Colors.grey[600],
+              color: AppTheme.textSecondaryColor,
             ),
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: 16),
           
-          TimeSelector(
-            selectedDate: _selectedDate,
-            selectedTime: _selectedTime,
-            serviceDuration: _getTotalDuration(),
-            onDateSelected: (date) {
-              setState(() {
-                _selectedDate = date;
-              });
-            },
-            onTimeSelected: (time) {
-              setState(() {
-                _selectedTime = time;
-              });
-            },
+          Container(
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(
+                color: AppTheme.borderColor,
+                width: 0.5,
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.02),
+                  blurRadius: 8,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+            ),
+            child: TimeSelector(
+              selectedDate: _selectedDate,
+              selectedTime: _selectedTime,
+              serviceDuration: _getTotalDuration(),
+              onDateSelected: (date) {
+                setState(() {
+                  _selectedDate = date;
+                });
+              },
+              onTimeSelected: (time) {
+                setState(() {
+                  _selectedTime = time;
+                });
+              },
+            ),
           ),
         ],
       ),
@@ -306,37 +440,126 @@ class _AddBookingPageState extends ConsumerState<AddBookingPage> {
 
   Widget _buildConfirmationStep() {
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.fromLTRB(20, 20, 20, 100),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'Шаг 4: Подтверждение',
-            style: AppTheme.headlineSmall.copyWith(
-              fontWeight: FontWeight.bold,
-            ),
+          // Заголовок секции с иконкой
+          Row(
+            children: [
+              Container(
+                width: 32,
+                height: 32,
+                decoration: BoxDecoration(
+                  color: AppTheme.primaryColor.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: const Icon(
+                  Icons.check_circle,
+                  color: AppTheme.primaryColor,
+                  size: 18,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Text(
+                'Подтверждение',
+                style: AppTheme.titleMedium.copyWith(
+                  fontWeight: FontWeight.w600,
+                  color: AppTheme.textPrimaryColor,
+                ),
+              ),
+            ],
           ),
           const SizedBox(height: 8),
           Text(
             'Проверьте данные записи перед созданием',
             style: AppTheme.bodyMedium.copyWith(
-              color: Colors.grey[600],
+              color: AppTheme.textSecondaryColor,
             ),
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: 16),
           
           _buildBookingSummary(),
           
-          const SizedBox(height: 24),
+          const SizedBox(height: 16),
           
-          // Notes field
-          TextField(
-            controller: _notesController,
-            maxLines: 3,
-            decoration: const InputDecoration(
-              labelText: 'Заметки (необязательно)',
-              hintText: 'Дополнительная информация о записи...',
-              border: OutlineInputBorder(),
+          // Notes field в карточке
+          Container(
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(
+                color: AppTheme.borderColor,
+                width: 0.5,
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.02),
+                  blurRadius: 8,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Container(
+                      width: 32,
+                      height: 32,
+                      decoration: BoxDecoration(
+                        color: AppTheme.primaryColor.withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: const Icon(
+                        Icons.note_add,
+                        color: AppTheme.primaryColor,
+                        size: 18,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Text(
+                      'Заметки',
+                      style: AppTheme.titleMedium.copyWith(
+                        fontWeight: FontWeight.w600,
+                        color: AppTheme.textPrimaryColor,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                TextField(
+                  controller: _notesController,
+                  maxLines: 3,
+                  decoration: InputDecoration(
+                    hintText: 'Дополнительная информация о записи...',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide(
+                        color: AppTheme.borderColor,
+                        width: 0.5,
+                      ),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide(
+                        color: AppTheme.borderColor,
+                        width: 0.5,
+                      ),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: const BorderSide(
+                        color: AppTheme.primaryColor,
+                        width: 1,
+                      ),
+                    ),
+                    contentPadding: const EdgeInsets.all(16),
+                  ),
+                ),
+              ],
             ),
           ),
         ],
@@ -370,21 +593,23 @@ class _AddBookingPageState extends ConsumerState<AddBookingPage> {
   }
 
   Widget _buildToggleButton(String text, bool isSelected, VoidCallback onTap) {
-    return GestureDetector(
+    return InkWell(
       onTap: onTap,
+      borderRadius: BorderRadius.circular(12),
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
         decoration: BoxDecoration(
-          color: isSelected ? AppTheme.primaryColor : Colors.grey[100],
-          borderRadius: BorderRadius.circular(8),
+          color: isSelected ? AppTheme.primaryColor : Colors.grey.withValues(alpha: 0.1),
+          borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: isSelected ? AppTheme.primaryColor : Colors.grey[300]!,
+            color: isSelected ? AppTheme.primaryColor : AppTheme.borderColor,
+            width: 0.5,
           ),
         ),
         child: Text(
           text,
           style: AppTheme.bodyMedium.copyWith(
-            color: isSelected ? Colors.white : Colors.grey[700],
+            color: isSelected ? Colors.white : AppTheme.textSecondaryColor,
             fontWeight: isSelected ? FontWeight.w500 : FontWeight.normal,
           ),
           textAlign: TextAlign.center,
@@ -418,13 +643,17 @@ class _AddBookingPageState extends ConsumerState<AddBookingPage> {
         : null;
 
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: AppTheme.borderColor,
+          width: 0.5,
+        ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
+            color: Colors.black.withValues(alpha: 0.02),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -435,12 +664,25 @@ class _AddBookingPageState extends ConsumerState<AddBookingPage> {
         children: [
           Row(
             children: [
-              const Icon(Icons.event, color: AppTheme.primaryColor),
-              const SizedBox(width: 8),
+              Container(
+                width: 32,
+                height: 32,
+                decoration: BoxDecoration(
+                  color: AppTheme.primaryColor.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: const Icon(
+                  Icons.event,
+                  color: AppTheme.primaryColor,
+                  size: 18,
+                ),
+              ),
+              const SizedBox(width: 12),
               Text(
                 'Детали записи',
                 style: AppTheme.titleMedium.copyWith(
-                  fontWeight: FontWeight.bold,
+                  fontWeight: FontWeight.w600,
+                  color: AppTheme.textPrimaryColor,
                 ),
               ),
             ],
@@ -528,13 +770,19 @@ class _AddBookingPageState extends ConsumerState<AddBookingPage> {
 
   Widget _buildBottomActions() {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: Colors.white,
+        border: Border(
+          top: BorderSide(
+            color: AppTheme.borderColor,
+            width: 0.5,
+          ),
+        ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 4,
+            color: Colors.black.withValues(alpha: 0.02),
+            blurRadius: 8,
             offset: const Offset(0, -2),
           ),
         ],
@@ -545,25 +793,62 @@ class _AddBookingPageState extends ConsumerState<AddBookingPage> {
             Expanded(
               child: OutlinedButton(
                 onPressed: _previousStep,
-                child: const Text('Назад'),
+                style: OutlinedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  side: BorderSide(
+                    color: AppTheme.borderColor,
+                    width: 0.5,
+                  ),
+                ),
+                child: Text(
+                  'Назад',
+                  style: AppTheme.bodyMedium.copyWith(
+                    color: AppTheme.textSecondaryColor,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
               ),
             ),
           if (_currentStep > 0)
             const SizedBox(width: 16),
           Expanded(
             flex: 2,
-            child: ElevatedButton(
-              onPressed: _canProceed() ? _nextStep : null,
-              child: _isLoading
-                  ? const SizedBox(
-                      width: 20,
-                      height: 20,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2,
-                        valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+            child: Container(
+              height: 48,
+              decoration: BoxDecoration(
+                gradient: _canProceed() ? AppTheme.primaryGradient : null,
+                color: !_canProceed() ? Colors.grey.withValues(alpha: 0.3) : null,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: ElevatedButton(
+                onPressed: _canProceed() ? _nextStep : null,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.transparent,
+                  shadowColor: Colors.transparent,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                child: _isLoading
+                    ? const SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                        ),
+                      )
+                    : Text(
+                        _currentStep == 3 ? 'Создать запись' : 'Далее',
+                        style: AppTheme.bodyMedium.copyWith(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w500,
+                        ),
                       ),
-                    )
-                  : Text(_currentStep == 3 ? 'Создать запись' : 'Далее'),
+              ),
             ),
           ),
         ],

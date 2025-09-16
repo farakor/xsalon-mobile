@@ -22,16 +22,328 @@ class WeekScheduleView extends StatelessWidget {
     final weekStart = _getWeekStart(selectedDate);
     final weekDays = List.generate(7, (index) => weekStart.add(Duration(days: index)));
 
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(16),
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.08),
+            blurRadius: 20,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
       child: Column(
         children: [
-          // Week Summary
-          _buildWeekSummary(),
-          const SizedBox(height: 16),
+          // Modern Week Summary
+          _buildModernWeekSummary(),
           // Week Grid
-          _buildWeekGrid(weekDays),
+          Expanded(
+            child: _buildModernWeekGrid(weekDays),
+          ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildModernWeekSummary() {
+    final totalAppointments = appointments.length;
+    final totalRevenue = appointments.fold<double>(
+      0,
+      (sum, appointment) => sum + appointment.price,
+    );
+
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            Color(0xFF667EEA),
+            Color(0xFF764BA2),
+          ],
+        ),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: _buildSummaryCard(
+              'Записей на неделю',
+              '$totalAppointments',
+              Icons.event_note,
+            ),
+          ),
+          const SizedBox(width: 16),
+          Container(
+            width: 1,
+            height: 50,
+            color: Colors.white.withValues(alpha: 0.3),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: _buildSummaryCard(
+              'Доход за неделю',
+              _formatPrice(totalRevenue),
+              Icons.attach_money,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSummaryCard(String label, String value, IconData icon) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: Colors.white.withValues(alpha: 0.2),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Icon(
+                icon,
+                color: Colors.white,
+                size: 16,
+              ),
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                label,
+                style: AppTheme.bodySmall.copyWith(
+                  color: Colors.white.withValues(alpha: 0.8),
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 8),
+        Text(
+          value,
+          style: AppTheme.headlineSmall.copyWith(
+            color: Colors.white,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildModernWeekGrid(List<DateTime> weekDays) {
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(20),
+      child: Column(
+        children: weekDays.map((day) => _buildModernDayRow(day)).toList(),
+      ),
+    );
+  }
+
+  Widget _buildModernDayRow(DateTime day) {
+    final dayAppointments = appointments.where((appointment) =>
+        _isSameDay(appointment.startTime, day)).toList();
+    
+    final isToday = _isSameDay(day, DateTime.now());
+    final isSelected = _isSameDay(day, selectedDate);
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      decoration: BoxDecoration(
+        color: isSelected ? AppTheme.primaryColor.withValues(alpha: 0.05) : AppTheme.backgroundColor,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: isSelected ? AppTheme.primaryColor.withValues(alpha: 0.3) : AppTheme.borderColor,
+          width: isSelected ? 2 : 1,
+        ),
+      ),
+      child: InkWell(
+        onTap: () => onDateTap(day),
+        borderRadius: BorderRadius.circular(16),
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Row(
+            children: [
+              // Day info
+              Container(
+                width: 70,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      _getDayName(day),
+                      style: AppTheme.bodySmall.copyWith(
+                        color: isToday ? AppTheme.primaryColor : AppTheme.textSecondaryColor,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: isToday ? AppTheme.primaryColor : AppTheme.textSecondaryColor,
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Text(
+                        '${day.day}',
+                        style: AppTheme.titleSmall.copyWith(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              
+              const SizedBox(width: 16),
+              
+              // Appointments
+              Expanded(
+                child: dayAppointments.isEmpty
+                    ? Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              color: AppTheme.textSecondaryColor.withValues(alpha: 0.1),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Icon(
+                              Icons.free_breakfast,
+                              color: AppTheme.textSecondaryColor,
+                              size: 16,
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Text(
+                            'Свободный день',
+                            style: AppTheme.bodyMedium.copyWith(
+                              color: AppTheme.textSecondaryColor,
+                              fontStyle: FontStyle.italic,
+                            ),
+                          ),
+                        ],
+                      )
+                    : Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                decoration: BoxDecoration(
+                                  color: AppTheme.primaryColor.withValues(alpha: 0.1),
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: Text(
+                                  '${dayAppointments.length} записей',
+                                  style: AppTheme.bodySmall.copyWith(
+                                    color: AppTheme.primaryColor,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 8),
+                          Wrap(
+                            spacing: 6,
+                            runSpacing: 6,
+                            children: dayAppointments.take(2).map((appointment) =>
+                                _buildModernAppointmentChip(appointment)).toList(),
+                          ),
+                          if (dayAppointments.length > 2)
+                            Padding(
+                              padding: const EdgeInsets.only(top: 6),
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                decoration: BoxDecoration(
+                                  color: AppTheme.textSecondaryColor.withValues(alpha: 0.1),
+                                  borderRadius: BorderRadius.circular(6),
+                                ),
+                                child: Text(
+                                  '+${dayAppointments.length - 2} еще',
+                                  style: AppTheme.bodySmall.copyWith(
+                                    color: AppTheme.textSecondaryColor,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ),
+                            ),
+                        ],
+                      ),
+              ),
+              
+              // Selection indicator
+              if (isSelected)
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: AppTheme.primaryColor,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: const Icon(
+                    Icons.check,
+                    color: Colors.white,
+                    size: 16,
+                  ),
+                ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildModernAppointmentChip(Appointment appointment) {
+    return GestureDetector(
+      onTap: () => onAppointmentTap(appointment),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [
+              _getStatusColor(appointment.status),
+              _getStatusColor(appointment.status).withValues(alpha: 0.8),
+            ],
+          ),
+          borderRadius: BorderRadius.circular(10),
+          boxShadow: [
+            BoxShadow(
+              color: _getStatusColor(appointment.status).withValues(alpha: 0.3),
+              blurRadius: 4,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 6,
+              height: 6,
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                shape: BoxShape.circle,
+              ),
+            ),
+            const SizedBox(width: 6),
+            Text(
+              '${_formatTime(appointment.startTime)} ${appointment.serviceName}',
+              style: AppTheme.bodySmall.copyWith(
+                color: Colors.white,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -295,17 +607,17 @@ class WeekScheduleView extends StatelessWidget {
   Color _getStatusColor(AppointmentStatus status) {
     switch (status) {
       case AppointmentStatus.pending:
-        return Colors.orange;
+        return const Color(0xFFFF9500); // Modern orange
       case AppointmentStatus.confirmed:
-        return Colors.green;
+        return const Color(0xFF34C759); // Modern green
       case AppointmentStatus.inProgress:
-        return Colors.blue;
+        return const Color(0xFF007AFF); // Modern blue
       case AppointmentStatus.completed:
-        return Colors.teal;
+        return const Color(0xFF30D158); // Modern teal
       case AppointmentStatus.cancelled:
-        return Colors.red;
+        return const Color(0xFFFF3B30); // Modern red
       case AppointmentStatus.noShow:
-        return Colors.grey;
+        return const Color(0xFF8E8E93); // Modern grey
     }
   }
 

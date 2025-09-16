@@ -1,22 +1,27 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class AppTheme {
-  // Colors
-  static const Color primaryColor = Color(0xFF6C5CE7);
-  static const Color secondaryColor = Color(0xFFA29BFE);
-  static const Color accentColor = Color(0xFFFF7675);
-  static const Color backgroundColor = Color(0xFFF8F9FA);
+  // Modern Colors - Professional Palette
+  static const Color primaryColor = Color(0xFF667EEA);
+  static const Color secondaryColor = Color(0xFF764BA2);
+  static const Color accentColor = Color(0xFFFF6B6B);
+  static const Color backgroundColor = Color(0xFFF8FAFC);
   static const Color surfaceColor = Color(0xFFFFFFFF);
-  static const Color errorColor = Color(0xFFE74C3C);
-  static const Color successColor = Color(0xFF00B894);
-  static const Color warningColor = Color(0xFFF39C12);
-  static const Color textPrimaryColor = Color(0xFF2D3436);
-  static const Color textSecondaryColor = Color(0xFF636E72);
-  static const Color borderColor = Color(0xFFDDD6FE);
-  static const Color dividerColor = Color(0xFFE9ECEF);
+  static const Color errorColor = Color(0xFFEF4444);
+  static const Color successColor = Color(0xFF10B981);
+  static const Color warningColor = Color(0xFFF59E0B);
+  static const Color textPrimaryColor = Color(0xFF1E293B);
+  static const Color textSecondaryColor = Color(0xFF64748B);
+  static const Color borderColor = Color(0xFFE2E8F0);
+  static const Color dividerColor = Color(0xFFF1F5F9);
   
-  // Gradients
+  // Additional modern colors
+  static const Color cardColor = Color(0xFFFFFFFF);
+  static const Color shadowColor = Color(0x1A000000);
+  
+  // Modern Gradients
   static const LinearGradient primaryGradient = LinearGradient(
     colors: [primaryColor, secondaryColor],
     begin: Alignment.topLeft,
@@ -24,9 +29,15 @@ class AppTheme {
   );
   
   static const LinearGradient backgroundGradient = LinearGradient(
-    colors: [Color(0xFFF8F9FA), Color(0xFFE9ECEF)],
+    colors: [backgroundColor, Color(0xFFF1F5F9)],
     begin: Alignment.topCenter,
     end: Alignment.bottomCenter,
+  );
+  
+  static const LinearGradient cardGradient = LinearGradient(
+    colors: [Colors.white, Color(0xFFFAFBFC)],
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
   );
   
   // Text Styles
@@ -124,8 +135,17 @@ class AppTheme {
         backgroundColor: Colors.transparent,
         elevation: 0,
         scrolledUnderElevation: 0,
-        titleTextStyle: titleLarge,
+        titleTextStyle: titleLarge.copyWith(
+          color: textPrimaryColor,
+          fontWeight: FontWeight.w700,
+          letterSpacing: -0.5,
+        ),
         iconTheme: const IconThemeData(color: textPrimaryColor),
+        actionsIconTheme: const IconThemeData(color: textPrimaryColor),
+        systemOverlayStyle: const SystemUiOverlayStyle(
+          statusBarColor: Colors.transparent,
+          statusBarIconBrightness: Brightness.dark,
+        ),
       ),
       
       // Card Theme - removed for MVP compatibility

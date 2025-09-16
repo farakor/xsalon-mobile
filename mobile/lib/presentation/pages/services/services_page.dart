@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../providers/services_provider.dart';
 import '../../theme/app_theme.dart';
+import '../../widgets/modern_app_header.dart';
 import 'widgets/service_card.dart';
 import 'widgets/service_category_filter.dart';
 import 'add_service_page.dart';
@@ -60,54 +61,82 @@ class _ServicesPageState extends ConsumerState<ServicesPage> {
     }
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Услуги'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.add),
-            onPressed: () {
-              Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (context) => const AddServicePage(),
-                ),
-              );
-            },
-          ),
-        ],
+      appBar: ModernAppHeader(
+        title: 'Услуги',
+        subtitle: 'Управление услугами салона',
       ),
+      backgroundColor: AppTheme.backgroundColor,
       body: Column(
         children: [
-          // Поиск
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: TextField(
-              controller: _searchController,
-              decoration: const InputDecoration(
-                hintText: 'Поиск услуг...',
-                prefixIcon: Icon(Icons.search),
-                border: OutlineInputBorder(),
+          // Search and Filter Bar
+          Container(
+            padding: const EdgeInsets.fromLTRB(20, 16, 20, 20),
+            decoration: BoxDecoration(
+              color: AppTheme.backgroundColor,
+              border: Border(
+                bottom: BorderSide(
+                  color: AppTheme.borderColor,
+                  width: 0.5,
+                ),
               ),
-              onChanged: (value) {
-                setState(() {
-                  _searchQuery = value;
-                });
-              },
+            ),
+            child: Column(
+              children: [
+                // Search Bar
+                Container(
+                  height: 44,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: AppTheme.borderColor,
+                      width: 0.5,
+                    ),
+                  ),
+                  child: TextField(
+                    controller: _searchController,
+                    decoration: InputDecoration(
+                      hintText: 'Поиск услуг...',
+                      hintStyle: AppTheme.bodyMedium.copyWith(
+                        color: AppTheme.textSecondaryColor,
+                      ),
+                      prefixIcon: Icon(
+                        Icons.search,
+                        color: AppTheme.textSecondaryColor,
+                        size: 20,
+                      ),
+                      border: InputBorder.none,
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 12,
+                      ),
+                    ),
+                    onChanged: (value) {
+                      setState(() {
+                        _searchQuery = value;
+                      });
+                    },
+                  ),
+                ),
+                
+                // Category Filter
+                if (categories.isNotEmpty) ...[
+                  const SizedBox(height: 16),
+                  ServiceCategoryFilter(
+                    categories: categories,
+                    selectedCategoryId: _selectedCategoryId,
+                    onCategorySelected: (categoryId) {
+                      setState(() {
+                        _selectedCategoryId = categoryId;
+                      });
+                    },
+                  ),
+                ],
+              ],
             ),
           ),
           
-          // Фильтр по категориям
-          if (categories.isNotEmpty)
-            ServiceCategoryFilter(
-              categories: categories,
-              selectedCategoryId: _selectedCategoryId,
-              onCategorySelected: (categoryId) {
-                setState(() {
-                  _selectedCategoryId = categoryId;
-                });
-              },
-            ),
-          
-          // Список услуг
+          // Services List
           Expanded(
             child: _buildServicesList(
               isLoading: isLoading,
@@ -116,6 +145,39 @@ class _ServicesPageState extends ConsumerState<ServicesPage> {
             ),
           ),
         ],
+      ),
+      floatingActionButton: Container(
+        width: 56,
+        height: 56,
+        decoration: BoxDecoration(
+          gradient: AppTheme.primaryGradient,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: AppTheme.primaryColor.withValues(alpha: 0.3),
+              blurRadius: 12,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            onTap: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => const AddServicePage(),
+                ),
+              );
+            },
+            borderRadius: BorderRadius.circular(16),
+            child: const Icon(
+              Icons.add,
+              color: Colors.white,
+              size: 24,
+            ),
+          ),
+        ),
       ),
     );
   }
@@ -166,42 +228,80 @@ class _ServicesPageState extends ConsumerState<ServicesPage> {
 
     if (services.isEmpty) {
       return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Icon(
-              Icons.design_services_outlined,
-              size: 64,
-              color: AppTheme.textSecondaryColor,
-            ),
-            const SizedBox(height: 16),
-            Text(
-              _searchQuery.isNotEmpty || _selectedCategoryId != null
-                  ? 'Услуги не найдены'
-                  : 'Нет услуг',
-              style: Theme.of(context).textTheme.headlineSmall,
-            ),
-            const SizedBox(height: 8),
-            Text(
-              _searchQuery.isNotEmpty || _selectedCategoryId != null
-                  ? 'Попробуйте изменить параметры поиска'
-                  : 'Добавьте первую услугу',
-              style: const TextStyle(color: AppTheme.textSecondaryColor),
-            ),
-            if (_searchQuery.isEmpty && _selectedCategoryId == null) ...[
-              const SizedBox(height: 16),
-              ElevatedButton(
-                onPressed: () {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (context) => const AddServicePage(),
-                    ),
-                  );
-                },
-                child: const Text('Добавить услугу'),
+        child: Padding(
+          padding: const EdgeInsets.all(32),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                width: 80,
+                height: 80,
+                decoration: BoxDecoration(
+                  color: AppTheme.primaryColor.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Icon(
+                  Icons.design_services_outlined,
+                  size: 40,
+                  color: AppTheme.primaryColor,
+                ),
               ),
+              const SizedBox(height: 24),
+              Text(
+                _searchQuery.isNotEmpty || _selectedCategoryId != null
+                    ? 'Услуги не найдены'
+                    : 'Нет услуг',
+                style: AppTheme.titleLarge.copyWith(
+                  color: AppTheme.textPrimaryColor,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                _searchQuery.isNotEmpty || _selectedCategoryId != null
+                    ? 'Попробуйте изменить параметры поиска'
+                    : 'Добавьте первую услугу',
+                style: AppTheme.bodyMedium.copyWith(
+                  color: AppTheme.textSecondaryColor,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              if (_searchQuery.isEmpty && _selectedCategoryId == null) ...[
+                const SizedBox(height: 32),
+                Container(
+                  width: double.infinity,
+                  height: 48,
+                  decoration: BoxDecoration(
+                    gradient: AppTheme.primaryGradient,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: ElevatedButton(
+                    onPressed: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (context) => const AddServicePage(),
+                        ),
+                      );
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.transparent,
+                      shadowColor: Colors.transparent,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    child: Text(
+                      'Добавить услугу',
+                      style: AppTheme.bodyMedium.copyWith(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ],
-          ],
+          ),
         ),
       );
     }
@@ -211,7 +311,7 @@ class _ServicesPageState extends ConsumerState<ServicesPage> {
         await ref.read(servicesProvider.notifier).loadServices();
       },
       child: ListView.builder(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.fromLTRB(20, 16, 20, 100),
         itemCount: services.length,
         itemBuilder: (context, index) {
           final service = services[index];

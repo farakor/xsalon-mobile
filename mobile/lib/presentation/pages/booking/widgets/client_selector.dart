@@ -68,11 +68,32 @@ class _ClientSelectorState extends ConsumerState<ClientSelector> {
         // Search Field
         TextField(
           controller: _searchController,
-          decoration: const InputDecoration(
+          decoration: InputDecoration(
             labelText: 'Поиск клиента',
             hintText: 'Введите имя, телефон или email',
-            prefixIcon: Icon(Icons.search),
-            border: OutlineInputBorder(),
+            prefixIcon: const Icon(Icons.search),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide(
+                color: AppTheme.borderColor,
+                width: 0.5,
+              ),
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide(
+                color: AppTheme.borderColor,
+                width: 0.5,
+              ),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: const BorderSide(
+                color: AppTheme.primaryColor,
+                width: 1,
+              ),
+            ),
+            contentPadding: const EdgeInsets.all(16),
           ),
         ),
         const SizedBox(height: 16),
@@ -80,15 +101,30 @@ class _ClientSelectorState extends ConsumerState<ClientSelector> {
         // Selected Client (if any)
         if (widget.selectedClient != null) ...[
           Container(
-            padding: const EdgeInsets.all(12),
+            padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
               color: AppTheme.primaryColor.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: AppTheme.primaryColor),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: AppTheme.primaryColor,
+                width: 1,
+              ),
             ),
             child: Row(
               children: [
-                const Icon(Icons.check_circle, color: AppTheme.primaryColor),
+                Container(
+                  width: 24,
+                  height: 24,
+                  decoration: BoxDecoration(
+                    color: AppTheme.primaryColor,
+                    borderRadius: BorderRadius.circular(6),
+                  ),
+                  child: const Icon(
+                    Icons.check,
+                    color: Colors.white,
+                    size: 16,
+                  ),
+                ),
                 const SizedBox(width: 12),
                 Expanded(
                   child: Column(
@@ -98,9 +134,10 @@ class _ClientSelectorState extends ConsumerState<ClientSelector> {
                         'Выбран: ${widget.selectedClient!.fullName}',
                         style: AppTheme.titleSmall.copyWith(
                           color: AppTheme.primaryColor,
-                          fontWeight: FontWeight.bold,
+                          fontWeight: FontWeight.w600,
                         ),
                       ),
+                      const SizedBox(height: 2),
                       Text(
                         widget.selectedClient!.displayPhone,
                         style: AppTheme.bodySmall.copyWith(
@@ -112,7 +149,13 @@ class _ClientSelectorState extends ConsumerState<ClientSelector> {
                 ),
                 TextButton(
                   onPressed: () => widget.onClientSelected(widget.selectedClient!),
-                  child: const Text('Изменить'),
+                  child: Text(
+                    'Изменить',
+                    style: AppTheme.bodyMedium.copyWith(
+                      color: AppTheme.primaryColor,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
                 ),
               ],
             ),
@@ -124,8 +167,25 @@ class _ClientSelectorState extends ConsumerState<ClientSelector> {
         if (isLoading)
           Container(
             height: 300,
-            alignment: Alignment.center,
-            child: const CircularProgressIndicator(),
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(
+                color: AppTheme.borderColor,
+                width: 0.5,
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.02),
+                  blurRadius: 8,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+            ),
+            child: const Center(
+              child: CircularProgressIndicator(),
+            ),
           )
         // Error state
         else if (error != null)
@@ -145,62 +205,138 @@ class _ClientSelectorState extends ConsumerState<ClientSelector> {
                       final client = _filteredClients[index];
                       final isSelected = widget.selectedClient?.id == client.id;
                       
-                      return Card(
-                        margin: const EdgeInsets.only(bottom: 8),
-                        elevation: isSelected ? 4 : 1,
-                        child: ListTile(
-                          leading: CircleAvatar(
-                            backgroundColor: _getAvatarColor(client),
-                            child: Text(
-                              client.initials,
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                              ),
+                      return Container(
+                        margin: const EdgeInsets.only(bottom: 12),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(16),
+                          border: Border.all(
+                            color: isSelected ? AppTheme.primaryColor : AppTheme.borderColor,
+                            width: isSelected ? 1 : 0.5,
+                          ),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withValues(alpha: 0.02),
+                              blurRadius: 8,
+                              offset: const Offset(0, 2),
                             ),
-                          ),
-                          title: Text(
-                            client.fullName,
-                            style: AppTheme.titleMedium.copyWith(
-                              fontWeight: FontWeight.bold,
-                              color: isSelected ? AppTheme.primaryColor : null,
-                            ),
-                          ),
-                          subtitle: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(client.displayPhone),
-                              const SizedBox(height: 2),
-                              Row(
-                                children: [
-                                  Icon(Icons.event, size: 14, color: Colors.grey[600]),
-                                  const SizedBox(width: 4),
-                                  Text(
-                                    '${client.totalVisits} визитов',
-                                    style: AppTheme.bodySmall.copyWith(
-                                      color: Colors.grey[600],
-                                    ),
-                                  ),
-                                  const SizedBox(width: 12),
-                                  Icon(Icons.star, size: 14, color: Colors.orange),
-                                  const SizedBox(width: 4),
-                                  Text(
-                                    client.loyaltyLevel,
-                                    style: AppTheme.bodySmall.copyWith(
-                                      color: Colors.orange,
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                          trailing: isSelected
-                              ? const Icon(Icons.check_circle, color: AppTheme.primaryColor)
-                              : const Icon(Icons.chevron_right),
-                          selected: isSelected,
-                          selectedTileColor: AppTheme.primaryColor.withValues(alpha: 0.05),
+                          ],
+                        ),
+                        child: InkWell(
                           onTap: () => widget.onClientSelected(client),
+                          borderRadius: BorderRadius.circular(16),
+                          child: Padding(
+                            padding: const EdgeInsets.all(16),
+                            child: Row(
+                              children: [
+                                CircleAvatar(
+                                  radius: 24,
+                                  backgroundColor: _getAvatarColor(client),
+                                  child: Text(
+                                    client.initials,
+                                    style: AppTheme.titleSmall.copyWith(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(width: 16),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        client.fullName,
+                                        style: AppTheme.titleMedium.copyWith(
+                                          fontWeight: FontWeight.w600,
+                                          color: isSelected ? AppTheme.primaryColor : AppTheme.textPrimaryColor,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 4),
+                                      Text(
+                                        client.displayPhone,
+                                        style: AppTheme.bodyMedium.copyWith(
+                                          color: AppTheme.textSecondaryColor,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 8),
+                                      Row(
+                                        children: [
+                                          Container(
+                                            padding: const EdgeInsets.symmetric(
+                                              horizontal: 8,
+                                              vertical: 4,
+                                            ),
+                                            decoration: BoxDecoration(
+                                              color: Colors.blue.withValues(alpha: 0.1),
+                                              borderRadius: BorderRadius.circular(12),
+                                            ),
+                                            child: Row(
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: [
+                                                const Icon(Icons.event, size: 12, color: Colors.blue),
+                                                const SizedBox(width: 4),
+                                                Text(
+                                                  '${client.totalVisits} визитов',
+                                                  style: AppTheme.bodySmall.copyWith(
+                                                    color: Colors.blue,
+                                                    fontWeight: FontWeight.w500,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                          const SizedBox(width: 8),
+                                          Container(
+                                            padding: const EdgeInsets.symmetric(
+                                              horizontal: 8,
+                                              vertical: 4,
+                                            ),
+                                            decoration: BoxDecoration(
+                                              color: Colors.orange.withValues(alpha: 0.1),
+                                              borderRadius: BorderRadius.circular(12),
+                                            ),
+                                            child: Row(
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: [
+                                                const Icon(Icons.star, size: 12, color: Colors.orange),
+                                                const SizedBox(width: 4),
+                                                Text(
+                                                  client.loyaltyLevel,
+                                                  style: AppTheme.bodySmall.copyWith(
+                                                    color: Colors.orange,
+                                                    fontWeight: FontWeight.w500,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                const SizedBox(width: 12),
+                                Container(
+                                  width: 24,
+                                  height: 24,
+                                  decoration: BoxDecoration(
+                                    color: isSelected 
+                                        ? AppTheme.primaryColor 
+                                        : AppTheme.textSecondaryColor.withValues(alpha: 0.1),
+                                    borderRadius: BorderRadius.circular(6),
+                                  ),
+                                  child: Icon(
+                                    isSelected ? Icons.check : Icons.chevron_right,
+                                    size: 16,
+                                    color: isSelected 
+                                        ? Colors.white 
+                                        : AppTheme.textSecondaryColor,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
                         ),
                       );
                     },
@@ -211,27 +347,50 @@ class _ClientSelectorState extends ConsumerState<ClientSelector> {
   }
 
   Widget _buildEmptyState() {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            Icons.search_off,
-            size: 64,
-            color: Colors.grey[400],
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: AppTheme.borderColor,
+          width: 0.5,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.02),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
           ),
-          const SizedBox(height: 16),
-          Text(
-            'Клиенты не найдены',
-            style: AppTheme.titleLarge.copyWith(
-              color: Colors.grey[600],
+        ],
+      ),
+      child: Column(
+        children: [
+          Container(
+            width: 48,
+            height: 48,
+            decoration: BoxDecoration(
+              color: Colors.grey.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: const Icon(
+              Icons.search_off,
+              color: Colors.grey,
+              size: 24,
             ),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 12),
+          Text(
+            'Клиенты не найдены',
+            style: AppTheme.titleSmall.copyWith(
+              fontWeight: FontWeight.w600,
+              color: AppTheme.textPrimaryColor,
+            ),
+          ),
           Text(
             'Попробуйте изменить поисковый запрос',
-            style: AppTheme.bodyMedium.copyWith(
-              color: Colors.grey[500],
+            style: AppTheme.bodySmall.copyWith(
+              color: AppTheme.textSecondaryColor,
             ),
             textAlign: TextAlign.center,
           ),
@@ -241,36 +400,80 @@ class _ClientSelectorState extends ConsumerState<ClientSelector> {
   }
 
   Widget _buildErrorState(String error) {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            Icons.error_outline,
-            size: 64,
-            color: Colors.red[400],
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: AppTheme.borderColor,
+          width: 0.5,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.02),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
           ),
-          const SizedBox(height: 16),
-          Text(
-            'Ошибка загрузки клиентов',
-            style: AppTheme.titleLarge.copyWith(
-              color: Colors.red[600],
+        ],
+      ),
+      child: Column(
+        children: [
+          Container(
+            width: 48,
+            height: 48,
+            decoration: BoxDecoration(
+              color: Colors.red.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: const Icon(
+              Icons.error_outline,
+              color: Colors.red,
+              size: 24,
             ),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 12),
+          Text(
+            'Ошибка загрузки клиентов',
+            style: AppTheme.titleSmall.copyWith(
+              fontWeight: FontWeight.w600,
+              color: AppTheme.textPrimaryColor,
+            ),
+          ),
           Text(
             error,
-            style: AppTheme.bodyMedium.copyWith(
-              color: Colors.grey[500],
+            style: AppTheme.bodySmall.copyWith(
+              color: AppTheme.textSecondaryColor,
             ),
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 16),
-          ElevatedButton(
-            onPressed: () {
-              ref.read(clientsProvider.notifier).loadClients();
-            },
-            child: const Text('Повторить'),
+          Container(
+            width: double.infinity,
+            height: 40,
+            decoration: BoxDecoration(
+              gradient: AppTheme.primaryGradient,
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: ElevatedButton(
+              onPressed: () {
+                ref.read(clientsProvider.notifier).loadClients();
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.transparent,
+                shadowColor: Colors.transparent,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+              child: Text(
+                'Повторить',
+                style: AppTheme.bodyMedium.copyWith(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
           ),
         ],
       ),

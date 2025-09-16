@@ -71,15 +71,30 @@ class _TimeSelectorState extends ConsumerState<TimeSelector> {
         // Selected Date and Time (if any)
         if (widget.selectedDate != null || widget.selectedTime != null) ...[
           Container(
-            padding: const EdgeInsets.all(12),
+            padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
               color: AppTheme.primaryColor.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: AppTheme.primaryColor),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: AppTheme.primaryColor,
+                width: 1,
+              ),
             ),
             child: Row(
               children: [
-                const Icon(Icons.check_circle, color: AppTheme.primaryColor),
+                Container(
+                  width: 24,
+                  height: 24,
+                  decoration: BoxDecoration(
+                    color: AppTheme.primaryColor,
+                    borderRadius: BorderRadius.circular(6),
+                  ),
+                  child: const Icon(
+                    Icons.check,
+                    color: Colors.white,
+                    size: 16,
+                  ),
+                ),
                 const SizedBox(width: 12),
                 Expanded(
                   child: Column(
@@ -90,7 +105,7 @@ class _TimeSelectorState extends ConsumerState<TimeSelector> {
                           'Выбрано: ${_formatDate(widget.selectedDate!)} в ${_formatTime(widget.selectedTime!)}',
                           style: AppTheme.titleSmall.copyWith(
                             color: AppTheme.primaryColor,
-                            fontWeight: FontWeight.bold,
+                            fontWeight: FontWeight.w600,
                           ),
                         )
                       else if (widget.selectedDate != null)
@@ -98,7 +113,7 @@ class _TimeSelectorState extends ConsumerState<TimeSelector> {
                           'Дата: ${_formatDate(widget.selectedDate!)}',
                           style: AppTheme.titleSmall.copyWith(
                             color: AppTheme.primaryColor,
-                            fontWeight: FontWeight.bold,
+                            fontWeight: FontWeight.w600,
                           ),
                         ),
                       if (widget.serviceDuration != null && widget.selectedTime != null) ...[
@@ -126,14 +141,30 @@ class _TimeSelectorState extends ConsumerState<TimeSelector> {
         
         // Time Slots
         if (widget.selectedDate != null) ...[
-          Align(
-            alignment: Alignment.centerLeft,
-            child: Text(
-              'Выберите время',
-              style: AppTheme.titleMedium.copyWith(
-                fontWeight: FontWeight.bold,
+          Row(
+            children: [
+              Container(
+                width: 32,
+                height: 32,
+                decoration: BoxDecoration(
+                  color: AppTheme.primaryColor.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: const Icon(
+                  Icons.access_time,
+                  color: AppTheme.primaryColor,
+                  size: 18,
+                ),
               ),
-            ),
+              const SizedBox(width: 12),
+              Text(
+                'Выберите время',
+                style: AppTheme.titleMedium.copyWith(
+                  fontWeight: FontWeight.w600,
+                  color: AppTheme.textPrimaryColor,
+                ),
+              ),
+            ],
           ),
           const SizedBox(height: 12),
           
@@ -144,31 +175,53 @@ class _TimeSelectorState extends ConsumerState<TimeSelector> {
         ] else ...[
           Container(
             height: 300,
-            child: Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.calendar_today,
-                    size: 64,
-                    color: Colors.grey[400],
-                  ),
-                  const SizedBox(height: 16),
-                  Text(
-                    'Выберите дату',
-                    style: AppTheme.titleLarge.copyWith(
-                      color: Colors.grey[600],
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'Сначала выберите дату для записи',
-                    style: AppTheme.bodyMedium.copyWith(
-                      color: Colors.grey[500],
-                    ),
-                  ),
-                ],
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(
+                color: AppTheme.borderColor,
+                width: 0.5,
               ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.02),
+                  blurRadius: 8,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+            ),
+            child: Column(
+              children: [
+                Container(
+                  width: 48,
+                  height: 48,
+                  decoration: BoxDecoration(
+                    color: Colors.grey.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: const Icon(
+                    Icons.calendar_today,
+                    color: Colors.grey,
+                    size: 24,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  'Выберите дату',
+                  style: AppTheme.titleSmall.copyWith(
+                    fontWeight: FontWeight.w600,
+                    color: AppTheme.textPrimaryColor,
+                  ),
+                ),
+                Text(
+                  'Сначала выберите дату для записи',
+                  style: AppTheme.bodySmall.copyWith(
+                    color: AppTheme.textSecondaryColor,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ],
             ),
           ),
         ],
@@ -178,13 +231,17 @@ class _TimeSelectorState extends ConsumerState<TimeSelector> {
 
   Widget _buildCalendar() {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: AppTheme.borderColor,
+          width: 0.5,
+        ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
+            color: Colors.black.withValues(alpha: 0.02),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -203,7 +260,8 @@ class _TimeSelectorState extends ConsumerState<TimeSelector> {
               Text(
                 _formatMonth(_currentMonth),
                 style: AppTheme.titleMedium.copyWith(
-                  fontWeight: FontWeight.bold,
+                  fontWeight: FontWeight.w600,
+                  color: AppTheme.textPrimaryColor,
                 ),
               ),
               IconButton(
@@ -221,7 +279,7 @@ class _TimeSelectorState extends ConsumerState<TimeSelector> {
                   child: Text(
                     day,
                     style: AppTheme.bodySmall.copyWith(
-                      color: Colors.grey[600],
+                      color: AppTheme.textSecondaryColor,
                       fontWeight: FontWeight.w600,
                     ),
                   ),

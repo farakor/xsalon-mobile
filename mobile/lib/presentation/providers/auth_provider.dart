@@ -69,11 +69,19 @@ class AuthNotifier extends StateNotifier<AuthState> {
     _supabase.auth.onAuthStateChange.listen((data) {
       final session = data.session;
       if (session != null) {
+        // Проверяем, изменился ли пользователь
+        final currentUserId = state.user?.id;
+        final newUserId = session.user.id;
+        
         state = state.copyWith(
           status: AuthStatus.authenticated,
           user: session.user,
         );
-        _loadUserProfile();
+        
+        // Загружаем профиль только если пользователь изменился
+        if (currentUserId != newUserId) {
+          _loadUserProfile();
+        }
       } else {
         state = state.copyWith(
           status: AuthStatus.unauthenticated,
@@ -87,6 +95,11 @@ class AuthNotifier extends StateNotifier<AuthState> {
   // Загрузка профиля пользователя
   Future<void> _loadUserProfile() async {
     if (state.user == null) return;
+    
+    // Если профиль уже загружен для этого пользователя, не загружаем повторно
+    if (state.profile != null && state.profile!.id == state.user!.id) {
+      return;
+    }
 
     try {
       print('Загружаем профиль для пользователя: ${state.user!.id}');
@@ -209,13 +222,18 @@ class AuthNotifier extends StateNotifier<AuthState> {
   // Выход из системы
   Future<void> signOut() async {
     try {
+      print('Начинаем выход из аккаунта...');
       await _supabase.auth.signOut();
+      print('Supabase signOut завершен');
+      
       state = state.copyWith(
         status: AuthStatus.unauthenticated,
         user: null,
         profile: null,
       );
+      print('Состояние обновлено: ${state.status}');
     } catch (error) {
+      print('Ошибка при выходе: $error');
       state = state.copyWith(
         status: AuthStatus.error,
         errorMessage: _getErrorMessage(error),

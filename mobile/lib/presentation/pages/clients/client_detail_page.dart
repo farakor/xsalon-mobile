@@ -79,180 +79,104 @@ class _ClientDetailPageState extends ConsumerState<ClientDetailPage>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppTheme.backgroundColor,
       appBar: AppBar(
-        title: Text(widget.client.fullName),
+        backgroundColor: Colors.transparent,
         elevation: 0,
+        leading: Container(
+          margin: const EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: AppTheme.borderColor,
+              width: 0.5,
+            ),
+          ),
+          child: IconButton(
+            icon: Icon(
+              Icons.arrow_back_ios_new,
+              color: AppTheme.textPrimaryColor,
+              size: 18,
+            ),
+            onPressed: () => Navigator.pop(context),
+          ),
+        ),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.edit),
-            onPressed: _editClient,
-            tooltip: 'Редактировать',
-          ),
-          PopupMenuButton<String>(
-            onSelected: (value) {
-              switch (value) {
-                case 'call':
-                  _callClient();
-                  break;
-                case 'message':
-                  _messageClient();
-                  break;
-                case 'block':
-                  _blockClient();
-                  break;
-                case 'delete':
-                  _deleteClient();
-                  break;
-              }
-            },
-            itemBuilder: (context) => [
-              const PopupMenuItem(
-                value: 'call',
-                child: Row(
-                  children: [
-                    Icon(Icons.phone),
-                    SizedBox(width: 8),
-                    Text('Позвонить'),
-                  ],
-                ),
-              ),
-              const PopupMenuItem(
-                value: 'message',
-                child: Row(
-                  children: [
-                    Icon(Icons.message),
-                    SizedBox(width: 8),
-                    Text('Сообщение'),
-                  ],
-                ),
-              ),
-              const PopupMenuItem(
-                value: 'block',
-                child: Row(
-                  children: [
-                    Icon(Icons.block, color: Colors.orange),
-                    SizedBox(width: 8),
-                    Text('Заблокировать'),
-                  ],
-                ),
-              ),
-              const PopupMenuItem(
-                value: 'delete',
-                child: Row(
-                  children: [
-                    Icon(Icons.delete, color: Colors.red),
-                    SizedBox(width: 8),
-                    Text('Удалить'),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ],
-        bottom: TabBar(
-          controller: _tabController,
-          tabs: const [
-            Tab(text: 'Профиль', icon: Icon(Icons.person)),
-            Tab(text: 'История', icon: Icon(Icons.history)),
-            Tab(text: 'Заметки', icon: Icon(Icons.note)),
-          ],
-        ),
-      ),
-      body: TabBarView(
-        controller: _tabController,
-        children: [
-          _buildProfileTab(),
-          _buildHistoryTab(),
-          _buildNotesTab(),
-        ],
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _bookAppointment,
-        child: const Icon(Icons.add),
-        tooltip: 'Записать клиента',
-      ),
-    );
-  }
-
-  Widget _buildProfileTab() {
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Client Header
-          _buildClientHeader(),
-          const SizedBox(height: 24),
-          // Stats Cards
-          _buildStatsCards(),
-          const SizedBox(height: 24),
-          // Contact Information
-          _buildContactInfo(),
-          const SizedBox(height: 24),
-          // Personal Information
-          _buildPersonalInfo(),
-          const SizedBox(height: 24),
-          // Preferred Services
-          _buildPreferredServices(),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildClientHeader() {
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [AppTheme.primaryColor.withValues(alpha: 0.1), Colors.white],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppTheme.primaryColor.withValues(alpha: 0.2)),
-      ),
-      child: Row(
-        children: [
-          CircleAvatar(
-            radius: 40,
-            backgroundColor: _getAvatarColor(),
-            backgroundImage: widget.client.avatarUrl != null 
-                ? NetworkImage(widget.client.avatarUrl!)
-                : null,
-            child: widget.client.avatarUrl == null
-                ? Text(
-                    widget.client.initials,
-                    style: AppTheme.headlineMedium.copyWith(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  )
-                : null,
-          ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  widget.client.fullName,
-                  style: AppTheme.headlineSmall.copyWith(
-                    fontWeight: FontWeight.bold,
+          Container(
+            margin: const EdgeInsets.only(right: 8),
+            child: PopupMenuButton<String>(
+              onSelected: (value) {
+                switch (value) {
+                  case 'call':
+                    _callClient();
+                    break;
+                  case 'edit':
+                    _editClient();
+                    break;
+                  case 'block':
+                    _blockClient();
+                    break;
+                  case 'delete':
+                    _deleteClient();
+                    break;
+                }
+              },
+              icon: Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: AppTheme.borderColor,
+                    width: 0.5,
                   ),
                 ),
-                const SizedBox(height: 4),
-                Row(
-                  children: [
-                    _buildStatusBadge(),
-                    const SizedBox(width: 8),
-                    _buildLoyaltyBadge(),
-                  ],
+                child: Icon(
+                  Icons.more_vert,
+                  color: AppTheme.textSecondaryColor,
+                  size: 18,
                 ),
-                const SizedBox(height: 8),
-                Text(
-                  'Клиент с ${_formatDate(widget.client.createdAt)}',
-                  style: AppTheme.bodyMedium.copyWith(
-                    color: Colors.grey[600],
+              ),
+              itemBuilder: (context) => [
+                const PopupMenuItem(
+                  value: 'call',
+                  child: Row(
+                    children: [
+                      Icon(Icons.phone, color: Colors.green),
+                      SizedBox(width: 8),
+                      Text('Позвонить'),
+                    ],
+                  ),
+                ),
+                const PopupMenuItem(
+                  value: 'edit',
+                  child: Row(
+                    children: [
+                      Icon(Icons.edit),
+                      SizedBox(width: 8),
+                      Text('Редактировать'),
+                    ],
+                  ),
+                ),
+                const PopupMenuItem(
+                  value: 'block',
+                  child: Row(
+                    children: [
+                      Icon(Icons.block, color: Colors.orange),
+                      SizedBox(width: 8),
+                      Text('Заблокировать'),
+                    ],
+                  ),
+                ),
+                const PopupMenuItem(
+                  value: 'delete',
+                  child: Row(
+                    children: [
+                      Icon(Icons.delete, color: Colors.red),
+                      SizedBox(width: 8),
+                      Text('Удалить'),
+                    ],
                   ),
                 ),
               ],
@@ -260,69 +184,282 @@ class _ClientDetailPageState extends ConsumerState<ClientDetailPage>
           ),
         ],
       ),
-    );
-  }
-
-  Widget _buildStatsCards() {
-    return Row(
-      children: [
-        Expanded(
-          child: _buildStatCard(
-            'Визитов',
-            '${widget.client.totalVisits}',
-            Icons.event,
-            Colors.blue,
-          ),
-        ),
-        const SizedBox(width: 12),
-        Expanded(
-          child: _buildStatCard(
-            'Потрачено',
-            _formatPrice(widget.client.totalSpent),
-            Icons.attach_money,
-            Colors.green,
-          ),
-        ),
-        const SizedBox(width: 12),
-        Expanded(
-          child: _buildStatCard(
-            'Баллов',
-            '${widget.client.loyaltyPoints}',
-            Icons.stars,
-            Colors.orange,
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildStatCard(String title, String value, IconData icon, Color color) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: color.withValues(alpha: 0.2)),
-      ),
-      child: Column(
+      body: Column(
         children: [
-          Icon(icon, color: color, size: 24),
-          const SizedBox(height: 8),
-          Text(
-            value,
-            style: AppTheme.titleLarge.copyWith(
-              color: color,
-              fontWeight: FontWeight.bold,
+          // Client Header
+          _buildClientHeader(),
+          // Tab Bar
+          Container(
+            margin: const EdgeInsets.symmetric(horizontal: 20),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: AppTheme.borderColor,
+                width: 0.5,
+              ),
+            ),
+            child: TabBar(
+              controller: _tabController,
+              indicator: BoxDecoration(
+                color: AppTheme.primaryColor,
+                borderRadius: BorderRadius.circular(10),
+              ),
+              indicatorSize: TabBarIndicatorSize.tab,
+              dividerColor: Colors.transparent,
+              labelColor: Colors.white,
+              unselectedLabelColor: AppTheme.textSecondaryColor,
+              labelStyle: AppTheme.bodyMedium.copyWith(
+                fontWeight: FontWeight.w500,
+              ),
+              unselectedLabelStyle: AppTheme.bodyMedium,
+              tabs: const [
+                Tab(text: 'Профиль'),
+                Tab(text: 'История'),
+                Tab(text: 'Заметки'),
+              ],
             ),
           ),
-          Text(
-            title,
-            style: AppTheme.bodySmall.copyWith(
-              color: Colors.grey[600],
+          const SizedBox(height: 20),
+          // Tab Content
+          Expanded(
+            child: TabBarView(
+              controller: _tabController,
+              children: [
+                _buildProfileTab(),
+                _buildHistoryTab(),
+                _buildNotesTab(),
+              ],
             ),
           ),
         ],
       ),
+      floatingActionButton: Container(
+        width: 56,
+        height: 56,
+        decoration: BoxDecoration(
+          gradient: AppTheme.primaryGradient,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: AppTheme.primaryColor.withValues(alpha: 0.3),
+              blurRadius: 12,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            onTap: _bookAppointment,
+            borderRadius: BorderRadius.circular(16),
+            child: const Icon(
+              Icons.add,
+              color: Colors.white,
+              size: 24,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildProfileTab() {
+    return SingleChildScrollView(
+      padding: const EdgeInsets.fromLTRB(20, 0, 20, 100),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Contact Information
+          _buildContactInfo(),
+          const SizedBox(height: 16),
+          // Personal Information
+          _buildPersonalInfo(),
+          const SizedBox(height: 16),
+          // Preferred Services
+          if (widget.client.preferredServices.isNotEmpty)
+            _buildPreferredServices(),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildClientHeader() {
+    return Container(
+      margin: const EdgeInsets.fromLTRB(20, 20, 20, 24),
+      padding: const EdgeInsets.all(24),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: AppTheme.borderColor,
+          width: 0.5,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.03),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          Row(
+            children: [
+              // Avatar
+              Container(
+                width: 80,
+                height: 80,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(20),
+                  color: _getAvatarColor().withValues(alpha: 0.1),
+                  border: Border.all(
+                    color: _getAvatarColor().withValues(alpha: 0.2),
+                    width: 1,
+                  ),
+                ),
+                child: widget.client.avatarUrl != null
+                    ? ClipRRect(
+                        borderRadius: BorderRadius.circular(19),
+                        child: Image.network(
+                          widget.client.avatarUrl!,
+                          fit: BoxFit.cover,
+                        ),
+                      )
+                    : Center(
+                        child: Text(
+                          widget.client.initials,
+                          style: AppTheme.headlineSmall.copyWith(
+                            color: _getAvatarColor(),
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+              ),
+              const SizedBox(width: 20),
+              // Client Info
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      widget.client.fullName,
+                      style: AppTheme.headlineSmall.copyWith(
+                        fontWeight: FontWeight.w700,
+                        color: AppTheme.textPrimaryColor,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      widget.client.displayPhone,
+                      style: AppTheme.bodyLarge.copyWith(
+                        color: AppTheme.textSecondaryColor,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    Row(
+                      children: [
+                        if (widget.client.loyaltyLevel == 'VIP')
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 10,
+                              vertical: 4,
+                            ),
+                            decoration: BoxDecoration(
+                              color: Colors.purple.withValues(alpha: 0.1),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Text(
+                              'VIP',
+                              style: AppTheme.labelSmall.copyWith(
+                                color: Colors.purple,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                        if (widget.client.loyaltyLevel == 'VIP')
+                          const SizedBox(width: 8),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 10,
+                            vertical: 4,
+                          ),
+                          decoration: BoxDecoration(
+                            color: _getClientStatusColor().withValues(alpha: 0.1),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Text(
+                            widget.client.status.displayName,
+                            style: AppTheme.labelSmall.copyWith(
+                              color: _getClientStatusColor(),
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 20),
+          // Quick Stats
+          Row(
+            children: [
+              Expanded(
+                child: _buildQuickStat(
+                  Icons.event_outlined,
+                  '${widget.client.totalVisits}',
+                  'визитов',
+                ),
+              ),
+              Container(
+                width: 1,
+                height: 40,
+                color: AppTheme.borderColor,
+              ),
+              Expanded(
+                child: _buildQuickStat(
+                  Icons.access_time,
+                  widget.client.lastVisit != null 
+                      ? _formatDateShort(widget.client.lastVisit!)
+                      : 'Никогда',
+                  'последний визит',
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildQuickStat(IconData icon, String value, String label) {
+    return Column(
+      children: [
+        Icon(
+          icon,
+          size: 20,
+          color: AppTheme.textSecondaryColor,
+        ),
+        const SizedBox(height: 6),
+        Text(
+          value,
+          style: AppTheme.titleMedium.copyWith(
+            fontWeight: FontWeight.w600,
+            color: AppTheme.textPrimaryColor,
+          ),
+        ),
+        Text(
+          label,
+          style: AppTheme.bodySmall.copyWith(
+            color: AppTheme.textSecondaryColor,
+          ),
+          textAlign: TextAlign.center,
+        ),
+      ],
     );
   }
 
@@ -400,13 +537,17 @@ class _ClientDetailPageState extends ConsumerState<ClientDetailPage>
 
   Widget _buildSection(String title, IconData icon, List<Widget> children) {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: AppTheme.borderColor,
+          width: 0.5,
+        ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
+            color: Colors.black.withValues(alpha: 0.02),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -417,12 +558,25 @@ class _ClientDetailPageState extends ConsumerState<ClientDetailPage>
         children: [
           Row(
             children: [
-              Icon(icon, color: AppTheme.primaryColor),
-              const SizedBox(width: 8),
+              Container(
+                width: 32,
+                height: 32,
+                decoration: BoxDecoration(
+                  color: AppTheme.primaryColor.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Icon(
+                  icon,
+                  color: AppTheme.primaryColor,
+                  size: 18,
+                ),
+              ),
+              const SizedBox(width: 12),
               Text(
                 title,
                 style: AppTheme.titleMedium.copyWith(
-                  fontWeight: FontWeight.bold,
+                  fontWeight: FontWeight.w600,
+                  color: AppTheme.textPrimaryColor,
                 ),
               ),
             ],
@@ -436,27 +590,42 @@ class _ClientDetailPageState extends ConsumerState<ClientDetailPage>
 
   Widget _buildInfoRow(IconData icon, String label, String value) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.only(bottom: 16),
       child: Row(
         children: [
-          Icon(icon, size: 20, color: Colors.grey[600]),
-          const SizedBox(width: 12),
-          Expanded(
-            flex: 2,
-            child: Text(
-              label,
-              style: AppTheme.bodyMedium.copyWith(
-                color: Colors.grey[600],
-              ),
+          Container(
+            width: 24,
+            height: 24,
+            decoration: BoxDecoration(
+              color: AppTheme.textSecondaryColor.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(6),
+            ),
+            child: Icon(
+              icon,
+              size: 14,
+              color: AppTheme.textSecondaryColor,
             ),
           ),
+          const SizedBox(width: 12),
           Expanded(
-            flex: 3,
-            child: Text(
-              value,
-              style: AppTheme.bodyMedium.copyWith(
-                fontWeight: FontWeight.w500,
-              ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  label,
+                  style: AppTheme.bodySmall.copyWith(
+                    color: AppTheme.textSecondaryColor,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  value,
+                  style: AppTheme.bodyMedium.copyWith(
+                    fontWeight: FontWeight.w500,
+                    color: AppTheme.textPrimaryColor,
+                  ),
+                ),
+              ],
             ),
           ),
         ],
@@ -467,35 +636,48 @@ class _ClientDetailPageState extends ConsumerState<ClientDetailPage>
   Widget _buildHistoryTab() {
     if (_mockHistory.isEmpty) {
       return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              Icons.history,
-              size: 64,
-              color: Colors.grey[400],
-            ),
-            const SizedBox(height: 16),
-            Text(
-              'История пуста',
-              style: AppTheme.titleLarge.copyWith(
-                color: Colors.grey[600],
+        child: Padding(
+          padding: const EdgeInsets.all(32),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                width: 80,
+                height: 80,
+                decoration: BoxDecoration(
+                  color: AppTheme.primaryColor.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Icon(
+                  Icons.history,
+                  size: 40,
+                  color: AppTheme.primaryColor,
+                ),
               ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'Записи клиента будут отображаться здесь',
-              style: AppTheme.bodyMedium.copyWith(
-                color: Colors.grey[500],
+              const SizedBox(height: 24),
+              Text(
+                'История пуста',
+                style: AppTheme.titleLarge.copyWith(
+                  color: AppTheme.textPrimaryColor,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
-            ),
-          ],
+              const SizedBox(height: 8),
+              Text(
+                'Записи клиента будут отображаться здесь',
+                style: AppTheme.bodyMedium.copyWith(
+                  color: AppTheme.textSecondaryColor,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ],
+          ),
         ),
       );
     }
 
     return ListView.builder(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.fromLTRB(20, 0, 20, 100),
       itemCount: _mockHistory.length,
       itemBuilder: (context, index) {
         final appointment = _mockHistory[index];
@@ -505,99 +687,24 @@ class _ClientDetailPageState extends ConsumerState<ClientDetailPage>
   }
 
   Widget _buildHistoryItem(Appointment appointment) {
-    return Card(
+    return Container(
       margin: const EdgeInsets.only(bottom: 12),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Expanded(
-                  child: Text(
-                    appointment.serviceName,
-                    style: AppTheme.titleMedium.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: _getStatusColor(appointment.status).withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(
-                      color: _getStatusColor(appointment.status).withValues(alpha: 0.3),
-                    ),
-                  ),
-                  child: Text(
-                    appointment.status.displayName,
-                    style: AppTheme.bodySmall.copyWith(
-                      color: _getStatusColor(appointment.status),
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 8),
-            Row(
-              children: [
-                Icon(Icons.schedule, size: 16, color: Colors.grey[600]),
-                const SizedBox(width: 4),
-                Text(
-                  _formatDateTime(appointment.startTime),
-                  style: AppTheme.bodyMedium.copyWith(
-                    color: Colors.grey[600],
-                  ),
-                ),
-                const Spacer(),
-                Icon(Icons.attach_money, size: 16, color: Colors.grey[600]),
-                const SizedBox(width: 4),
-                Text(
-                  _formatPrice(appointment.price),
-                  style: AppTheme.bodyMedium.copyWith(
-                    color: Colors.grey[600],
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ],
-            ),
-            if (appointment.notes != null) ...[
-              const SizedBox(height: 8),
-              Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: Colors.grey[100],
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Row(
-                  children: [
-                    Icon(Icons.note, size: 16, color: Colors.grey[600]),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: Text(
-                        appointment.notes!,
-                        style: AppTheme.bodySmall.copyWith(
-                          color: Colors.grey[700],
-                          fontStyle: FontStyle.italic,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ],
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: AppTheme.borderColor,
+          width: 0.5,
         ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.02),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
       ),
-    );
-  }
-
-  Widget _buildNotesTab() {
-    return Padding(
-      padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -605,103 +712,210 @@ class _ClientDetailPageState extends ConsumerState<ClientDetailPage>
             children: [
               Expanded(
                 child: Text(
-                  'Заметки о клиенте',
+                  appointment.serviceName,
                   style: AppTheme.titleMedium.copyWith(
-                    fontWeight: FontWeight.bold,
+                    fontWeight: FontWeight.w600,
+                    color: AppTheme.textPrimaryColor,
                   ),
                 ),
               ),
-              IconButton(
-                icon: const Icon(Icons.edit),
-                onPressed: _editNotes,
-                tooltip: 'Редактировать заметки',
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                decoration: BoxDecoration(
+                  color: _getStatusColor(appointment.status).withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Text(
+                  appointment.status.displayName,
+                  style: AppTheme.labelSmall.copyWith(
+                    color: _getStatusColor(appointment.status),
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
               ),
             ],
           ),
-          const SizedBox(height: 16),
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: Colors.grey[50],
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: Colors.grey[300]!),
-            ),
-            child: Text(
-              widget.client.notes ?? 'Заметки отсутствуют',
-              style: AppTheme.bodyMedium.copyWith(
-                color: widget.client.notes != null ? Colors.black87 : Colors.grey[500],
-                fontStyle: widget.client.notes != null ? FontStyle.normal : FontStyle.italic,
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              Icon(
+                Icons.access_time,
+                size: 16,
+                color: AppTheme.textSecondaryColor,
+              ),
+              const SizedBox(width: 6),
+              Text(
+                _formatDateTime(appointment.startTime),
+                style: AppTheme.bodyMedium.copyWith(
+                  color: AppTheme.textSecondaryColor,
+                ),
+              ),
+              const Spacer(),
+              Text(
+                _formatPrice(appointment.price),
+                style: AppTheme.bodyMedium.copyWith(
+                  color: AppTheme.textPrimaryColor,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
+          ),
+          if (appointment.notes != null) ...[
+            const SizedBox(height: 12),
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: AppTheme.backgroundColor,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Icon(
+                    Icons.note_outlined,
+                    size: 16,
+                    color: AppTheme.textSecondaryColor,
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      appointment.notes!,
+                      style: AppTheme.bodySmall.copyWith(
+                        color: AppTheme.textSecondaryColor,
+                        fontStyle: FontStyle.italic,
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _buildNotesTab() {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20, 0, 20, 100),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                width: 32,
+                height: 32,
+                decoration: BoxDecoration(
+                  color: AppTheme.primaryColor.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Icon(
+                  Icons.note_outlined,
+                  color: AppTheme.primaryColor,
+                  size: 18,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Text(
+                  'Заметки о клиенте',
+                  style: AppTheme.titleMedium.copyWith(
+                    fontWeight: FontWeight.w600,
+                    color: AppTheme.textPrimaryColor,
+                  ),
+                ),
+              ),
+              Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: AppTheme.borderColor,
+                    width: 0.5,
+                  ),
+                ),
+                child: IconButton(
+                  icon: Icon(
+                    Icons.edit_outlined,
+                    size: 18,
+                    color: AppTheme.textSecondaryColor,
+                  ),
+                  onPressed: _editNotes,
+                  padding: EdgeInsets.zero,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 20),
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(
+                color: AppTheme.borderColor,
+                width: 0.5,
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.02),
+                  blurRadius: 8,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+            ),
+            child: widget.client.notes != null && widget.client.notes!.isNotEmpty
+                ? Text(
+                    widget.client.notes!,
+                    style: AppTheme.bodyMedium.copyWith(
+                      color: AppTheme.textPrimaryColor,
+                      height: 1.5,
+                    ),
+                  )
+                : Column(
+                    children: [
+                      Icon(
+                        Icons.note_add_outlined,
+                        size: 48,
+                        color: AppTheme.textSecondaryColor.withValues(alpha: 0.5),
+                      ),
+                      const SizedBox(height: 12),
+                      Text(
+                        'Заметки отсутствуют',
+                        style: AppTheme.bodyMedium.copyWith(
+                          color: AppTheme.textSecondaryColor,
+                          fontStyle: FontStyle.italic,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        'Нажмите на кнопку редактирования, чтобы добавить заметки',
+                        style: AppTheme.bodySmall.copyWith(
+                          color: AppTheme.textSecondaryColor,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ],
+                  ),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildStatusBadge() {
-    Color color;
+  Color _getClientStatusColor() {
     switch (widget.client.status) {
       case ClientStatus.active:
-        color = Colors.green;
-        break;
+        return Colors.green;
       case ClientStatus.inactive:
-        color = Colors.orange;
-        break;
+        return Colors.orange;
       case ClientStatus.blocked:
-        color = Colors.red;
-        break;
+        return Colors.red;
     }
-
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: color.withValues(alpha: 0.3)),
-      ),
-      child: Text(
-        widget.client.status.displayName,
-        style: AppTheme.bodySmall.copyWith(
-          color: color,
-          fontWeight: FontWeight.w500,
-        ),
-      ),
-    );
-  }
-
-  Widget _buildLoyaltyBadge() {
-    Color color;
-    switch (widget.client.loyaltyLevel) {
-      case 'VIP':
-        color = Colors.purple;
-        break;
-      case 'Золотой':
-        color = Colors.amber;
-        break;
-      case 'Серебряный':
-        color = Colors.grey;
-        break;
-      default:
-        color = Colors.blue;
-    }
-
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: color.withValues(alpha: 0.3)),
-      ),
-      child: Text(
-        widget.client.loyaltyLevel,
-        style: AppTheme.bodySmall.copyWith(
-          color: color,
-          fontWeight: FontWeight.bold,
-        ),
-      ),
-    );
   }
 
   Color _getAvatarColor() {
@@ -734,6 +948,23 @@ class _ClientDetailPageState extends ConsumerState<ClientDetailPage>
 
   String _formatDate(DateTime date) {
     return '${date.day}.${date.month.toString().padLeft(2, '0')}.${date.year}';
+  }
+
+  String _formatDateShort(DateTime date) {
+    final now = DateTime.now();
+    final difference = now.difference(date).inDays;
+    
+    if (difference == 0) {
+      return 'Сегодня';
+    } else if (difference == 1) {
+      return 'Вчера';
+    } else if (difference < 7) {
+      return '$difference дн. назад';
+    } else if (difference < 30) {
+      return '${(difference / 7).floor()} нед. назад';
+    } else {
+      return '${date.day}.${date.month.toString().padLeft(2, '0')}';
+    }
   }
 
   String _formatDateTime(DateTime dateTime) {

@@ -5,6 +5,7 @@ import '../../../core/constants/app_constants.dart';
 import '../../../data/models/client.dart';
 import '../../theme/app_theme.dart';
 import '../../providers/clients_provider.dart';
+import '../../widgets/modern_app_header.dart';
 import 'widgets/client_card.dart';
 import 'widgets/client_search_delegate.dart';
 import 'client_detail_page.dart';
@@ -59,73 +60,139 @@ class _StaffClientsPageState extends ConsumerState<StaffClientsPage> {
     final filteredClients = _getFilteredAndSortedClients(clientsState.clients);
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Клиенты'),
-        elevation: 0,
+      appBar: ModernAppHeader(
+        title: 'Клиенты',
+        subtitle: 'База данных клиентов салона',
         actions: [
-          IconButton(
-            icon: const Icon(Icons.search),
-            onPressed: _showSearch,
-            tooltip: 'Поиск клиентов',
+          Container(
+            margin: const EdgeInsets.only(right: 8),
+            child: IconButton(
+              icon: Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: AppTheme.backgroundColor,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: AppTheme.borderColor,
+                    width: 1,
+                  ),
+                ),
+                child: Icon(
+                  Icons.search,
+                  color: AppTheme.textSecondaryColor,
+                  size: 18,
+                ),
+              ),
+              onPressed: _showSearch,
+              tooltip: 'Поиск клиентов',
+            ),
           ),
-          PopupMenuButton<String>(
-            onSelected: (value) {
-              if (value == 'add_client') {
-                _addClient();
-              } else if (value == 'export') {
-                _exportClients();
-              }
-            },
-            itemBuilder: (context) => [
-              const PopupMenuItem(
-                value: 'add_client',
-                child: Row(
-                  children: [
-                    Icon(Icons.person_add),
-                    SizedBox(width: 8),
-                    Text('Добавить клиента'),
-                  ],
+          Container(
+            margin: const EdgeInsets.only(right: 8),
+            child: PopupMenuButton<String>(
+              icon: Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: AppTheme.backgroundColor,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: AppTheme.borderColor,
+                    width: 1,
+                  ),
+                ),
+                child: Icon(
+                  Icons.more_vert,
+                  color: AppTheme.textSecondaryColor,
+                  size: 18,
                 ),
               ),
-              const PopupMenuItem(
-                value: 'export',
-                child: Row(
-                  children: [
-                    Icon(Icons.download),
-                    SizedBox(width: 8),
-                    Text('Экспорт списка'),
-                  ],
+              onSelected: (value) {
+                if (value == 'add_client') {
+                  _addClient();
+                } else if (value == 'export') {
+                  _exportClients();
+                }
+              },
+              itemBuilder: (context) => [
+                const PopupMenuItem(
+                  value: 'add_client',
+                  child: Row(
+                    children: [
+                      Icon(Icons.person_add),
+                      SizedBox(width: 8),
+                      Text('Добавить клиента'),
+                    ],
+                  ),
                 ),
-              ),
-            ],
+                const PopupMenuItem(
+                  value: 'export',
+                  child: Row(
+                    children: [
+                      Icon(Icons.download),
+                      SizedBox(width: 8),
+                      Text('Экспорт списка'),
+                    ],
+                  ),
+                ),
+              ],
+            ),
           ),
         ],
       ),
       body: Column(
         children: [
-          // Stats and Filters
+          // Search and Filter Bar
           Container(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.fromLTRB(20, 16, 20, 20),
             decoration: BoxDecoration(
-              color: Theme.of(context).scaffoldBackgroundColor,
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.05),
-                  blurRadius: 4,
-                  offset: const Offset(0, 2),
+              color: AppTheme.backgroundColor,
+              border: Border(
+                bottom: BorderSide(
+                  color: AppTheme.borderColor,
+                  width: 0.5,
                 ),
-              ],
+              ),
             ),
             child: Column(
               children: [
-                // Stats
-                _buildStatsRow(filteredClients),
+                // Search Bar
+                Container(
+                  height: 44,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: AppTheme.borderColor,
+                      width: 0.5,
+                    ),
+                  ),
+                  child: TextField(
+                    decoration: InputDecoration(
+                      hintText: 'Поиск клиентов...',
+                      hintStyle: AppTheme.bodyMedium.copyWith(
+                        color: AppTheme.textSecondaryColor,
+                      ),
+                      prefixIcon: Icon(
+                        Icons.search,
+                        color: AppTheme.textSecondaryColor,
+                        size: 20,
+                      ),
+                      border: InputBorder.none,
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 12,
+                      ),
+                    ),
+                    onTap: _showSearch,
+                    readOnly: true,
+                  ),
+                ),
                 const SizedBox(height: 16),
-                // Filters and Sort
+                // Filter Chips
                 Row(
                   children: [
                     Expanded(child: _buildFilterChips()),
-                    const SizedBox(width: 16),
+                    const SizedBox(width: 12),
                     _buildSortButton(),
                   ],
                 ),
@@ -137,7 +204,7 @@ class _StaffClientsPageState extends ConsumerState<StaffClientsPage> {
             child: filteredClients.isEmpty
                 ? _buildEmptyState()
                 : ListView.builder(
-                    padding: const EdgeInsets.all(16),
+                    padding: const EdgeInsets.fromLTRB(20, 16, 20, 100),
                     itemCount: filteredClients.length,
                     itemBuilder: (context, index) {
                       final client = filteredClients[index];
@@ -152,81 +219,36 @@ class _StaffClientsPageState extends ConsumerState<StaffClientsPage> {
           ),
         ],
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _addClient,
-        child: const Icon(Icons.person_add),
-        tooltip: 'Добавить клиента',
-      ),
-    );
-  }
-
-  Widget _buildStatsRow(List<Client> clients) {
-    final activeClients = clients.where((c) => c.status == ClientStatus.active).length;
-    final totalRevenue = clients.fold<double>(0, (sum, client) => sum + client.totalSpent);
-    final avgSpent = clients.isNotEmpty ? totalRevenue / clients.length : 0.0;
-
-    return Row(
-      children: [
-        Expanded(
-          child: _buildStatCard(
-            'Всего клиентов',
-            '${clients.length}',
-            Icons.people,
-            Colors.blue,
-          ),
+      floatingActionButton: Container(
+        width: 56,
+        height: 56,
+        decoration: BoxDecoration(
+          gradient: AppTheme.primaryGradient,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: AppTheme.primaryColor.withValues(alpha: 0.3),
+              blurRadius: 12,
+              offset: const Offset(0, 4),
+            ),
+          ],
         ),
-        const SizedBox(width: 12),
-        Expanded(
-          child: _buildStatCard(
-            'Активных',
-            '$activeClients',
-            Icons.person,
-            Colors.green,
-          ),
-        ),
-        const SizedBox(width: 12),
-        Expanded(
-          child: _buildStatCard(
-            'Средний чек',
-            _formatPrice(avgSpent),
-            Icons.attach_money,
-            Colors.orange,
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildStatCard(String title, String value, IconData icon, Color color) {
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: color.withValues(alpha: 0.2)),
-      ),
-      child: Column(
-        children: [
-          Icon(icon, color: color, size: 20),
-          const SizedBox(height: 4),
-          Text(
-            value,
-            style: AppTheme.titleMedium.copyWith(
-              color: color,
-              fontWeight: FontWeight.bold,
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            onTap: _addClient,
+            borderRadius: BorderRadius.circular(16),
+            child: const Icon(
+              Icons.person_add,
+              color: Colors.white,
+              size: 24,
             ),
           ),
-          Text(
-            title,
-            style: AppTheme.bodySmall.copyWith(
-              color: Colors.grey[600],
-            ),
-            textAlign: TextAlign.center,
-          ),
-        ],
+        ),
       ),
     );
   }
+
 
   Widget _buildFilterChips() {
     return SingleChildScrollView(
@@ -236,16 +258,41 @@ class _StaffClientsPageState extends ConsumerState<StaffClientsPage> {
           final isSelected = _filterType == filter;
           return Padding(
             padding: const EdgeInsets.only(right: 8),
-            child: FilterChip(
-              label: Text(_getFilterLabel(filter)),
-              selected: isSelected,
-              onSelected: (selected) {
+            child: GestureDetector(
+              onTap: () {
                 setState(() {
                   _filterType = filter;
                 });
               },
-              selectedColor: AppTheme.primaryColor.withValues(alpha: 0.2),
-              checkmarkColor: AppTheme.primaryColor,
+              child: Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 8,
+                ),
+                decoration: BoxDecoration(
+                  color: isSelected 
+                      ? AppTheme.primaryColor 
+                      : Colors.white,
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(
+                    color: isSelected 
+                        ? AppTheme.primaryColor 
+                        : AppTheme.borderColor,
+                    width: 1,
+                  ),
+                ),
+                child: Text(
+                  _getFilterLabel(filter),
+                  style: AppTheme.bodyMedium.copyWith(
+                    color: isSelected 
+                        ? Colors.white 
+                        : AppTheme.textSecondaryColor,
+                    fontWeight: isSelected 
+                        ? FontWeight.w500 
+                        : FontWeight.normal,
+                  ),
+                ),
+              ),
             ),
           );
         }).toList(),
@@ -273,27 +320,30 @@ class _StaffClientsPageState extends ConsumerState<StaffClientsPage> {
               Text(_getSortLabel(sortType)),
               const Spacer(),
               if (_sortType == sortType)
-                Icon(_sortAscending ? Icons.arrow_upward : Icons.arrow_downward),
+                Icon(
+                  _sortAscending ? Icons.arrow_upward : Icons.arrow_downward,
+                  size: 16,
+                  color: AppTheme.primaryColor,
+                ),
             ],
           ),
         );
       }).toList(),
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        width: 40,
+        height: 40,
         decoration: BoxDecoration(
-          border: Border.all(color: Colors.grey[300]!),
-          borderRadius: BorderRadius.circular(8),
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: AppTheme.borderColor,
+            width: 0.5,
+          ),
         ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Icon(Icons.sort, size: 18),
-            const SizedBox(width: 4),
-            Text(
-              _getSortLabel(_sortType),
-              style: AppTheme.bodySmall,
-            ),
-          ],
+        child: Icon(
+          Icons.tune,
+          size: 20,
+          color: AppTheme.textSecondaryColor,
         ),
       ),
     );
@@ -301,36 +351,69 @@ class _StaffClientsPageState extends ConsumerState<StaffClientsPage> {
 
   Widget _buildEmptyState() {
     return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            Icons.people_outline,
-            size: 64,
-            color: Colors.grey[400],
-          ),
-          const SizedBox(height: 16),
-          Text(
-            'Клиенты не найдены',
-            style: AppTheme.titleLarge.copyWith(
-              color: Colors.grey[600],
+      child: Padding(
+        padding: const EdgeInsets.all(32),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              width: 80,
+              height: 80,
+              decoration: BoxDecoration(
+                color: AppTheme.primaryColor.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Icon(
+                Icons.people_outline,
+                size: 40,
+                color: AppTheme.primaryColor,
+              ),
             ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            'Попробуйте изменить фильтры или добавить нового клиента',
-            style: AppTheme.bodyMedium.copyWith(
-              color: Colors.grey[500],
+            const SizedBox(height: 24),
+            Text(
+              'Клиенты не найдены',
+              style: AppTheme.titleLarge.copyWith(
+                color: AppTheme.textPrimaryColor,
+                fontWeight: FontWeight.w600,
+              ),
             ),
-            textAlign: TextAlign.center,
-          ),
-          const SizedBox(height: 24),
-          ElevatedButton.icon(
-            onPressed: _addClient,
-            icon: const Icon(Icons.person_add),
-            label: const Text('Добавить клиента'),
-          ),
-        ],
+            const SizedBox(height: 8),
+            Text(
+              'Попробуйте изменить фильтры или добавить нового клиента',
+              style: AppTheme.bodyMedium.copyWith(
+                color: AppTheme.textSecondaryColor,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 32),
+            Container(
+              width: double.infinity,
+              height: 48,
+              decoration: BoxDecoration(
+                gradient: AppTheme.primaryGradient,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: ElevatedButton.icon(
+                onPressed: _addClient,
+                icon: const Icon(Icons.person_add, color: Colors.white),
+                label: Text(
+                  'Добавить клиента',
+                  style: AppTheme.bodyMedium.copyWith(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.transparent,
+                  shadowColor: Colors.transparent,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -470,9 +553,6 @@ class _StaffClientsPageState extends ConsumerState<StaffClientsPage> {
     );
   }
 
-  String _formatPrice(double price) {
-    return '${(price / 1000).toStringAsFixed(0)} тыс. сум';
-  }
 
   Widget _buildErrorState(String error) {
     return Center(

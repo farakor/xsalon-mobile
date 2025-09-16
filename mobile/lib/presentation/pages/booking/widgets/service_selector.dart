@@ -57,24 +57,39 @@ class _ServiceSelectorState extends ConsumerState<ServiceSelector> {
         // Selected Services (if any)
         if (widget.selectedServices.isNotEmpty) ...[
           Container(
-            padding: const EdgeInsets.all(12),
+            padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
               color: AppTheme.primaryColor.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: AppTheme.primaryColor),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: AppTheme.primaryColor,
+                width: 1,
+              ),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Row(
                   children: [
-                    const Icon(Icons.check_circle, color: AppTheme.primaryColor),
-                    const SizedBox(width: 8),
+                    Container(
+                      width: 24,
+                      height: 24,
+                      decoration: BoxDecoration(
+                        color: AppTheme.primaryColor,
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      child: const Icon(
+                        Icons.check,
+                        color: Colors.white,
+                        size: 16,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
                     Text(
                       'Выбрано услуг: ${widget.selectedServices.length}',
                       style: AppTheme.titleSmall.copyWith(
                         color: AppTheme.primaryColor,
-                        fontWeight: FontWeight.bold,
+                        fontWeight: FontWeight.w600,
                       ),
                     ),
                   ],
@@ -127,12 +142,31 @@ class _ServiceSelectorState extends ConsumerState<ServiceSelector> {
           const SizedBox(height: 16),
         ],
         
-        // Categories
-        Text(
-          'Выберите категорию услуг',
-          style: AppTheme.titleMedium.copyWith(
-            fontWeight: FontWeight.bold,
-          ),
+        // Categories с иконкой
+        Row(
+          children: [
+            Container(
+              width: 32,
+              height: 32,
+              decoration: BoxDecoration(
+                color: AppTheme.primaryColor.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: const Icon(
+                Icons.category,
+                color: AppTheme.primaryColor,
+                size: 18,
+              ),
+            ),
+            const SizedBox(width: 12),
+            Text(
+              'Выберите категорию услуг',
+              style: AppTheme.titleMedium.copyWith(
+                fontWeight: FontWeight.w600,
+                color: AppTheme.textPrimaryColor,
+              ),
+            ),
+          ],
         ),
         const SizedBox(height: 12),
         
@@ -172,17 +206,25 @@ class _ServiceSelectorState extends ConsumerState<ServiceSelector> {
                         child: Container(
                           width: 120,
                           margin: const EdgeInsets.only(right: 12),
-                          padding: const EdgeInsets.all(12),
+                          padding: const EdgeInsets.all(16),
                           decoration: BoxDecoration(
                             color: isSelected 
                                 ? AppTheme.primaryColor 
-                                : Colors.grey[100],
-                            borderRadius: BorderRadius.circular(12),
+                                : Colors.white,
+                            borderRadius: BorderRadius.circular(16),
                             border: Border.all(
                               color: isSelected 
                                   ? AppTheme.primaryColor 
-                                  : Colors.grey[300]!,
+                                  : AppTheme.borderColor,
+                              width: isSelected ? 1 : 0.5,
                             ),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withValues(alpha: 0.02),
+                                blurRadius: 8,
+                                offset: const Offset(0, 2),
+                              ),
+                            ],
                           ),
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
@@ -196,7 +238,7 @@ class _ServiceSelectorState extends ConsumerState<ServiceSelector> {
                               Text(
                                 category.name,
                                 style: AppTheme.bodySmall.copyWith(
-                                  color: isSelected ? Colors.white : Colors.grey[700],
+                                  color: isSelected ? Colors.white : AppTheme.textSecondaryColor,
                                   fontWeight: isSelected ? FontWeight.w500 : FontWeight.normal,
                                 ),
                                 textAlign: TextAlign.center,
@@ -215,14 +257,30 @@ class _ServiceSelectorState extends ConsumerState<ServiceSelector> {
         
         // Services
         if (_selectedCategoryId != null) ...[
-          Align(
-            alignment: Alignment.centerLeft,
-            child: Text(
-              'Выберите услугу',
-              style: AppTheme.titleMedium.copyWith(
-                fontWeight: FontWeight.bold,
+          Row(
+            children: [
+              Container(
+                width: 32,
+                height: 32,
+                decoration: BoxDecoration(
+                  color: AppTheme.primaryColor.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: const Icon(
+                  Icons.design_services,
+                  color: AppTheme.primaryColor,
+                  size: 18,
+                ),
               ),
-            ),
+              const SizedBox(width: 12),
+              Text(
+                'Выберите услугу',
+                style: AppTheme.titleMedium.copyWith(
+                  fontWeight: FontWeight.w600,
+                  color: AppTheme.textPrimaryColor,
+                ),
+              ),
+            ],
           ),
           const SizedBox(height: 12),
           
@@ -236,27 +294,70 @@ class _ServiceSelectorState extends ConsumerState<ServiceSelector> {
                       final service = _filteredServices[index];
                       final isSelected = widget.selectedServices.any((s) => s.id == service.id);
                       
-                      return Card(
-                        margin: const EdgeInsets.only(bottom: 8),
-                        elevation: isSelected ? 4 : 1,
-                        child: ListTile(
-                          contentPadding: const EdgeInsets.all(16),
-                          title: Text(
-                            service.name,
-                            style: AppTheme.titleMedium.copyWith(
-                              fontWeight: FontWeight.bold,
-                              color: isSelected ? AppTheme.primaryColor : null,
-                            ),
+                      return Container(
+                        margin: const EdgeInsets.only(bottom: 12),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(16),
+                          border: Border.all(
+                            color: isSelected ? AppTheme.primaryColor : AppTheme.borderColor,
+                            width: isSelected ? 1 : 0.5,
                           ),
-                          subtitle: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const SizedBox(height: 4),
-                              Text(
-                                service.description,
-                                style: AppTheme.bodyMedium,
-                              ),
-                              const SizedBox(height: 8),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withValues(alpha: 0.02),
+                              blurRadius: 8,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                        child: InkWell(
+                          onTap: () => _toggleService(service),
+                          borderRadius: BorderRadius.circular(16),
+                          child: Padding(
+                            padding: const EdgeInsets.all(20),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      child: Text(
+                                        service.name,
+                                        style: AppTheme.titleMedium.copyWith(
+                                          fontWeight: FontWeight.w600,
+                                          color: isSelected ? AppTheme.primaryColor : AppTheme.textPrimaryColor,
+                                        ),
+                                      ),
+                                    ),
+                                    const SizedBox(width: 12),
+                                    Container(
+                                      width: 24,
+                                      height: 24,
+                                      decoration: BoxDecoration(
+                                        color: isSelected 
+                                            ? AppTheme.primaryColor 
+                                            : AppTheme.textSecondaryColor.withValues(alpha: 0.1),
+                                        borderRadius: BorderRadius.circular(6),
+                                      ),
+                                      child: Icon(
+                                        isSelected ? Icons.check : Icons.add,
+                                        size: 16,
+                                        color: isSelected 
+                                            ? Colors.white 
+                                            : AppTheme.textSecondaryColor,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 8),
+                                Text(
+                                  service.description,
+                                  style: AppTheme.bodyMedium.copyWith(
+                                    color: AppTheme.textSecondaryColor,
+                                  ),
+                                ),
+                                const SizedBox(height: 12),
                               Row(
                                 children: [
                                   Container(
@@ -308,16 +409,11 @@ class _ServiceSelectorState extends ConsumerState<ServiceSelector> {
                                       ],
                                     ),
                                   ),
-                                ],
-                              ),
-                            ],
-                          ),
-                          trailing: isSelected
-                              ? const Icon(Icons.check_circle, color: AppTheme.primaryColor)
-                              : const Icon(Icons.chevron_right),
-                          selected: isSelected,
-                          selectedTileColor: AppTheme.primaryColor.withValues(alpha: 0.05),
-                          onTap: () => _toggleService(service),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
                         ),
                       );
                     },
@@ -410,28 +506,52 @@ class _ServiceSelectorState extends ConsumerState<ServiceSelector> {
   }
 
   Widget _buildEmptyState() {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            Icons.design_services_outlined,
-            size: 64,
-            color: Colors.grey[400],
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: AppTheme.borderColor,
+          width: 0.5,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.02),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
           ),
-          const SizedBox(height: 16),
+        ],
+      ),
+      child: Column(
+        children: [
+          Container(
+            width: 48,
+            height: 48,
+            decoration: BoxDecoration(
+              color: Colors.grey.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: const Icon(
+              Icons.design_services_outlined,
+              color: Colors.grey,
+              size: 24,
+            ),
+          ),
+          const SizedBox(height: 12),
           Text(
             'Услуги не найдены',
-            style: AppTheme.titleLarge.copyWith(
-              color: Colors.grey[600],
+            style: AppTheme.titleSmall.copyWith(
+              fontWeight: FontWeight.w600,
+              color: AppTheme.textPrimaryColor,
             ),
           ),
-          const SizedBox(height: 8),
           Text(
             'В этой категории пока нет доступных услуг',
-            style: AppTheme.bodyMedium.copyWith(
-              color: Colors.grey[500],
+            style: AppTheme.bodySmall.copyWith(
+              color: AppTheme.textSecondaryColor,
             ),
+            textAlign: TextAlign.center,
           ),
         ],
       ),

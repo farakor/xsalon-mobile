@@ -99,197 +99,311 @@ class _ScheduleSettingsPageState extends ConsumerState<ScheduleSettingsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppTheme.backgroundColor,
       appBar: AppBar(
         title: const Text('Настройте график работы'),
         backgroundColor: Colors.white,
-        foregroundColor: Colors.black,
         elevation: 0,
+        shadowColor: Colors.black.withValues(alpha: 0.02),
+        surfaceTintColor: Colors.white,
       ),
-      body: Container(
-        color: Colors.grey[50],
-        child: Column(
-          children: [
-            Expanded(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.all(AppConstants.defaultPadding),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Заголовок и описание
-                    Text(
-                      'Настройте график работы',
-                      style: AppTheme.titleLarge.copyWith(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black87,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      'Укажите часовой пояс и часы работы. Не беспокойтесь: если что, это можно будет отредактировать позже',
-                      style: AppTheme.bodyMedium.copyWith(
-                        color: Colors.grey[600],
-                      ),
-                    ),
-                    const SizedBox(height: 32),
-
-                    // Список дней недели
-                    ...workingDays.entries.map((entry) {
-                      final dayKey = entry.key;
-                      final isWorking = entry.value;
-                      final hours = workingHours[dayKey]!;
-
-                      return Container(
-                        margin: const EdgeInsets.only(bottom: 8),
-                        padding: const EdgeInsets.all(16),
+      body: Column(
+        children: [
+          Expanded(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.fromLTRB(20, 20, 20, 100),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Заголовок с иконкой
+                  Row(
+                    children: [
+                      Container(
+                        width: 32,
+                        height: 32,
                         decoration: BoxDecoration(
-                          color: Colors.white,
+                          color: AppTheme.primaryColor.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(8),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withValues(alpha: 0.05),
-                              blurRadius: 4,
-                              offset: const Offset(0, 2),
-                            ),
-                          ],
                         ),
-                        child: Row(
-                          children: [
-                            // День недели
-                            SizedBox(
-                              width: 30,
-                              child: Text(
-                                dayKey,
-                                style: AppTheme.bodyMedium.copyWith(
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                            ),
-                            const SizedBox(width: 16),
-
-                            // Время работы или переключатель
-                            if (isWorking) ...[
-                              Expanded(
-                                child: Row(
-                                  children: [
-                                    GestureDetector(
-                                      onTap: () => _selectTime(context, dayKey, 'start'),
-                                      child: Container(
-                                        padding: const EdgeInsets.symmetric(
-                                          horizontal: 12,
-                                          vertical: 8,
-                                        ),
-                                        decoration: BoxDecoration(
-                                          color: Colors.grey[100],
-                                          borderRadius: BorderRadius.circular(6),
-                                        ),
-                                        child: Text(
-                                          _formatTime(hours['start']!),
-                                          style: AppTheme.bodyMedium.copyWith(
-                                            color: Colors.pink,
-                                            fontWeight: FontWeight.w500,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                    const SizedBox(width: 8),
-                                    Text(
-                                      ' — ',
-                                      style: AppTheme.bodyMedium,
-                                    ),
-                                    const SizedBox(width: 8),
-                                    GestureDetector(
-                                      onTap: () => _selectTime(context, dayKey, 'end'),
-                                      child: Container(
-                                        padding: const EdgeInsets.symmetric(
-                                          horizontal: 12,
-                                          vertical: 8,
-                                        ),
-                                        decoration: BoxDecoration(
-                                          color: Colors.grey[100],
-                                          borderRadius: BorderRadius.circular(6),
-                                        ),
-                                        child: Text(
-                                          _formatTime(hours['end']!),
-                                          style: AppTheme.bodyMedium.copyWith(
-                                            color: Colors.pink,
-                                            fontWeight: FontWeight.w500,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ] else ...[
-                              Expanded(
-                                child: Text(
-                                  'Выходной',
-                                  style: AppTheme.bodyMedium.copyWith(
-                                    color: Colors.grey[500],
-                                  ),
-                                ),
-                              ),
-                            ],
-
-                            // Переключатель работы/выходного
-                            Switch(
-                              value: isWorking,
-                              onChanged: (value) {
-                                setState(() {
-                                  workingDays[dayKey] = value;
-                                });
-                              },
-                              activeColor: Colors.green,
-                              activeTrackColor: Colors.green.withValues(alpha: 0.3),
-                            ),
-                          ],
+                        child: const Icon(
+                          Icons.schedule,
+                          color: AppTheme.primaryColor,
+                          size: 18,
                         ),
-                      );
-                    }),
-
-                    const SizedBox(height: 40),
-                  ],
-                ),
-              ),
-            ),
-
-            // Кнопка продолжить
-            Container(
-              padding: const EdgeInsets.all(AppConstants.defaultPadding),
-              child: SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: _isLoading ? null : _saveSchedule,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.pink,
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
+                      ),
+                      const SizedBox(width: 12),
+                      Text(
+                        'Настройка расписания',
+                        style: AppTheme.titleMedium.copyWith(
+                          fontWeight: FontWeight.w600,
+                          color: AppTheme.textPrimaryColor,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Укажите часовой пояс и часы работы. Не беспокойтесь: если что, это можно будет отредактировать позже',
+                    style: AppTheme.bodyMedium.copyWith(
+                      color: AppTheme.textSecondaryColor,
                     ),
                   ),
-                                        child: _isLoading
-                          ? const SizedBox(
-                              height: 20,
-                              width: 20,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2,
-                                valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                  const SizedBox(height: 16),
+
+                  // Карточка с расписанием
+                  Container(
+                    padding: const EdgeInsets.all(20),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(
+                        color: AppTheme.borderColor,
+                        width: 0.5,
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.02),
+                          blurRadius: 8,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Заголовок секции
+                        Row(
+                          children: [
+                            Container(
+                              width: 32,
+                              height: 32,
+                              decoration: BoxDecoration(
+                                color: AppTheme.primaryColor.withValues(alpha: 0.1),
+                                borderRadius: BorderRadius.circular(8),
                               ),
-                            )
-                          : const Text(
-                              'Сохранить',
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w600,
+                              child: const Icon(
+                                Icons.calendar_view_week,
+                                color: AppTheme.primaryColor,
+                                size: 18,
                               ),
                             ),
-                ),
+                            const SizedBox(width: 12),
+                            Text(
+                              'Рабочие дни',
+                              style: AppTheme.titleMedium.copyWith(
+                                fontWeight: FontWeight.w600,
+                                color: AppTheme.textPrimaryColor,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 16),
+                        
+                        // Список дней недели
+                        ...workingDays.entries.map((entry) {
+                          final dayKey = entry.key;
+                          final isWorking = entry.value;
+                          final hours = workingHours[dayKey]!;
+
+                          return Container(
+                            margin: const EdgeInsets.only(bottom: 12),
+                            padding: const EdgeInsets.all(16),
+                            decoration: BoxDecoration(
+                              color: isWorking 
+                                  ? AppTheme.primaryColor.withValues(alpha: 0.05)
+                                  : Colors.grey.withValues(alpha: 0.05),
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(
+                                color: isWorking 
+                                    ? AppTheme.primaryColor.withValues(alpha: 0.2)
+                                    : AppTheme.borderColor,
+                                width: 0.5,
+                              ),
+                            ),
+                            child: Row(
+                              children: [
+                                // День недели
+                                Container(
+                                  width: 32,
+                                  height: 32,
+                                  decoration: BoxDecoration(
+                                    color: isWorking 
+                                        ? AppTheme.primaryColor 
+                                        : Colors.grey.withValues(alpha: 0.3),
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  child: Center(
+                                    child: Text(
+                                      dayKey.toUpperCase(),
+                                      style: AppTheme.bodySmall.copyWith(
+                                        fontWeight: FontWeight.w600,
+                                        color: isWorking ? Colors.white : Colors.grey,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(width: 16),
+
+                                // Время работы или переключатель
+                                if (isWorking) ...[
+                                  Expanded(
+                                    child: Row(
+                                      children: [
+                                        InkWell(
+                                          onTap: () => _selectTime(context, dayKey, 'start'),
+                                          borderRadius: BorderRadius.circular(8),
+                                          child: Container(
+                                            padding: const EdgeInsets.symmetric(
+                                              horizontal: 12,
+                                              vertical: 8,
+                                            ),
+                                            decoration: BoxDecoration(
+                                              color: AppTheme.primaryColor.withValues(alpha: 0.1),
+                                              borderRadius: BorderRadius.circular(8),
+                                              border: Border.all(
+                                                color: AppTheme.primaryColor.withValues(alpha: 0.3),
+                                                width: 0.5,
+                                              ),
+                                            ),
+                                            child: Row(
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: [
+                                                const Icon(
+                                                  Icons.access_time,
+                                                  size: 14,
+                                                  color: AppTheme.primaryColor,
+                                                ),
+                                                const SizedBox(width: 4),
+                                                Text(
+                                                  _formatTime(hours['start']!),
+                                                  style: AppTheme.bodyMedium.copyWith(
+                                                    color: AppTheme.primaryColor,
+                                                    fontWeight: FontWeight.w500,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                        const SizedBox(width: 8),
+                                        Text(
+                                          '—',
+                                          style: AppTheme.bodyMedium.copyWith(
+                                            color: AppTheme.textSecondaryColor,
+                                          ),
+                                        ),
+                                        const SizedBox(width: 8),
+                                        InkWell(
+                                          onTap: () => _selectTime(context, dayKey, 'end'),
+                                          borderRadius: BorderRadius.circular(8),
+                                          child: Container(
+                                            padding: const EdgeInsets.symmetric(
+                                              horizontal: 12,
+                                              vertical: 8,
+                                            ),
+                                            decoration: BoxDecoration(
+                                              color: AppTheme.primaryColor.withValues(alpha: 0.1),
+                                              borderRadius: BorderRadius.circular(8),
+                                              border: Border.all(
+                                                color: AppTheme.primaryColor.withValues(alpha: 0.3),
+                                                width: 0.5,
+                                              ),
+                                            ),
+                                            child: Row(
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: [
+                                                const Icon(
+                                                  Icons.access_time,
+                                                  size: 14,
+                                                  color: AppTheme.primaryColor,
+                                                ),
+                                                const SizedBox(width: 4),
+                                                Text(
+                                                  _formatTime(hours['end']!),
+                                                  style: AppTheme.bodyMedium.copyWith(
+                                                    color: AppTheme.primaryColor,
+                                                    fontWeight: FontWeight.w500,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ] else ...[
+                                  Expanded(
+                                    child: Text(
+                                      'Выходной',
+                                      style: AppTheme.bodyMedium.copyWith(
+                                        color: AppTheme.textSecondaryColor,
+                                        fontStyle: FontStyle.italic,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+
+                                // Переключатель работы/выходного
+                                Switch(
+                                  value: isWorking,
+                                  onChanged: (value) {
+                                    setState(() {
+                                      workingDays[dayKey] = value;
+                                    });
+                                  },
+                                  activeColor: AppTheme.primaryColor,
+                                  materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                ),
+                              ],
+                            ),
+                          );
+                        }),
+                      ],
+                    ),
+                  ),
+                  
+                  const SizedBox(height: 16),
+                ],
               ),
             ),
-          ],
-        ),
+          ),
+
+          // Кнопка сохранить
+          Container(
+            padding: const EdgeInsets.all(20),
+            child: SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: _isLoading ? null : _saveSchedule,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppTheme.primaryColor,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                child: _isLoading
+                    ? const SizedBox(
+                        height: 20,
+                        width: 20,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                        ),
+                      )
+                    : const Text(
+                        'Сохранить',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -308,7 +422,7 @@ class _ScheduleSettingsPageState extends ConsumerState<ScheduleSettingsPage> {
         return Theme(
           data: Theme.of(context).copyWith(
             colorScheme: Theme.of(context).colorScheme.copyWith(
-              primary: Colors.pink,
+              primary: AppTheme.primaryColor,
             ),
           ),
           child: child!,
