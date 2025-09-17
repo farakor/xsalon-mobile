@@ -442,14 +442,9 @@ class _ScheduleSettingsPageState extends ConsumerState<ScheduleSettingsPage> {
       setState(() => _isLoading = true);
       
       final masterId = await _scheduleService.getCurrentMasterId();
-      final organizationId = await _scheduleService.getCurrentOrganizationId();
       
       if (masterId == null) {
         throw Exception('Мастер не найден. Проверьте, что вы авторизованы как мастер.');
-      }
-      
-      if (organizationId == null) {
-        throw Exception('Организация не найдена. Обратитесь к администратору.');
       }
       
       // Конвертируем UI данные в модели
@@ -469,7 +464,6 @@ class _ScheduleSettingsPageState extends ConsumerState<ScheduleSettingsPage> {
         schedules.add(MasterSchedule(
           id: '', // Будет сгенерирован в базе
           masterId: masterId,
-          organizationId: organizationId,
           dayOfWeek: englishDay,
           isWorking: isWorking,
           startTime: startTime,
@@ -479,7 +473,7 @@ class _ScheduleSettingsPageState extends ConsumerState<ScheduleSettingsPage> {
         ));
       }
       
-      await _scheduleService.saveMasterSchedule(masterId, organizationId, schedules);
+      await _scheduleService.saveMasterSchedule(masterId, schedules);
       
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(

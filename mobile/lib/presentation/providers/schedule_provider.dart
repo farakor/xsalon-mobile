@@ -85,13 +85,12 @@ class ScheduleNotifier extends StateNotifier<ScheduleState> {
 
     try {
       final masterId = await _scheduleService.getCurrentMasterId();
-      final organizationId = await _scheduleService.getCurrentOrganizationId();
       
-      if (masterId == null || organizationId == null) {
-        throw Exception('Не удалось определить мастера или организацию');
+      if (masterId == null) {
+        throw Exception('Не удалось определить мастера');
       }
 
-      await _scheduleService.saveMasterSchedule(masterId, organizationId, schedules);
+      await _scheduleService.saveMasterSchedule(masterId, schedules);
       
       state = state.copyWith(
         status: ScheduleStatus.loaded,

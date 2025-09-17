@@ -1,7 +1,6 @@
 class MasterSchedule {
   final String id;
   final String masterId;
-  final String organizationId;
   final String dayOfWeek;
   final bool isWorking;
   final String? startTime;
@@ -14,7 +13,6 @@ class MasterSchedule {
   const MasterSchedule({
     required this.id,
     required this.masterId,
-    required this.organizationId,
     required this.dayOfWeek,
     required this.isWorking,
     this.startTime,
@@ -29,7 +27,6 @@ class MasterSchedule {
     return MasterSchedule(
       id: json['id'],
       masterId: json['master_id'],
-      organizationId: json['organization_id'],
       dayOfWeek: json['day_of_week'],
       isWorking: json['is_working'] ?? false,
       startTime: json['start_time'],
@@ -45,7 +42,6 @@ class MasterSchedule {
     return {
       'id': id,
       'master_id': masterId,
-      'organization_id': organizationId,
       'day_of_week': dayOfWeek,
       'is_working': isWorking,
       'start_time': startTime,
@@ -60,7 +56,6 @@ class MasterSchedule {
   MasterSchedule copyWith({
     String? id,
     String? masterId,
-    String? organizationId,
     String? dayOfWeek,
     bool? isWorking,
     String? startTime,
@@ -73,7 +68,6 @@ class MasterSchedule {
     return MasterSchedule(
       id: id ?? this.id,
       masterId: masterId ?? this.masterId,
-      organizationId: organizationId ?? this.organizationId,
       dayOfWeek: dayOfWeek ?? this.dayOfWeek,
       isWorking: isWorking ?? this.isWorking,
       startTime: startTime ?? this.startTime,
@@ -92,7 +86,6 @@ class MasterSchedule {
     return other is MasterSchedule &&
         other.id == id &&
         other.masterId == masterId &&
-        other.organizationId == organizationId &&
         other.dayOfWeek == dayOfWeek &&
         other.isWorking == isWorking &&
         other.startTime == startTime &&
@@ -107,7 +100,6 @@ class MasterSchedule {
   int get hashCode {
     return id.hashCode ^
         masterId.hashCode ^
-        organizationId.hashCode ^
         dayOfWeek.hashCode ^
         isWorking.hashCode ^
         startTime.hashCode ^
@@ -120,7 +112,7 @@ class MasterSchedule {
 
   @override
   String toString() {
-    return 'MasterSchedule(id: $id, masterId: $masterId, organizationId: $organizationId, dayOfWeek: $dayOfWeek, isWorking: $isWorking, startTime: $startTime, endTime: $endTime, breakStartTime: $breakStartTime, breakEndTime: $breakEndTime, createdAt: $createdAt, updatedAt: $updatedAt)';
+    return 'MasterSchedule(id: $id, masterId: $masterId, dayOfWeek: $dayOfWeek, isWorking: $isWorking, startTime: $startTime, endTime: $endTime, breakStartTime: $breakStartTime, breakEndTime: $breakEndTime, createdAt: $createdAt, updatedAt: $updatedAt)';
   }
 }
 

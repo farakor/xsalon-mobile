@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../theme/app_theme.dart';
 import '../../providers/services_provider.dart';
@@ -7,6 +8,7 @@ import '../../providers/masters_provider.dart';
 import '../../widgets/common/custom_button.dart';
 import '../../../domain/entities/service.dart';
 import '../../../domain/entities/master.dart';
+import '../../../core/constants/app_constants.dart';
 
 class ClientBookingPage extends ConsumerStatefulWidget {
   const ClientBookingPage({super.key});
@@ -912,9 +914,15 @@ class _ClientBookingPageState extends ConsumerState<ClientBookingPage> {
       const SnackBar(
         content: Text('Запись успешно создана!'),
         backgroundColor: Colors.green,
+        duration: Duration(seconds: 2),
       ),
     );
     
-    Navigator.of(context).pop();
+    // Даем пользователю время увидеть сообщение, затем переходим на главную
+    Future.delayed(const Duration(milliseconds: 1500), () {
+      if (mounted) {
+        context.go(AppConstants.homeRoute);
+      }
+    });
   }
 }

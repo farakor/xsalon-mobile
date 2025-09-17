@@ -206,7 +206,7 @@ class _DebugServicesLoadingState extends State<DebugServicesLoading> {
         // Проверяем профиль пользователя
         final profile = await supabase
             .from('user_profiles')
-            .select('id, full_name, role, organization_id')
+            .select('id, full_name, role')
             .eq('id', user.id)
             .maybeSingle();
         
@@ -214,9 +214,10 @@ class _DebugServicesLoadingState extends State<DebugServicesLoading> {
           _addOutput('Профиль найден:');
           _addOutput('  - Имя: ${profile['full_name'] ?? 'не указано'}');
           _addOutput('  - Роль: ${profile['role'] ?? 'не указана'}');
-          _addOutput('  - ID организации: ${profile['organization_id'] ?? 'не указан'}');
+          _addOutput('  - Организация: XSalon (единая система)');
           
-          if (profile['organization_id'] == null) {
+          // Организация больше не требуется - единая система
+          if (false) {
             _addOutput('⚠️ ПРОБЛЕМА: У пользователя нет привязки к организации!');
           }
         } else {
@@ -257,23 +258,15 @@ class _DebugServicesLoadingState extends State<DebugServicesLoading> {
       // Проверяем все услуги
       final allServices = await supabase
           .from('services')
-          .select('id, name, organization_id, category_id, is_active, price, duration_minutes');
+          .select('id, name, category_id, is_active, price, duration_minutes');
       
       _addOutput('Всего услуг в БД: ${allServices.length}');
       
       if (allServices.isNotEmpty) {
-        // Группируем по организациям
-        final servicesByOrg = <String, List<dynamic>>{};
+        // Все услуги теперь в единой системе
+        _addOutput('Услуги в системе XSalon:');
         for (final service in allServices) {
-          final orgId = service['organization_id'] as String;
-          servicesByOrg.putIfAbsent(orgId, () => []).add(service);
-        }
-        
-        for (final entry in servicesByOrg.entries) {
-          _addOutput('Организация ${entry.key}:');
-          for (final service in entry.value) {
-            _addOutput('  - ${service['name']} (${service['is_active'] ? 'активна' : 'неактивна'}) - ${service['price']}₽, ${service['duration_minutes']}мин');
-          }
+          _addOutput('  - ${service['name']} (${service['is_active'] ? 'активна' : 'неактивна'}) - ${service['price']}₽, ${service['duration_minutes']}мин');
         }
       } else {
         _addOutput('⚠️ ПРОБЛЕМА: В БД нет услуг!');
@@ -282,7 +275,7 @@ class _DebugServicesLoadingState extends State<DebugServicesLoading> {
       // Проверяем активные услуги
       final activeServices = await supabase
           .from('services')
-          .select('id, name, organization_id')
+          .select('id, name')
           .eq('is_active', true);
       
       _addOutput('Активных услуг: ${activeServices.length}');
@@ -309,7 +302,7 @@ class _DebugServicesLoadingState extends State<DebugServicesLoading> {
       // Проверяем все категории
       final allCategories = await supabase
           .from('service_categories')
-          .select('id, name, organization_id, is_active');
+          .select('id, name, is_active');
       
       _addOutput('Всего категорий в БД: ${allCategories.length}');
       

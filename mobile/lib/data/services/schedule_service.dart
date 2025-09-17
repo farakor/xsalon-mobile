@@ -27,7 +27,7 @@ class ScheduleService {
   }
 
   /// Сохранить расписание мастера
-  Future<void> saveMasterSchedule(String masterId, String organizationId, List<MasterSchedule> schedules) async {
+  Future<void> saveMasterSchedule(String masterId, List<MasterSchedule> schedules) async {
     try {
       // Начинаем транзакцию - удаляем старое расписание
       await _supabase
@@ -38,7 +38,6 @@ class ScheduleService {
       // Подготавливаем данные для вставки
       final scheduleData = schedules.map((schedule) => {
         'master_id': masterId,
-        'organization_id': organizationId,
         'day_of_week': schedule.dayOfWeek,
         'is_working': schedule.isWorking,
         'start_time': schedule.isWorking ? schedule.startTime : null,
@@ -57,11 +56,10 @@ class ScheduleService {
   }
 
   /// Создать стандартное расписание для нового мастера
-  Future<void> createDefaultSchedule(String masterId, String organizationId) async {
+  Future<void> createDefaultSchedule(String masterId) async {
     try {
       await _supabase.rpc('create_default_master_schedule', params: {
         'master_uuid': masterId,
-        'org_uuid': organizationId,
       });
     } catch (e) {
       throw ServerFailure('Ошибка создания стандартного расписания: $e');
@@ -79,7 +77,7 @@ class ScheduleService {
       // Сначала проверяем, что пользователь является мастером
       final userProfile = await _supabase
           .from('user_profiles')
-          .select('role, organization_id')
+          .select('role')
           .eq('id', userId)
           .maybeSingle();
 
@@ -100,17 +98,11 @@ class ScheduleService {
 
       if (masterResponse == null) {
         // Создаем запись мастера автоматически
-        final organizationId = userProfile['organization_id'];
-        if (organizationId == null) {
-          throw ServerFailure('Пользователь не привязан к организации');
-        }
-
         try {
           masterResponse = await _supabase
               .from('masters')
               .insert({
                 'user_id': userId,
-                'organization_id': organizationId,
                 'is_active': true,
               })
               .select('id')
@@ -131,35 +123,6 @@ class ScheduleService {
     }
   }
 
-  /// Получить ID организации текущего пользователя
-  Future<String?> getCurrentOrganizationId() async {
-    try {
-      final userId = _supabase.auth.currentUser?.id;
-      if (userId == null) {
-        throw ServerFailure('Пользователь не авторизован');
-      }
-
-      final response = await _supabase
-          .from('user_profiles')
-          .select('organization_id')
-          .eq('id', userId)
-          .maybeSingle();
-
-      if (response == null) {
-        throw ServerFailure('Профиль пользователя не найден');
-      }
-
-      final organizationId = response['organization_id'];
-      if (organizationId == null) {
-        throw ServerFailure('Пользователь не привязан к организации');
-      }
-
-      return organizationId;
-    } catch (e) {
-      if (e is ServerFailure) rethrow;
-      throw ServerFailure('Ошибка получения ID организации: $e');
-         }
-   }
 
    /// Получить доступные временные слоты для указанной даты
    Future<List<TimeOfDay>> getAvailableTimeSlots(
