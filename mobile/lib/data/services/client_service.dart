@@ -5,63 +5,15 @@ import '../models/client.dart';
 class ClientService {
   final SupabaseClient _supabase = Supabase.instance.client;
 
-  /// Получить или создать организацию для пользователя
-  Future<String> _getOrCreateOrganizationId() async {
-    final user = _supabase.auth.currentUser;
-    if (user == null) throw Exception('Пользователь не авторизован');
+  // Метод больше не нужен - убрана логика мультиорганизационности
 
-    // Получаем профиль пользователя
-    final profileResponse = await _supabase
-        .from('user_profiles')
-        .select('organization_id')
-        .eq('id', user.id)
-        .single();
-
-    String? organizationId = profileResponse['organization_id'];
-    
-    // Если пользователь не привязан к организации, используем временное решение
-    if (organizationId == null) {
-      // Пытаемся найти любую существующую организацию
-      final existingOrgResponse = await _supabase
-          .from('organizations')
-          .select('id')
-          .limit(1)
-          .maybeSingle();
-          
-      if (existingOrgResponse != null) {
-        organizationId = existingOrgResponse['id'];
-        
-        // Обновляем профиль пользователя
-        await _supabase
-            .from('user_profiles')
-            .update({'organization_id': organizationId})
-            .eq('id', user.id);
-      } else {
-        // Если нет ни одной организации, создаем временный ID
-        // В реальном приложении это должно быть решено на уровне админ-панели
-        throw Exception('В системе не найдено ни одной организации. Обратитесь к администратору для настройки.');
-      }
-    }
-    
-    // Гарантируем, что organizationId не null
-    if (organizationId == null) {
-      throw Exception('Не удалось получить или создать организацию');
-    }
-    
-    return organizationId;
-  }
-
-  /// Получить всех клиентов организации
+  /// Получить всех клиентов
   Future<List<Client>> getClients() async {
     try {
-      // Получаем или создаем организацию
-      final organizationId = await _getOrCreateOrganizationId();
-
-      // Получаем клиентов организации
+      // Получаем всех клиентов (без фильтрации по организации)
       final response = await _supabase
           .from('clients')
           .select('*')
-          .eq('organization_id', organizationId)
           .order('created_at', ascending: false);
 
       return response.map<Client>((json) => Client.fromJson(json)).toList();
@@ -73,9 +25,6 @@ class ClientService {
   /// Создать нового клиента
   Future<Client> createClient(Client client) async {
     try {
-      // Получаем или создаем организацию
-      final organizationId = await _getOrCreateOrganizationId();
-
       // Проверяем уникальность телефона
       if (client.phone != null) {
         final existingClient = await _supabase
@@ -91,7 +40,6 @@ class ClientService {
 
       // Создаем клиента
       final clientData = client.toJson();
-      clientData['organization_id'] = organizationId;
       clientData.remove('id'); // Удаляем ID, чтобы база сгенерировала новый
 
       final response = await _supabase
@@ -153,14 +101,12 @@ class ClientService {
   /// Поиск клиентов по запросу
   Future<List<Client>> searchClients(String query) async {
     try {
-      // Получаем или создаем организацию
-      final organizationId = await _getOrCreateOrganizationId();
+      // Поиск клиентов
 
       // Поиск по имени, телефону или email
       final response = await _supabase
           .from('clients')
           .select('*')
-          .eq('organization_id', organizationId)
           .or('full_name.ilike.%$query%,phone.ilike.%$query%,email.ilike.%$query%')
           .order('created_at', ascending: false);
 
@@ -194,13 +140,11 @@ class ClientService {
   /// Получить топ клиентов по тратам
   Future<List<Client>> getTopClientsBySpending({int limit = 10}) async {
     try {
-      // Получаем или создаем организацию
-      final organizationId = await _getOrCreateOrganizationId();
+      // Поиск клиентов
 
       final response = await _supabase
           .from('clients')
           .select('*')
-          .eq('organization_id', organizationId)
           .order('total_spent', ascending: false)
           .limit(limit);
 
@@ -213,13 +157,11 @@ class ClientService {
   /// Получить клиентов по уровню лояльности
   Future<List<Client>> getClientsByLoyaltyLevel(String loyaltyLevel) async {
     try {
-      // Получаем или создаем организацию
-      final organizationId = await _getOrCreateOrganizationId();
+      // Поиск клиентов
 
       final response = await _supabase
           .from('clients')
           .select('*')
-          .eq('organization_id', organizationId)
           .eq('loyalty_level', loyaltyLevel)
           .order('total_spent', ascending: false);
 

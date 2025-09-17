@@ -46,11 +46,13 @@ class _ServicesPageState extends ConsumerState<ServicesPage> {
     // Фильтруем услуги
     var filteredServices = services;
     
-    if (_selectedCategoryId != null) {
-      filteredServices = filteredServices
-          .where((service) => service.categoryId == _selectedCategoryId)
-          .toList();
-    }
+    // В новой архитектуре услуги не привязаны к категориям
+    // Фильтрация по категориям больше не поддерживается
+    // if (_selectedCategoryId != null) {
+    //   filteredServices = filteredServices
+    //       .where((service) => service.categoryId == _selectedCategoryId)
+    //       .toList();
+    // }
     
     if (_searchQuery.isNotEmpty) {
       filteredServices = filteredServices
@@ -368,7 +370,7 @@ class _ServicesPageState extends ConsumerState<ServicesPage> {
               ),
               const SizedBox(height: 8),
               Text(
-                service.categoryName,
+                'Услуга мастера', // В новой архитектуре нет категорий
                 style: TextStyle(
                   color: AppTheme.primaryColor,
                   fontWeight: FontWeight.w500,

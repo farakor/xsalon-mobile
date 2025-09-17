@@ -26,9 +26,11 @@ class _ServiceSelectorState extends ConsumerState<ServiceSelector> {
   @override
   void initState() {
     super.initState();
-    // Если есть выбранные услуги, устанавливаем первую категорию
+    // Если есть выбранные услуги, устанавливаем их как отфильтрованные
     if (widget.selectedServices.isNotEmpty) {
-      _selectedCategoryId = widget.selectedServices.first.categoryId;
+      // В новой архитектуре услуги не привязаны к категориям
+      // Используем первую категорию по умолчанию или null
+      _selectedCategoryId = null;
       _filteredServices = List.from(widget.selectedServices);
     }
     

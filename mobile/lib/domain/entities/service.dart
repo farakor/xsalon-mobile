@@ -1,11 +1,12 @@
 class ServiceEntity {
   final String id;
+  final String masterId;
   final String name;
   final String description;
-  final String categoryId;
-  final String categoryName;
   final double price;
   final int durationMinutes;
+  final int preparationTimeMinutes;
+  final int cleanupTimeMinutes;
   final String? imageUrl;
   final bool isActive;
   final DateTime createdAt;
@@ -13,12 +14,13 @@ class ServiceEntity {
 
   const ServiceEntity({
     required this.id,
+    required this.masterId,
     required this.name,
     required this.description,
-    required this.categoryId,
-    required this.categoryName,
     required this.price,
     required this.durationMinutes,
+    this.preparationTimeMinutes = 5,
+    this.cleanupTimeMinutes = 5,
     this.imageUrl,
     required this.isActive,
     required this.createdAt,
@@ -44,12 +46,13 @@ class ServiceEntity {
 
   ServiceEntity copyWith({
     String? id,
+    String? masterId,
     String? name,
     String? description,
-    String? categoryId,
-    String? categoryName,
     double? price,
     int? durationMinutes,
+    int? preparationTimeMinutes,
+    int? cleanupTimeMinutes,
     String? imageUrl,
     bool? isActive,
     DateTime? createdAt,
@@ -57,12 +60,13 @@ class ServiceEntity {
   }) {
     return ServiceEntity(
       id: id ?? this.id,
+      masterId: masterId ?? this.masterId,
       name: name ?? this.name,
       description: description ?? this.description,
-      categoryId: categoryId ?? this.categoryId,
-      categoryName: categoryName ?? this.categoryName,
       price: price ?? this.price,
       durationMinutes: durationMinutes ?? this.durationMinutes,
+      preparationTimeMinutes: preparationTimeMinutes ?? this.preparationTimeMinutes,
+      cleanupTimeMinutes: cleanupTimeMinutes ?? this.cleanupTimeMinutes,
       imageUrl: imageUrl ?? this.imageUrl,
       isActive: isActive ?? this.isActive,
       createdAt: createdAt ?? this.createdAt,

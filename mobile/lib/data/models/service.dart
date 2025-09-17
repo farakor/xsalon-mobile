@@ -1,11 +1,12 @@
 class Service {
   final String id;
+  final String masterId;
   final String name;
   final String description;
-  final String categoryId;
-  final String categoryName;
   final double price;
   final int durationMinutes;
+  final int preparationTimeMinutes;
+  final int cleanupTimeMinutes;
   final String? imageUrl;
   final bool isActive;
   final DateTime createdAt;
@@ -13,12 +14,13 @@ class Service {
 
   const Service({
     required this.id,
+    required this.masterId,
     required this.name,
     required this.description,
-    required this.categoryId,
-    required this.categoryName,
     required this.price,
     required this.durationMinutes,
+    this.preparationTimeMinutes = 5,
+    this.cleanupTimeMinutes = 5,
     this.imageUrl,
     required this.isActive,
     required this.createdAt,
@@ -45,12 +47,13 @@ class Service {
   factory Service.fromJson(Map<String, dynamic> json) {
     return Service(
       id: json['id'] as String,
+      masterId: json['master_id'] as String,
       name: json['name'] as String,
       description: json['description'] as String? ?? '',
-      categoryId: json['category_id'] as String,
-      categoryName: json['category_name'] as String,
       price: (json['price'] as num).toDouble(),
       durationMinutes: json['duration_minutes'] as int,
+      preparationTimeMinutes: json['preparation_time_minutes'] as int? ?? 5,
+      cleanupTimeMinutes: json['cleanup_time_minutes'] as int? ?? 5,
       imageUrl: json['image_url'] as String?,
       isActive: json['is_active'] as bool? ?? true,
       createdAt: DateTime.parse(json['created_at'] as String),
@@ -61,12 +64,13 @@ class Service {
   Map<String, dynamic> toJson() {
     return {
       'id': id,
+      'master_id': masterId,
       'name': name,
       'description': description,
-      'category_id': categoryId,
-      'category_name': categoryName,
       'price': price,
       'duration_minutes': durationMinutes,
+      'preparation_time_minutes': preparationTimeMinutes,
+      'cleanup_time_minutes': cleanupTimeMinutes,
       'image_url': imageUrl,
       'is_active': isActive,
       'created_at': createdAt.toIso8601String(),
@@ -76,12 +80,13 @@ class Service {
 
   Service copyWith({
     String? id,
+    String? masterId,
     String? name,
     String? description,
-    String? categoryId,
-    String? categoryName,
     double? price,
     int? durationMinutes,
+    int? preparationTimeMinutes,
+    int? cleanupTimeMinutes,
     String? imageUrl,
     bool? isActive,
     DateTime? createdAt,
@@ -89,12 +94,13 @@ class Service {
   }) {
     return Service(
       id: id ?? this.id,
+      masterId: masterId ?? this.masterId,
       name: name ?? this.name,
       description: description ?? this.description,
-      categoryId: categoryId ?? this.categoryId,
-      categoryName: categoryName ?? this.categoryName,
       price: price ?? this.price,
       durationMinutes: durationMinutes ?? this.durationMinutes,
+      preparationTimeMinutes: preparationTimeMinutes ?? this.preparationTimeMinutes,
+      cleanupTimeMinutes: cleanupTimeMinutes ?? this.cleanupTimeMinutes,
       imageUrl: imageUrl ?? this.imageUrl,
       isActive: isActive ?? this.isActive,
       createdAt: createdAt ?? this.createdAt,

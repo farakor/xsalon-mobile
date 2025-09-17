@@ -4,14 +4,14 @@ import '../models/service.dart';
 class DefaultCategoriesService {
   final SupabaseClient _supabase = Supabase.instance.client;
 
-  /// Создает категории по умолчанию для организации, если их нет
-  Future<void> createDefaultCategoriesIfNeeded(String organizationId) async {
+  /// Создает категории по умолчанию, если их нет
+  Future<void> createDefaultCategoriesIfNeeded() async {
     try {
       // Проверяем, есть ли уже категории
       final existingCategories = await _supabase
           .from('service_categories')
           .select('id')
-          .eq('organization_id', organizationId)
+          .eq('is_active', true)
           .limit(1);
 
       // Если категории уже есть, ничего не делаем
@@ -20,7 +20,7 @@ class DefaultCategoriesService {
       }
 
       // Создаем категории по умолчанию
-      final defaultCategories = _getDefaultCategories(organizationId);
+      final defaultCategories = _getDefaultCategories();
       
       await _supabase
           .from('service_categories')
@@ -32,7 +32,7 @@ class DefaultCategoriesService {
   }
 
   /// Возвращает список категорий по умолчанию
-  List<ServiceCategory> _getDefaultCategories(String organizationId) {
+  List<ServiceCategory> _getDefaultCategories() {
     final now = DateTime.now();
     
     return [

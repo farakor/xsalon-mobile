@@ -7,62 +7,15 @@ import '../models/service.dart';
 class SimpleServiceService {
   final SupabaseClient _supabase = Supabase.instance.client;
 
-  /// Получить или создать организацию для пользователя
-  Future<String> _getOrCreateOrganizationId() async {
-    final user = _supabase.auth.currentUser;
-    if (user == null) throw Exception('Пользователь не авторизован');
-
-    // Получаем профиль пользователя
-    final profileResponse = await _supabase
-        .from('user_profiles')
-        .select('organization_id')
-        .eq('id', user.id)
-        .single();
-
-    String? organizationId = profileResponse['organization_id'];
-    
-    // Если пользователь не привязан к организации, используем временное решение
-    if (organizationId == null) {
-      // Пытаемся найти любую существующую организацию
-      final existingOrgResponse = await _supabase
-          .from('organizations')
-          .select('id')
-          .limit(1)
-          .maybeSingle();
-          
-      if (existingOrgResponse != null) {
-        organizationId = existingOrgResponse['id'];
-        
-        // Обновляем профиль пользователя
-        await _supabase
-            .from('user_profiles')
-            .update({'organization_id': organizationId})
-            .eq('id', user.id);
-      } else {
-        // Если нет ни одной организации, создаем временный ID
-        throw Exception('В системе не найдено ни одной организации. Обратитесь к администратору для настройки.');
-      }
-    }
-    
-    // Гарантируем, что organizationId не null
-    if (organizationId == null) {
-      throw Exception('Не удалось получить или создать организацию');
-    }
-    
-    return organizationId;
-  }
+  // Метод больше не нужен - убрана логика мультиорганизационности
 
   /// Получить все активные категории услуг
   Future<List<ServiceCategory>> getServiceCategories() async {
     try {
-      // Получаем или создаем организацию
-      final organizationId = await _getOrCreateOrganizationId();
-
-      // Получаем категории услуг организации
+      // Получаем категории услуг
       final response = await _supabase
           .from('service_categories')
           .select('*')
-          .eq('organization_id', organizationId)
           .eq('is_active', true)
           .order('sort_order', ascending: true);
 
@@ -75,8 +28,7 @@ class SimpleServiceService {
   /// Получить все активные услуги
   Future<List<Service>> getServices() async {
     try {
-      // Получаем или создаем организацию
-      final organizationId = await _getOrCreateOrganizationId();
+      // Получаем все активные услуги
 
       // Получаем услуги организации с информацией о категориях
       final response = await _supabase
@@ -87,7 +39,6 @@ class SimpleServiceService {
               name
             )
           ''')
-          .eq('organization_id', organizationId)
           .eq('is_active', true)
           .order('name', ascending: true);
 
@@ -105,8 +56,7 @@ class SimpleServiceService {
   /// Получить услуги по категории
   Future<List<Service>> getServicesByCategory(String categoryId) async {
     try {
-      // Получаем или создаем организацию
-      final organizationId = await _getOrCreateOrganizationId();
+      // Получаем все активные услуги
 
       // Получаем услуги конкретной категории
       final response = await _supabase
@@ -117,7 +67,6 @@ class SimpleServiceService {
               name
             )
           ''')
-          .eq('organization_id', organizationId)
           .eq('category_id', categoryId)
           .eq('is_active', true)
           .order('name', ascending: true);
@@ -161,8 +110,7 @@ class SimpleServiceService {
   /// Поиск услуг по названию
   Future<List<Service>> searchServices(String query) async {
     try {
-      // Получаем или создаем организацию
-      final organizationId = await _getOrCreateOrganizationId();
+      // Получаем все активные услуги
 
       // Поиск по названию и описанию
       final response = await _supabase
@@ -173,7 +121,6 @@ class SimpleServiceService {
               name
             )
           ''')
-          .eq('organization_id', organizationId)
           .eq('is_active', true)
           .or('name.ilike.%$query%,description.ilike.%$query%')
           .order('name', ascending: true);

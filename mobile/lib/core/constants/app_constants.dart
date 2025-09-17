@@ -61,6 +61,7 @@ class AppConstants {
   static const String staffLoginRoute = '/auth/staff';
   static const String homeRoute = '/home';
   static const String bookingRoute = '/booking';
+  static const String clientBookingRoute = '/client-booking';
   static const String profileRoute = '/profile';
   static const String historyRoute = '/history';
   static const String mastersRoute = '/masters';

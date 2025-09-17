@@ -3,6 +3,7 @@ import '../../data/datasources/service_remote_datasource.dart';
 import '../../data/repositories/service_repository_impl.dart';
 import '../../data/services/service_service.dart';
 import '../../data/services/default_categories_service.dart';
+import '../../data/services/mock_service_service.dart';
 import '../../domain/entities/service.dart';
 import '../../domain/repositories/service_repository.dart';
 import '../../domain/usecases/get_services.dart';
@@ -73,16 +74,20 @@ class ServicesNotifier extends StateNotifier<ServicesState> {
 
   // Загрузка активных услуг
   Future<void> loadActiveServices() async {
+    print('ServicesNotifier: Начинаем загрузку активных услуг из БД...');
     state = state.copyWith(status: ServicesStatus.loading);
 
     try {
       final services = await _serviceService.getActiveServices();
+      print('ServicesNotifier: Загружено услуг из БД: ${services.length}');
+      
       state = state.copyWith(
         status: ServicesStatus.loaded,
         services: services,
         errorMessage: null,
       );
     } catch (error) {
+      print('ServicesNotifier: Ошибка загрузки услуг из БД: $error');
       state = state.copyWith(
         status: ServicesStatus.error,
         errorMessage: error.toString(),
@@ -109,12 +114,8 @@ class ServicesNotifier extends StateNotifier<ServicesState> {
   // Создает категории по умолчанию, если их нет
   Future<void> _ensureDefaultCategories() async {
     try {
-      // Получаем ID организации из сервиса
-      final remoteDataSource = ServiceRemoteDataSourceImpl();
-      final organizationId = await remoteDataSource.getOrCreateOrganizationId();
-      
       // Создаем категории по умолчанию, если их нет
-      await _defaultCategoriesService.createDefaultCategoriesIfNeeded(organizationId);
+      await _defaultCategoriesService.createDefaultCategoriesIfNeeded();
     } catch (e) {
       // Игнорируем ошибки создания категорий по умолчанию
       // Пользователь сможет создать категории вручную
@@ -340,10 +341,16 @@ final serviceByIdProvider = Provider.family<ServiceEntity?, String>((ref, servic
   }
 });
 
-// Провайдер для получения услуг по категории
-final servicesByCategoryProvider = Provider.family<List<ServiceEntity>, String>((ref, categoryId) {
+// Провайдер для получения услуг по мастеру
+final servicesByMasterProvider = Provider.family<List<ServiceEntity>, String>((ref, masterId) {
   final services = ref.watch(servicesListProvider);
-  return services.where((service) => service.categoryId == categoryId).toList();
+  return services.where((service) => service.masterId == masterId).toList();
+});
+
+// Устаревший провайдер для совместимости (возвращает пустой список)
+final servicesByCategoryProvider = Provider.family<List<ServiceEntity>, String>((ref, categoryId) {
+  // В новой архитектуре услуги не привязаны к категориям
+  return <ServiceEntity>[];
 });
 
 // Провайдер для получения категории по ID

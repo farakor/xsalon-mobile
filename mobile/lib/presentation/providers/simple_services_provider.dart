@@ -141,8 +141,8 @@ final simpleServicesErrorProvider = Provider<String?>((ref) {
   return servicesState.errorMessage;
 });
 
-// Провайдер для получения услуг по категории
+// Провайдер для получения услуг по категории (устаревший)
 final simpleServicesByCategoryProvider = Provider.family<List<Service>, String>((ref, categoryId) {
-  final services = ref.watch(simpleServicesListProvider);
-  return services.where((service) => service.categoryId == categoryId).toList();
+  // В новой архитектуре услуги не привязаны к категориям
+  return <Service>[];
 });

@@ -98,12 +98,13 @@ class ServiceRepositoryImpl implements ServiceRepository {
   ServiceEntity _mapToEntity(Service service) {
     return ServiceEntity(
       id: service.id,
+      masterId: service.masterId,
       name: service.name,
       description: service.description,
-      categoryId: service.categoryId,
-      categoryName: service.categoryName,
       price: service.price,
       durationMinutes: service.durationMinutes,
+      preparationTimeMinutes: service.preparationTimeMinutes,
+      cleanupTimeMinutes: service.cleanupTimeMinutes,
       imageUrl: service.imageUrl,
       isActive: service.isActive,
       createdAt: service.createdAt,
@@ -115,12 +116,13 @@ class ServiceRepositoryImpl implements ServiceRepository {
   Service _mapToModel(ServiceEntity service) {
     return Service(
       id: service.id,
+      masterId: service.masterId,
       name: service.name,
       description: service.description,
-      categoryId: service.categoryId,
-      categoryName: service.categoryName,
       price: service.price,
       durationMinutes: service.durationMinutes,
+      preparationTimeMinutes: service.preparationTimeMinutes,
+      cleanupTimeMinutes: service.cleanupTimeMinutes,
       imageUrl: service.imageUrl,
       isActive: service.isActive,
       createdAt: service.createdAt,

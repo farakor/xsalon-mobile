@@ -11,6 +11,7 @@ import '../../presentation/pages/auth/otp_verification_page.dart';
 import '../../presentation/pages/auth/staff_login_page.dart';
 import '../../presentation/pages/home/home_page.dart';
 import '../../presentation/pages/booking/booking_page.dart';
+import '../../presentation/pages/booking/client_booking_page.dart';
 import '../../presentation/pages/profile/profile_page.dart';
 import '../../presentation/pages/history/history_page.dart';
 import '../../presentation/pages/masters/masters_page.dart';
@@ -82,6 +83,12 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: AppConstants.bookingRoute,
         name: 'booking',
         builder: (context, state) => const BookingPage(),
+      ),
+      
+      GoRoute(
+        path: AppConstants.clientBookingRoute,
+        name: 'client_booking',
+        builder: (context, state) => const ClientBookingPage(),
       ),
       
       GoRoute(

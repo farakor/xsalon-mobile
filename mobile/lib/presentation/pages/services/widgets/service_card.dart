@@ -60,7 +60,7 @@ class ServiceCard extends StatelessWidget {
                           ),
                           const SizedBox(height: 4),
                           Text(
-                            service.categoryName,
+                            'Услуга мастера', // В новой архитектуре нет категорий
                             style: AppTheme.bodySmall.copyWith(
                               color: AppTheme.primaryColor,
                               fontWeight: FontWeight.w500,

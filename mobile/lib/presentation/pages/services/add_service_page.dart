@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../../domain/entities/service.dart';
+import '../../../data/services/booking_service.dart';
 import '../../providers/services_provider.dart';
 import '../../theme/app_theme.dart';
 
@@ -46,7 +47,8 @@ class _AddServicePageState extends ConsumerState<AddServicePage> {
       _descriptionController.text = service.description;
       _priceController.text = service.price.toStringAsFixed(0);
       _durationController.text = service.durationMinutes.toString();
-      _selectedCategoryId = service.categoryId;
+      // В новой архитектуре услуги не привязаны к категориям
+      // _selectedCategoryId = service.categoryId;
       _isActive = service.isActive;
     }
   }
@@ -283,19 +285,19 @@ class _AddServicePageState extends ConsumerState<AddServicePage> {
     });
 
     try {
-      final categories = ref.read(serviceCategoriesProvider);
-      final selectedCategory = categories.firstWhere(
-        (cat) => cat.id == _selectedCategoryId,
-      );
+      // Получаем ID текущего мастера
+      final bookingService = BookingService();
+      final masterId = await bookingService.getCurrentMasterId();
 
       final service = ServiceEntity(
         id: widget.service?.id ?? const Uuid().v4(),
+        masterId: masterId,
         name: _nameController.text.trim(),
         description: _descriptionController.text.trim(),
-        categoryId: _selectedCategoryId!,
-        categoryName: selectedCategory.name,
         price: double.parse(_priceController.text),
         durationMinutes: int.parse(_durationController.text),
+        preparationTimeMinutes: 5,
+        cleanupTimeMinutes: 5,
         isActive: _isActive,
         createdAt: widget.service?.createdAt ?? DateTime.now(),
         updatedAt: DateTime.now(),

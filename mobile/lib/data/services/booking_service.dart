@@ -9,7 +9,6 @@ class BookingService {
   Future<String> createBooking({
     required String clientId,
     required String masterId,
-    required String organizationId,
     required String serviceId,
     required DateTime startTime,
     required DateTime endTime,
@@ -21,7 +20,6 @@ class BookingService {
       print('BookingService: Creating booking...');
       print('  Client ID: $clientId');
       print('  Master ID: $masterId');
-      print('  Organization ID: $organizationId');
       print('  Service ID: $serviceId');
       print('  Start time: $startTime');
       print('  End time: $endTime');
@@ -31,7 +29,7 @@ class BookingService {
       print('BookingService: Checking if client exists...');
       final clientResponse = await _supabase
           .from('clients')
-          .select('id, full_name, organization_id')
+          .select('id, full_name')
           .eq('id', clientId)
           .maybeSingle();
 
@@ -40,13 +38,13 @@ class BookingService {
         throw ServerFailure('Клиент не найден с ID: $clientId');
       }
 
-      print('  Client found: ${clientResponse['full_name']} (org: ${clientResponse['organization_id']})');
+      print('  Client found: ${clientResponse['full_name']}');
 
       // Проверяем что мастер существует
       print('BookingService: Checking if master exists...');
       final masterResponse = await _supabase
           .from('masters')
-          .select('id, specialization, description, organization_id')
+          .select('id, specialization, description')
           .eq('id', masterId)
           .maybeSingle();
 
@@ -58,13 +56,13 @@ class BookingService {
       final masterSpec = masterResponse['specialization'] is List 
           ? (masterResponse['specialization'] as List).join(', ')
           : masterResponse['specialization']?.toString() ?? 'Мастер';
-      print('  Master found: $masterSpec (org: ${masterResponse['organization_id']})');
+      print('  Master found: $masterSpec');
 
       // Проверяем что услуга существует
       print('BookingService: Checking if service exists...');
       final serviceResponse = await _supabase
           .from('services')
-          .select('id, name, organization_id')
+          .select('id, name')
           .eq('id', serviceId)
           .maybeSingle();
 
@@ -73,29 +71,14 @@ class BookingService {
         throw ServerFailure('Услуга не найдена с ID: $serviceId');
       }
 
-      print('  Service found: ${serviceResponse['name']} (org: ${serviceResponse['organization_id']})');
+      print('  Service found: ${serviceResponse['name']}');
 
-      // Проверяем что организация существует
-      print('BookingService: Checking if organization exists...');
-      final orgResponse = await _supabase
-          .from('organizations')
-          .select('id, name')
-          .eq('id', organizationId)
-          .maybeSingle();
-
-      if (orgResponse == null) {
-        print('BookingService: Organization not found with ID: $organizationId');
-        throw ServerFailure('Организация не найдена с ID: $organizationId');
-      }
-
-      print('  Organization found: ${orgResponse['name']}');
-
+      // Создаем запись
       final response = await _supabase
           .from('bookings')
           .insert({
             'client_id': clientId, // Используем clients.id напрямую
             'master_id': masterId,
-            'organization_id': organizationId,
             'service_id': serviceId,
             'start_time': TimezoneUtils.samarkandToUtc(startTime).toIso8601String(),
             'end_time': TimezoneUtils.samarkandToUtc(endTime).toIso8601String(),
@@ -144,35 +127,7 @@ class BookingService {
     }
   }
 
-  /// Получить ID организации текущего пользователя
-  Future<String> getCurrentOrganizationId() async {
-    try {
-      final userId = _supabase.auth.currentUser?.id;
-      if (userId == null) {
-        throw ServerFailure('Пользователь не авторизован');
-      }
-
-      final response = await _supabase
-          .from('user_profiles')
-          .select('organization_id')
-          .eq('id', userId)
-          .maybeSingle();
-
-      if (response == null) {
-        throw ServerFailure('Профиль пользователя не найден');
-      }
-
-      final organizationId = response['organization_id'];
-      if (organizationId == null) {
-        throw ServerFailure('Пользователь не привязан к организации');
-      }
-
-      return organizationId;
-    } catch (e) {
-      if (e is ServerFailure) rethrow;
-      throw ServerFailure('Ошибка получения ID организации: $e');
-    }
-  }
+  // Метод больше не нужен - убрана логика мультиорганизационности
 
   /// Проверить доступность времени для записи
   Future<bool> isTimeSlotAvailable({

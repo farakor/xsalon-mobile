@@ -7,7 +7,6 @@ class UserProfile {
   final DateTime? dateOfBirth;
   final String? gender;
   final String role;
-  final String? organizationId;
   final bool isActive;
   final DateTime? lastLoginAt;
   final DateTime createdAt;
@@ -22,7 +21,6 @@ class UserProfile {
     this.dateOfBirth,
     this.gender,
     required this.role,
-    this.organizationId,
     required this.isActive,
     this.lastLoginAt,
     required this.createdAt,
@@ -41,7 +39,6 @@ class UserProfile {
           : null,
       gender: json['gender'] as String?,
       role: json['role'] as String? ?? 'client',
-      organizationId: json['organization_id'] as String?,
       isActive: json['is_active'] as bool? ?? true,
       lastLoginAt: json['last_login_at'] != null
           ? DateTime.parse(json['last_login_at'] as String)
@@ -61,7 +58,6 @@ class UserProfile {
       'date_of_birth': dateOfBirth?.toIso8601String().split('T')[0],
       'gender': gender,
       'role': role,
-      'organization_id': organizationId,
       'is_active': isActive,
       'last_login_at': lastLoginAt?.toIso8601String(),
       'created_at': createdAt.toIso8601String(),
@@ -78,7 +74,6 @@ class UserProfile {
     DateTime? dateOfBirth,
     String? gender,
     String? role,
-    String? organizationId,
     bool? isActive,
     DateTime? lastLoginAt,
     DateTime? createdAt,
@@ -93,7 +88,6 @@ class UserProfile {
       dateOfBirth: dateOfBirth ?? this.dateOfBirth,
       gender: gender ?? this.gender,
       role: role ?? this.role,
-      organizationId: organizationId ?? this.organizationId,
       isActive: isActive ?? this.isActive,
       lastLoginAt: lastLoginAt ?? this.lastLoginAt,
       createdAt: createdAt ?? this.createdAt,

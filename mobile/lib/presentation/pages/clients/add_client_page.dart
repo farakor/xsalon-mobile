@@ -30,7 +30,7 @@ class _AddClientPageState extends ConsumerState<AddClientPage> {
   // Form data
   DateTime? _birthDate;
   String _selectedGender = 'female';
-  List<String> _selectedServices = [];
+  List<Service> _selectedServices = [];
   bool _isLoading = false;
 
   final List<String> _stepTitles = [
@@ -568,7 +568,7 @@ class _AddClientPageState extends ConsumerState<AddClientPage> {
             _buildSummaryRow(
               Icons.design_services,
               'Предпочитаемые услуги',
-              _selectedServices.join(', '),
+              _selectedServices.map((s) => s.name).join(', '),
             ),
           if (_notesController.text.isNotEmpty)
             _buildSummaryRow(Icons.note, 'Заметки', _notesController.text),
@@ -738,7 +738,7 @@ class _AddClientPageState extends ConsumerState<AddClientPage> {
         totalSpent: 0,
         loyaltyPoints: 0,
         loyaltyLevel: 'Новичок',
-        preferredServices: _selectedServices,
+        preferredServices: _selectedServices.map((s) => s.name).toList(),
         status: ClientStatus.active,
         notes: _notesController.text.isNotEmpty ? _notesController.text : null,
       );

@@ -51,11 +51,10 @@ class BookingNotifier extends StateNotifier<BookingState> {
     try {
       print('BookingProvider: Creating booking...');
       
-      // Получаем ID мастера и организации
+      // Получаем ID мастера
       final masterId = await _bookingService.getCurrentMasterId();
-      final organizationId = await _bookingService.getCurrentOrganizationId();
       
-      print('BookingProvider: Master ID: $masterId, Organization ID: $organizationId');
+      print('BookingProvider: Master ID: $masterId');
 
       // Проверяем доступность времени
       print('BookingProvider: Checking time slot availability...');
@@ -83,7 +82,6 @@ class BookingNotifier extends StateNotifier<BookingState> {
       final bookingId = await _bookingService.createBooking(
         clientId: clientId,
         masterId: masterId,
-        organizationId: organizationId,
         serviceId: serviceId,
         startTime: startTime,
         endTime: endTime,
