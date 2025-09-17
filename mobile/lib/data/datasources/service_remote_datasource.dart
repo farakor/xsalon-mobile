@@ -221,78 +221,31 @@ class ServiceRemoteDataSourceImpl implements ServiceRemoteDataSource {
 
   @override
   Future<List<ServiceCategory>> getServiceCategories() async {
-    try {
-      final response = await _supabase
-          .from('service_categories')
-          .select('*')
-          .eq('is_active', true)
-          .order('sort_order', ascending: true);
-
-      return response.map<ServiceCategory>((json) => ServiceCategory.fromJson(json)).toList();
-    } catch (e) {
-      throw Exception('Ошибка загрузки категорий услуг: $e');
-    }
+    // В новой системе категории не используются
+    return [];
   }
 
   @override
   Future<ServiceCategory?> getCategoryById(String categoryId) async {
-    try {
-      final response = await _supabase
-          .from('service_categories')
-          .select('*')
-          .eq('id', categoryId)
-          .maybeSingle();
-
-      if (response == null) return null;
-      return ServiceCategory.fromJson(response);
-    } catch (e) {
-      throw Exception('Ошибка получения категории: $e');
-    }
+    // В новой системе категории не используются
+    return null;
   }
 
   @override
   Future<ServiceCategory> createCategory(ServiceCategory category) async {
-    try {
-      final categoryData = category.toJson();
-      categoryData.remove('id'); // Удаляем ID, чтобы база сгенерировала новый
-
-      final response = await _supabase
-          .from('service_categories')
-          .insert(categoryData)
-          .select()
-          .single();
-
-      return ServiceCategory.fromJson(response);
-    } catch (e) {
-      throw Exception('Ошибка создания категории: $e');
-    }
+    // В новой системе категории не используются
+    throw Exception('Создание категорий больше не поддерживается');
   }
 
   @override
   Future<ServiceCategory> updateCategory(ServiceCategory category) async {
-    try {
-      final response = await _supabase
-          .from('service_categories')
-          .update(category.toJson())
-          .eq('id', category.id)
-          .select()
-          .single();
-
-      return ServiceCategory.fromJson(response);
-    } catch (e) {
-      throw Exception('Ошибка обновления категории: $e');
-    }
+    // В новой системе категории не используются
+    throw Exception('Обновление категорий больше не поддерживается');
   }
 
   @override
   Future<void> deleteCategory(String categoryId) async {
-    try {
-      await _supabase
-          .from('service_categories')
-          .delete()
-          .eq('id', categoryId);
-    } catch (e) {
-      throw Exception('Ошибка удаления категории: $e');
-    }
+    // В новой системе категории не используются
+    throw Exception('Удаление категорий больше не поддерживается');
   }
 }

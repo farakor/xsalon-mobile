@@ -25,6 +25,13 @@ class BookingService {
       print('  End time: $endTime');
       print('  Total price: $totalPrice');
 
+      // Проверяем авторизацию
+      final currentUser = _supabase.auth.currentUser;
+      if (currentUser == null) {
+        throw ServerFailure('Пользователь не авторизован');
+      }
+      print('BookingService: Current user ID: ${currentUser.id}');
+
       // Проверяем что клиент существует
       print('BookingService: Checking if client exists...');
       final clientResponse = await _supabase
@@ -58,10 +65,10 @@ class BookingService {
           : masterResponse['specialization']?.toString() ?? 'Мастер';
       print('  Master found: $masterSpec');
 
-      // Проверяем что услуга существует
-      print('BookingService: Checking if service exists...');
+      // Проверяем что услуга существует в master_services_new
+      print('BookingService: Checking if service exists in master_services_new...');
       final serviceResponse = await _supabase
-          .from('services')
+          .from('master_services_new')
           .select('id, name')
           .eq('id', serviceId)
           .maybeSingle();
@@ -97,6 +104,26 @@ class BookingService {
       return bookingId;
     } catch (e) {
       print('BookingService: Error creating booking: $e');
+      print('BookingService: Error type: ${e.runtimeType}');
+      
+      // Более детальная обработка ошибок Supabase
+      if (e is PostgrestException) {
+        print('BookingService: PostgrestException details:');
+        print('  Code: ${e.code}');
+        print('  Message: ${e.message}');
+        print('  Details: ${e.details}');
+        print('  Hint: ${e.hint}');
+        
+        // Специфичные ошибки
+        if (e.code == '23503') {
+          throw ServerFailure('Ошибка внешнего ключа: проверьте существование клиента, мастера или услуги');
+        } else if (e.code == '42501') {
+          throw ServerFailure('Недостаточно прав для создания записи. Проверьте авторизацию.');
+        } else {
+          throw ServerFailure('Ошибка базы данных: ${e.message}');
+        }
+      }
+      
       throw ServerFailure('Ошибка создания записи: $e');
     }
   }
@@ -217,7 +244,7 @@ class BookingService {
             client_notes,
             master_notes,
             clients!inner(full_name, phone),
-            services!inner(name, duration_minutes)
+            master_services_new!inner(name, duration_minutes)
           ''')
           .eq('master_id', masterId)
           .gte('start_time', TimezoneUtils.samarkandToUtc(startOfDay).toIso8601String())
@@ -262,7 +289,7 @@ class BookingService {
             client_notes,
             master_notes,
             clients!inner(full_name, phone),
-            services!inner(name, duration_minutes)
+            master_services_new!inner(name, duration_minutes)
           ''')
           .eq('master_id', masterId)
           .gte('start_time', TimezoneUtils.samarkandToUtc(startDate).toIso8601String())

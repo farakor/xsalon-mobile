@@ -61,15 +61,15 @@ class AppointmentsNotifier extends StateNotifier<AppointmentsState> {
 
       // Преобразуем данные из базы в модель Appointment
       final appointments = bookingsData.map((booking) {
-        final client = booking['clients'] as Map<String, dynamic>;
-        final service = booking['services'] as Map<String, dynamic>;
+        final client = booking['clients'] as Map<String, dynamic>?;
+        final service = booking['master_services_new'] as Map<String, dynamic>?;
         return Appointment(
           id: booking['id'],
           clientId: booking['client_id'] ?? '',
-          clientName: client['full_name'] ?? 'Неизвестный клиент',
-          clientPhone: client['phone'] ?? '',
+          clientName: client?['full_name'] ?? 'Неизвестный клиент',
+          clientPhone: client?['phone'] ?? '',
           serviceId: booking['service_id'] ?? '',
-          serviceName: service['name'] ?? 'Услуга',
+          serviceName: service?['name'] ?? 'Услуга',
           startTime: DateTime.parse(booking['start_time']),
           endTime: DateTime.parse(booking['end_time']),
           status: AppointmentStatus.values.firstWhere(
@@ -110,15 +110,15 @@ class AppointmentsNotifier extends StateNotifier<AppointmentsState> {
       );
 
       final appointments = bookingsData.map((booking) {
-        final client = booking['clients'] as Map<String, dynamic>;
-        final service = booking['services'] as Map<String, dynamic>;
+        final client = booking['clients'] as Map<String, dynamic>?;
+        final service = booking['master_services_new'] as Map<String, dynamic>?;
         return Appointment(
           id: booking['id'],
           clientId: booking['client_id'] ?? '',
-          clientName: client['full_name'] ?? 'Неизвестный клиент',
-          clientPhone: client['phone'] ?? '',
+          clientName: client?['full_name'] ?? 'Неизвестный клиент',
+          clientPhone: client?['phone'] ?? '',
           serviceId: booking['service_id'] ?? '',
-          serviceName: service['name'] ?? 'Услуга',
+          serviceName: service?['name'] ?? 'Услуга',
           startTime: DateTime.parse(booking['start_time']),
           endTime: DateTime.parse(booking['end_time']),
           status: AppointmentStatus.values.firstWhere(

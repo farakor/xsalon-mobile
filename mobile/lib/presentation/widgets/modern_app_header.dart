@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import '../theme/app_theme.dart';
 import '../providers/auth_provider.dart';
 
@@ -51,7 +52,7 @@ class ModernAppHeader extends ConsumerWidget implements PreferredSizeWidget {
           child: Row(
             children: [
               // Leading button
-              if (Navigator.canPop(context))
+              if (context.canPop())
                 Container(
                   margin: const EdgeInsets.only(right: 16),
                     child: IconButton(
@@ -71,7 +72,16 @@ class ModernAppHeader extends ConsumerWidget implements PreferredSizeWidget {
                           size: 18,
                         ),
                       ),
-                    onPressed: () => Navigator.pop(context),
+                    onPressed: () {
+                      try {
+                        if (context.canPop()) {
+                          context.pop();
+                        }
+                      } catch (e) {
+                        // Если не можем вернуться назад, ничего не делаем
+                        debugPrint('Cannot pop: $e');
+                      }
+                    },
                   ),
                 ),
               

@@ -121,12 +121,12 @@ class MasterRemoteDataSourceImpl implements MasterRemoteDataSource {
               email,
               avatar_url
             ),
-            master_services!inner(
-              service_id
+            master_services_new!inner(
+              id
             )
           ''')
           .eq('is_active', true)
-          .eq('master_services.service_id', serviceId)
+          .eq('master_services_new.id', serviceId)
           .order('rating', ascending: false);
 
       return (response as List)
@@ -141,12 +141,13 @@ class MasterRemoteDataSourceImpl implements MasterRemoteDataSource {
   Future<List<String>> getMasterServiceIds(String masterId) async {
     try {
       final response = await _supabaseClient
-          .from('master_services')
-          .select('service_id')
-          .eq('master_id', masterId);
+          .from('master_services_new')
+          .select('id')
+          .eq('master_id', masterId)
+          .eq('is_active', true);
 
       return (response as List<dynamic>)
-          .map((json) => json['service_id'] as String)
+          .map((json) => json['id'] as String)
           .toList();
     } catch (e) {
       throw Exception('Ошибка при загрузке услуг мастера: $e');

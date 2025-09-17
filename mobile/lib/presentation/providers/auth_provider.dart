@@ -327,6 +327,10 @@ class AuthNotifier extends StateNotifier<AuthState> {
         
         await _supabase.from('user_profiles').insert(newProfile);
         print('✅ Новый профиль клиента создан успешно');
+        
+        // Дополнительная проверка: убеждаемся, что запись в clients создалась
+        await _ensureClientRecordExists(phone);
+        
       } else {
         print('Профиль уже существует, обновляем данные...');
         
@@ -338,10 +342,53 @@ class AuthNotifier extends StateNotifier<AuthState> {
         }).eq('id', state.user!.id);
         
         print('✅ Профиль клиента обновлен успешно');
+        
+        // Дополнительная проверка: убеждаемся, что запись в clients существует
+        await _ensureClientRecordExists(phone);
       }
     } catch (error) {
       print('❌ Ошибка создания/обновления профиля клиента: $error');
       // Не прерываем процесс авторизации из-за ошибки профиля
+    }
+  }
+
+  // Дополнительная проверка и создание записи в таблице clients
+  Future<void> _ensureClientRecordExists(String phone) async {
+    if (state.user == null) return;
+
+    try {
+      print('Проверяем существование записи в таблице clients...');
+      
+      // Проверяем, есть ли запись в clients
+      final existingClient = await _supabase
+          .from('clients')
+          .select('id')
+          .eq('user_profile_id', state.user!.id)
+          .maybeSingle();
+
+      if (existingClient == null) {
+        print('Запись в clients не найдена, создаем...');
+        
+        // Создаем запись в clients
+        final clientData = {
+          'user_profile_id': state.user!.id,
+          'full_name': 'Клиент ($phone)',
+          'phone': phone,
+          'status': 'active',
+          'total_visits': 0,
+          'total_spent': 0.00,
+          'loyalty_points': 0,
+          'loyalty_level': 'Новичок',
+        };
+        
+        await _supabase.from('clients').insert(clientData);
+        print('✅ Запись в таблице clients создана успешно');
+      } else {
+        print('✅ Запись в таблице clients уже существует');
+      }
+    } catch (error) {
+      print('❌ Ошибка проверки/создания записи в clients: $error');
+      // Не критично, триггер БД должен справиться
     }
   }
 

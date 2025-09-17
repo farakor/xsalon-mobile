@@ -64,12 +64,32 @@ class SimpleServicesNotifier extends StateNotifier<SimpleServicesState> {
     }
   }
 
-  // Загрузка всех услуг
+  // Загрузка всех услуг (больше не используется - загружает услуги всех мастеров)
+  @deprecated
   Future<void> loadServices() async {
     state = state.copyWith(status: SimpleServicesStatus.loading);
 
     try {
       final services = await _serviceService.getServices();
+      state = state.copyWith(
+        status: SimpleServicesStatus.loaded,
+        services: services,
+        errorMessage: null,
+      );
+    } catch (error) {
+      state = state.copyWith(
+        status: SimpleServicesStatus.error,
+        errorMessage: error.toString(),
+      );
+    }
+  }
+
+  // Загрузка услуг конкретного мастера
+  Future<void> loadServicesByMaster(String masterId) async {
+    state = state.copyWith(status: SimpleServicesStatus.loading);
+
+    try {
+      final services = await _serviceService.getServicesByMaster(masterId);
       state = state.copyWith(
         status: SimpleServicesStatus.loaded,
         services: services,

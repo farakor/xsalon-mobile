@@ -45,6 +45,7 @@ class BookingNotifier extends StateNotifier<BookingState> {
     required DateTime endTime,
     required double totalPrice,
     String? clientNotes,
+    String? masterId, // Опциональный ID мастера (для клиентов)
   }) async {
     state = state.copyWith(status: BookingStatus.loading);
 
@@ -52,14 +53,14 @@ class BookingNotifier extends StateNotifier<BookingState> {
       print('BookingProvider: Creating booking...');
       
       // Получаем ID мастера
-      final masterId = await _bookingService.getCurrentMasterId();
+      final finalMasterId = masterId ?? await _bookingService.getCurrentMasterId();
       
-      print('BookingProvider: Master ID: $masterId');
+      print('BookingProvider: Master ID: $finalMasterId');
 
       // Проверяем доступность времени
       print('BookingProvider: Checking time slot availability...');
       final isAvailable = await _bookingService.isTimeSlotAvailable(
-        masterId: masterId,
+        masterId: finalMasterId,
         startTime: startTime,
         endTime: endTime,
       );
@@ -81,7 +82,7 @@ class BookingNotifier extends StateNotifier<BookingState> {
       
       final bookingId = await _bookingService.createBooking(
         clientId: clientId,
-        masterId: masterId,
+        masterId: finalMasterId,
         serviceId: serviceId,
         startTime: startTime,
         endTime: endTime,

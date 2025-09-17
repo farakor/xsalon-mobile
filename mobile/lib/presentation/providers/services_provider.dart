@@ -4,6 +4,7 @@ import '../../data/repositories/service_repository_impl.dart';
 import '../../data/services/service_service.dart';
 import '../../data/services/default_categories_service.dart';
 import '../../data/services/mock_service_service.dart';
+import '../../data/services/booking_service.dart';
 import '../../domain/entities/service.dart';
 import '../../domain/repositories/service_repository.dart';
 import '../../domain/usecases/get_services.dart';
@@ -53,7 +54,8 @@ class ServicesNotifier extends StateNotifier<ServicesState> {
   final ServiceService _serviceService;
   final DefaultCategoriesService _defaultCategoriesService;
 
-  // Загрузка всех услуг
+  // Загрузка всех услуг (больше не используется - загружает услуги всех мастеров)
+  @deprecated
   Future<void> loadServices() async {
     state = state.copyWith(status: ServicesStatus.loading);
 
@@ -69,6 +71,43 @@ class ServicesNotifier extends StateNotifier<ServicesState> {
         status: ServicesStatus.error,
         errorMessage: error.toString(),
       );
+    }
+  }
+
+  // Загрузка услуг текущего мастера
+  Future<void> loadServicesForCurrentMaster() async {
+    state = state.copyWith(status: ServicesStatus.loading);
+
+    try {
+      // Получаем ID текущего мастера
+      final masterId = await _getCurrentMasterId();
+      if (masterId == null) {
+        throw Exception('Мастер не найден');
+      }
+
+      // Загружаем услуги только этого мастера
+      final services = await _serviceService.getServicesByMaster(masterId);
+      state = state.copyWith(
+        status: ServicesStatus.loaded,
+        services: services,
+        errorMessage: null,
+      );
+    } catch (error) {
+      state = state.copyWith(
+        status: ServicesStatus.error,
+        errorMessage: error.toString(),
+      );
+    }
+  }
+
+  // Получить ID текущего мастера
+  Future<String?> _getCurrentMasterId() async {
+    try {
+      // Импортируем BookingService для получения ID мастера
+      final bookingService = BookingService();
+      return await bookingService.getCurrentMasterId();
+    } catch (e) {
+      return null;
     }
   }
 
@@ -95,31 +134,18 @@ class ServicesNotifier extends StateNotifier<ServicesState> {
     }
   }
 
-  // Загрузка категорий
+  // Загрузка категорий (больше не используется в новой системе)
+  @deprecated
   Future<void> loadCategories() async {
-    try {
-      // Сначала пытаемся создать категории по умолчанию, если их нет
-      await _ensureDefaultCategories();
-      
-      final categories = await _serviceService.getServiceCategories();
-      state = state.copyWith(categories: categories);
-    } catch (error) {
-      state = state.copyWith(
-        status: ServicesStatus.error,
-        errorMessage: error.toString(),
-      );
-    }
+    // В новой системе категории не используются
+    // Устанавливаем пустой список категорий
+    state = state.copyWith(categories: []);
   }
 
-  // Создает категории по умолчанию, если их нет
+  // Создает категории по умолчанию, если их нет (больше не используется)
+  @deprecated
   Future<void> _ensureDefaultCategories() async {
-    try {
-      // Создаем категории по умолчанию, если их нет
-      await _defaultCategoriesService.createDefaultCategoriesIfNeeded();
-    } catch (e) {
-      // Игнорируем ошибки создания категорий по умолчанию
-      // Пользователь сможет создать категории вручную
-    }
+    // В новой системе категории не используются
   }
 
   // Добавление новой услуги

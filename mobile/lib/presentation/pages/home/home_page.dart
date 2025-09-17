@@ -209,30 +209,6 @@ class _ClientHomeTab extends StatelessWidget {
                 const SizedBox(width: 12),
                 Expanded(
                   child: _QuickActionCard(
-                    icon: Icons.people,
-                    title: 'Мастера',
-                    subtitle: 'Выбрать',
-                    onTap: () => context.go(AppConstants.mastersRoute),
-                  ),
-                ),
-              ],
-            ),
-            
-            const SizedBox(height: 12),
-            
-            Row(
-              children: [
-                Expanded(
-                  child: _QuickActionCard(
-                    icon: Icons.design_services,
-                    title: 'Услуги',
-                    subtitle: 'Каталог',
-                    onTap: () => context.go(AppConstants.servicesRoute),
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: _QuickActionCard(
                     icon: Icons.card_giftcard,
                     title: 'Бонусы',
                     subtitle: 'Программа',

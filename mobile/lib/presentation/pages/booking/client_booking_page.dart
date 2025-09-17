@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../theme/app_theme.dart';
 import '../../providers/services_provider.dart';
 import '../../providers/masters_provider.dart';
+import '../../providers/booking_provider.dart';
 import '../../widgets/common/custom_button.dart';
 import '../../../domain/entities/service.dart';
 import '../../../domain/entities/master.dart';
@@ -908,21 +910,130 @@ class _ClientBookingPageState extends ConsumerState<ClientBookingPage> {
     }
   }
 
-  void _confirmBooking() {
-    // TODO: Реализовать создание записи
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Запись успешно создана!'),
-        backgroundColor: Colors.green,
-        duration: Duration(seconds: 2),
-      ),
-    );
-    
-    // Даем пользователю время увидеть сообщение, затем переходим на главную
-    Future.delayed(const Duration(milliseconds: 1500), () {
-      if (mounted) {
-        context.go(AppConstants.homeRoute);
+  Future<void> _confirmBooking() async {
+    // Проверяем, что все данные заполнены
+    if (selectedMaster == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Выберите мастера'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
+    if (selectedService == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Выберите услугу'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
+    if (selectedDate == null || selectedTime == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Выберите дату и время'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
+    try {
+      // Показываем индикатор загрузки
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) => const Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
+
+      // Получаем ID текущего клиента
+      final currentUser = Supabase.instance.client.auth.currentUser;
+      if (currentUser == null) {
+        throw Exception('Пользователь не авторизован');
       }
-    });
+
+      // Ищем клиента по user_profile_id
+      final clientResponse = await Supabase.instance.client
+          .from('clients')
+          .select('id')
+          .eq('user_profile_id', currentUser.id)
+          .single();
+
+      final clientId = clientResponse['id'] as String;
+
+      // Создаем DateTime для записи
+      final startDateTime = DateTime(
+        selectedDate!.year,
+        selectedDate!.month,
+        selectedDate!.day,
+        selectedTime!.hour,
+        selectedTime!.minute,
+      );
+
+      final endDateTime = startDateTime.add(
+        Duration(minutes: selectedService!.durationMinutes),
+      );
+
+      // Создаем запись через провайдер
+      final success = await ref.read(bookingProvider.notifier).createBooking(
+        clientId: clientId,
+        serviceIds: [selectedService!.id],
+        startTime: startDateTime,
+        endTime: endDateTime,
+        totalPrice: selectedService!.price,
+        masterId: selectedMaster!.id, // Передаем ID выбранного мастера
+      );
+
+      // Закрываем индикатор загрузки
+      if (mounted) {
+        Navigator.of(context).pop();
+      }
+
+      if (success && mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Запись успешно создана!'),
+            backgroundColor: Colors.green,
+            duration: Duration(seconds: 2),
+          ),
+        );
+        
+        // Переходим на главную
+        Future.delayed(const Duration(milliseconds: 1500), () {
+          if (mounted) {
+            context.go(AppConstants.homeRoute);
+          }
+        });
+      } else if (mounted) {
+        final error = ref.read(bookingErrorProvider);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Ошибка создания записи: ${error ?? 'Неизвестная ошибка'}'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } catch (error) {
+      // Закрываем индикатор загрузки
+      if (mounted) {
+        Navigator.of(context).pop();
+      }
+
+      print('ClientBookingPage: Error creating booking: $error');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Ошибка создания записи: $error'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
   }
 }

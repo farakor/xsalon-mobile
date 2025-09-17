@@ -23,9 +23,9 @@ class _ServicesPageState extends ConsumerState<ServicesPage> {
   @override
   void initState() {
     super.initState();
-    // Загружаем услуги и категории при инициализации
+    // Загружаем услуги текущего мастера при инициализации
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.read(servicesProvider.notifier).loadServices();
+      ref.read(servicesProvider.notifier).loadServicesForCurrentMaster();
       ref.read(servicesProvider.notifier).loadCategories();
     });
   }
@@ -219,7 +219,7 @@ class _ServicesPageState extends ConsumerState<ServicesPage> {
             const SizedBox(height: 16),
             ElevatedButton(
               onPressed: () {
-                ref.read(servicesProvider.notifier).loadServices();
+                ref.read(servicesProvider.notifier).loadServicesForCurrentMaster();
               },
               child: const Text('Повторить'),
             ),
@@ -310,7 +310,7 @@ class _ServicesPageState extends ConsumerState<ServicesPage> {
 
     return RefreshIndicator(
       onRefresh: () async {
-        await ref.read(servicesProvider.notifier).loadServices();
+        await ref.read(servicesProvider.notifier).loadServicesForCurrentMaster();
       },
       child: ListView.builder(
         padding: const EdgeInsets.fromLTRB(20, 16, 20, 100),
