@@ -55,8 +55,14 @@ class _SplashPageState extends ConsumerState<SplashPage>
 
   Future<void> _initializeApp() async {
     try {
-      // Инициализация Supabase
-      await SupabaseConfig.initialize();
+      // Инициализация Supabase (только если не в debug режиме)
+      try {
+        await SupabaseConfig.initialize();
+        print('✅ Supabase инициализирован успешно');
+      } catch (supabaseError) {
+        print('⚠️ Ошибка инициализации Supabase: $supabaseError');
+        print('🔧 Продолжаем в debug режиме...');
+      }
       
       // Инициализация провайдера аутентификации
       ref.read(authProvider.notifier).initialize();
@@ -64,6 +70,15 @@ class _SplashPageState extends ConsumerState<SplashPage>
       // Минимальное время показа splash
       await Future.delayed(const Duration(seconds: 2));
       
+      // В debug режиме всегда переходим на авторизацию
+      if (SupabaseConfig.debugSmsToConsole) {
+        if (mounted) {
+          context.go(AppConstants.authRoute);
+        }
+        return;
+      }
+      
+      // В production режиме проверяем сессию
       final session = SupabaseConfig.auth.currentSession;
       
       if (mounted) {
@@ -76,6 +91,7 @@ class _SplashPageState extends ConsumerState<SplashPage>
         }
       }
     } catch (error) {
+      print('Ошибка инициализации приложения: $error');
       // В случае ошибки переходим на страницу авторизации
       if (mounted) {
         context.go(AppConstants.authRoute);

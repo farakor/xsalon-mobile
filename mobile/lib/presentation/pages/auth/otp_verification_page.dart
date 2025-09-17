@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:pinput/pinput.dart';
 
 import '../../../core/constants/app_constants.dart';
+import '../../../core/config/supabase_config.dart';
 import '../../providers/auth_provider.dart';
 import '../../theme/app_theme.dart';
 import '../../widgets/common/custom_button.dart';
@@ -195,9 +196,10 @@ class _OtpVerificationPageState extends ConsumerState<OtpVerificationPage> {
               const SizedBox(height: 16),
               
               Text(
-                'Мы отправили 6-значный код на номер\n$_maskedPhone',
+                'ТЕСТОВЫЙ РЕЖИМ: Введите любой 6-значный код\n(рекомендуется: 123456)',
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: AppTheme.textSecondaryColor,
+                  color: Colors.orange,
+                  fontWeight: FontWeight.w500,
                 ),
                 textAlign: TextAlign.center,
               ),

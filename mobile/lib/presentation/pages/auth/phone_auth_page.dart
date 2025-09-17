@@ -121,7 +121,7 @@ class _PhoneAuthPageState extends ConsumerState<PhoneAuthPage> {
                 const SizedBox(height: 16),
                 
                 Text(
-                  'Мы отправим SMS с кодом подтверждения',
+                  'Мы отправим SMS с кодом подтверждения.\nПри первом входе автоматически создастся аккаунт.',
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     color: AppTheme.textSecondaryColor,
                   ),

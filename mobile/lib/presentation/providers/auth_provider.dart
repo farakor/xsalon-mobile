@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../core/config/supabase_config.dart';
 import '../../data/models/user_profile.dart';
+import '../../data/services/sms_debug_service.dart';
 
 // Состояние аутентификации
 enum AuthStatus {
@@ -150,13 +151,17 @@ class AuthNotifier extends StateNotifier<AuthState> {
     state = state.copyWith(status: AuthStatus.loading);
 
     try {
-      await _supabase.auth.signInWithOtp(
-        phone: phone,
-      );
+      // В тестовом режиме не отправляем реальный SMS через Supabase
+      // Имитируем задержку отправки SMS
+      await Future.delayed(const Duration(seconds: 1));
       
-      // OTP отправлен успешно
+      // Логируем информацию о тестовом SMS
+      SmsDebugService.logSmsInfo(phone);
+      
+      // OTP "отправлен" успешно (тестовый режим)
       state = state.copyWith(status: AuthStatus.unauthenticated);
     } catch (error) {
+      print('Ошибка отправки OTP: $error');
       state = state.copyWith(
         status: AuthStatus.error,
         errorMessage: _getErrorMessage(error),
@@ -169,27 +174,127 @@ class AuthNotifier extends StateNotifier<AuthState> {
     state = state.copyWith(status: AuthStatus.loading);
 
     try {
-      final response = await _supabase.auth.verifyOTP(
-        phone: phone,
-        token: token,
-        type: OtpType.sms,
-      );
-
-      if (response.user != null) {
-        state = state.copyWith(
-          status: AuthStatus.authenticated,
-          user: response.user,
-        );
+      // В тестовом режиме принимаем любой 6-значный код
+      if (SmsDebugService.isValidDebugCode(token)) {
+        SmsDebugService.logCodeVerification(phone, token);
         
-        // Создаем или обновляем профиль клиента
-        await _createOrUpdateClientProfile(phone);
-        await _loadUserProfile();
+        // Создаем пользователя через Supabase с email/password для тестирования
+        final phoneClean = phone.replaceAll('+', '').replaceAll(' ', '');
+        final debugEmail = 'client_$phoneClean@xsalon.test';
+        final debugPassword = 'test123456';
+        
+        try {
+          print('🔧 Создаем/ищем пользователя с email: $debugEmail');
+          
+          // Сначала пытаемся создать пользователя
+          var response = await _supabase.auth.signUp(
+            email: debugEmail,
+            password: debugPassword,
+            data: {
+              'phone': phone,
+              'full_name': 'Клиент ($phone)',
+            },
+          );
+          
+          print('📊 Результат создания: ${response.user != null ? "Пользователь создан" : "Ошибка создания"}');
+          
+          // Если пользователь уже существует, пытаемся войти
+          if (response.user == null) {
+            print('🔧 Пользователь уже существует, пытаемся войти...');
+            response = await _supabase.auth.signInWithPassword(
+              email: debugEmail,
+              password: debugPassword,
+            );
+            print('📊 Результат входа: ${response.user != null ? "Вход успешен" : "Ошибка входа"}');
+          }
+          
+          if (response.user != null) {
+            state = state.copyWith(
+              status: AuthStatus.authenticated,
+              user: response.user,
+            );
+            
+            // Создаем или обновляем профиль клиента
+            await _createOrUpdateClientProfile(phone);
+            await _loadUserProfile();
+            
+            print('✅ Тестовая авторизация успешна! Пользователь: ${response.user!.id}');
+            return;
+          }
+        } catch (supabaseError) {
+          print('❌ Ошибка работы с Supabase: $supabaseError');
+          
+          // Если это ошибка "пользователь уже существует", пытаемся войти
+          if (supabaseError.toString().contains('already registered') || 
+              supabaseError.toString().contains('User already registered')) {
+            try {
+              print('🔄 Пользователь уже зарегистрирован, пытаемся войти...');
+              final loginResponse = await _supabase.auth.signInWithPassword(
+                email: debugEmail,
+                password: debugPassword,
+              );
+              
+              if (loginResponse.user != null) {
+                state = state.copyWith(
+                  status: AuthStatus.authenticated,
+                  user: loginResponse.user,
+                );
+                
+                await _createOrUpdateClientProfile(phone);
+                await _loadUserProfile();
+                
+                print('✅ Вход существующего пользователя успешен!');
+                return;
+              }
+            } catch (loginError) {
+              print('❌ Ошибка входа существующего пользователя: $loginError');
+            }
+          }
+          
+          state = state.copyWith(
+            status: AuthStatus.error,
+            errorMessage: 'Ошибка авторизации: ${_getErrorMessage(supabaseError)}',
+          );
+          return;
+        }
       }
+      
+      // Если код неверный
+      state = state.copyWith(
+        status: AuthStatus.error,
+        errorMessage: 'Неверный код подтверждения',
+      );
     } catch (error) {
+      print('Ошибка верификации OTP: $error');
       state = state.copyWith(
         status: AuthStatus.error,
         errorMessage: _getErrorMessage(error),
       );
+    }
+  }
+
+  // Создание debug профиля клиента (без обращения к Supabase)
+  Future<void> _createDebugClientProfile(String phone, String userId) async {
+    try {
+      print('🔧 Создаем debug профиль клиента...');
+      
+      // Создаем локальный профиль для debug режима
+      final debugProfile = UserProfile(
+        id: userId,
+        phone: phone,
+        role: 'client',
+        isActive: true,
+        createdAt: DateTime.now(),
+        updatedAt: DateTime.now(),
+        fullName: 'Debug User ($phone)',
+      );
+      
+      // Устанавливаем профиль в состояние
+      state = state.copyWith(profile: debugProfile);
+      
+      print('✅ Debug профиль создан: ${debugProfile.displayName}');
+    } catch (error) {
+      print('❌ Ошибка создания debug профиля: $error');
     }
   }
 
@@ -198,6 +303,8 @@ class AuthNotifier extends StateNotifier<AuthState> {
     if (state.user == null) return;
 
     try {
+      print('Создаем/обновляем профиль клиента для пользователя: ${state.user!.id}');
+      
       // Проверяем, существует ли профиль
       final existingProfile = await _supabase
           .from('user_profiles')
@@ -206,16 +313,35 @@ class AuthNotifier extends StateNotifier<AuthState> {
           .maybeSingle();
 
       if (existingProfile == null) {
+        print('Профиль не найден, создаем новый...');
+        
         // Создаем новый профиль клиента
-        await _supabase.from('user_profiles').insert({
+        final newProfile = {
           'id': state.user!.id,
           'phone': phone,
           'role': 'client',
           'is_active': true,
-        });
+          'created_at': DateTime.now().toIso8601String(),
+          'updated_at': DateTime.now().toIso8601String(),
+        };
+        
+        await _supabase.from('user_profiles').insert(newProfile);
+        print('✅ Новый профиль клиента создан успешно');
+      } else {
+        print('Профиль уже существует, обновляем данные...');
+        
+        // Обновляем существующий профиль
+        await _supabase.from('user_profiles').update({
+          'phone': phone,
+          'last_login_at': DateTime.now().toIso8601String(),
+          'updated_at': DateTime.now().toIso8601String(),
+        }).eq('id', state.user!.id);
+        
+        print('✅ Профиль клиента обновлен успешно');
       }
     } catch (error) {
-      // TODO: Добавить логирование через Logger
+      print('❌ Ошибка создания/обновления профиля клиента: $error');
+      // Не прерываем процесс авторизации из-за ошибки профиля
     }
   }
 
