@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-import '../../../../core/constants/app_constants.dart';
 import '../../../../data/models/appointment.dart';
 import '../../../theme/app_theme.dart';
 
@@ -18,15 +17,19 @@ class DayScheduleView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (appointments.isEmpty) {
+      return _buildEmptyState();
+    }
+
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.08),
-            blurRadius: 20,
-            offset: const Offset(0, 4),
+            color: Colors.black.withValues(alpha: 0.06),
+            blurRadius: 24,
+            offset: const Offset(0, 8),
           ),
         ],
       ),
@@ -45,49 +48,69 @@ class DayScheduleView extends StatelessWidget {
 
   Widget _buildModernDaySummary() {
     final totalAppointments = appointments.length;
-    final totalRevenue = appointments.fold<double>(
-      0,
-      (sum, appointment) => sum + appointment.price,
-    );
 
     return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            Color(0xFF667EEA),
-            Color(0xFF764BA2),
-          ],
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+      decoration: BoxDecoration(
+        color: AppTheme.backgroundColor,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+        border: Border(
+          bottom: BorderSide(
+            color: AppTheme.borderColor.withValues(alpha: 0.5),
+            width: 1,
+          ),
         ),
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       child: Row(
         children: [
-          Expanded(
-            child: _buildSummaryCard(
-              'Записей',
-              '$totalAppointments',
-              Icons.event_note,
-              Colors.white.withValues(alpha: 0.9),
-            ),
-          ),
-          const SizedBox(width: 16),
           Container(
-            width: 1,
-            height: 50,
-            color: Colors.white.withValues(alpha: 0.3),
-          ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: _buildSummaryCard(
-              'Доход',
-              _formatPrice(totalRevenue),
-              Icons.attach_money,
-              Colors.white.withValues(alpha: 0.9),
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: AppTheme.primaryColor.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Icon(
+              Icons.calendar_today,
+              color: AppTheme.primaryColor,
+              size: 16,
             ),
           ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  _formatSelectedDate(),
+                  style: AppTheme.titleMedium.copyWith(
+                    color: AppTheme.textPrimaryColor,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                Text(
+                  '$totalAppointments записей на день',
+                  style: AppTheme.bodySmall.copyWith(
+                    color: AppTheme.textSecondaryColor,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          if (totalAppointments > 0)
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              decoration: BoxDecoration(
+                color: AppTheme.primaryColor,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Text(
+                '$totalAppointments',
+                style: AppTheme.bodyMedium.copyWith(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
         ],
       ),
     );
@@ -261,76 +284,6 @@ class DayScheduleView extends StatelessWidget {
     return widgets;
   }
 
-  Widget _buildDaySummary() {
-    final totalAppointments = appointments.length;
-    final totalRevenue = appointments.fold<double>(
-      0,
-      (sum, appointment) => sum + appointment.price,
-    );
-
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [AppTheme.primaryColor.withValues(alpha: 0.1), Colors.white],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppTheme.primaryColor.withValues(alpha: 0.2)),
-      ),
-      child: Row(
-        children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Записей на день',
-                  style: AppTheme.bodyMedium.copyWith(
-                    color: Colors.grey[600],
-                  ),
-                ),
-                Text(
-                  '$totalAppointments',
-                  style: AppTheme.headlineMedium.copyWith(
-                    color: AppTheme.primaryColor,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          Container(
-            width: 1,
-            height: 40,
-            color: Colors.grey[300],
-          ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Доход за день',
-                  style: AppTheme.bodyMedium.copyWith(
-                    color: Colors.grey[600],
-                  ),
-                ),
-                Text(
-                  _formatPrice(totalRevenue),
-                  style: AppTheme.headlineMedium.copyWith(
-                    color: Colors.green[600],
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
 
   Widget _buildTimeSchedule(BuildContext context) {
     const startHour = 8;
@@ -490,31 +443,30 @@ class DayScheduleView extends StatelessWidget {
             height: height,
             margin: const EdgeInsets.only(bottom: 4),
             decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [
-                  _getStatusColor(appointment.status),
-                  _getStatusColor(appointment.status).withValues(alpha: 0.8),
-                ],
-              ),
+              color: Colors.white,
               borderRadius: BorderRadius.circular(16),
+              border: Border.all(
+                color: _getStatusColor(appointment.status),
+                width: 2,
+              ),
               boxShadow: [
                 BoxShadow(
-                  color: _getStatusColor(appointment.status).withValues(alpha: 0.3),
-                  blurRadius: 8,
-                  offset: const Offset(0, 4),
+                  color: _getStatusColor(appointment.status).withValues(alpha: 0.15),
+                  blurRadius: 12,
+                  offset: const Offset(0, 6),
+                ),
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.05),
+                  blurRadius: 20,
+                  offset: const Offset(0, 8),
                 ),
               ],
             ),
             child: Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(
-                  color: Colors.white.withValues(alpha: 0.2),
-                  width: 1,
-                ),
+                borderRadius: BorderRadius.circular(14),
+                color: _getStatusColor(appointment.status).withValues(alpha: 0.1),
               ),
               child: Padding(
                 padding: EdgeInsets.all(height < 40 ? 1.0 : (height < 60 ? 2.0 : 4.0)),
@@ -524,7 +476,7 @@ class DayScheduleView extends StatelessWidget {
                       child: Text(
                         '${appointment.clientName} ${_formatTime(appointment.startTime)}-${_formatTime(appointment.endTime)}',
                         style: AppTheme.bodySmall.copyWith(
-                          color: Colors.white,
+                          color: _getStatusColor(appointment.status),
                           fontWeight: FontWeight.w600,
                           fontSize: 8,
                         ),
@@ -545,7 +497,7 @@ class DayScheduleView extends StatelessWidget {
                             Text(
                               appointment.clientName,
                               style: AppTheme.bodySmall.copyWith(
-                                color: Colors.white,
+                                color: AppTheme.textPrimaryColor,
                                 fontWeight: FontWeight.w600,
                                 fontSize: 9,
                               ),
@@ -557,7 +509,7 @@ class DayScheduleView extends StatelessWidget {
                             Text(
                               '${_formatTime(appointment.startTime)}-${_formatTime(appointment.endTime)}',
                               style: AppTheme.bodySmall.copyWith(
-                                color: Colors.white.withValues(alpha: 0.8),
+                                color: _getStatusColor(appointment.status),
                                 fontWeight: FontWeight.w500,
                                 fontSize: 7,
                               ),
@@ -578,7 +530,7 @@ class DayScheduleView extends StatelessWidget {
                               Text(
                                 appointment.clientName,
                                 style: AppTheme.bodyMedium.copyWith(
-                                  color: Colors.white,
+                                  color: AppTheme.textPrimaryColor,
                                   fontWeight: FontWeight.w600,
                                 ),
                                 maxLines: 1,
@@ -586,11 +538,38 @@ class DayScheduleView extends StatelessWidget {
                               ),
                               const SizedBox(height: 2),
                               // Время
-                              Text(
-                                '${_formatTime(appointment.startTime)} - ${_formatTime(appointment.endTime)}',
-                                style: AppTheme.bodySmall.copyWith(
-                                  color: Colors.white.withValues(alpha: 0.8),
-                                  fontWeight: FontWeight.w500,
+                              Row(
+                                children: [
+                                  Icon(
+                                    Icons.access_time,
+                                    size: 12,
+                                    color: _getStatusColor(appointment.status),
+                                  ),
+                                  const SizedBox(width: 4),
+                                  Text(
+                                    '${_formatTime(appointment.startTime)} - ${_formatTime(appointment.endTime)}',
+                                    style: AppTheme.bodySmall.copyWith(
+                                      color: _getStatusColor(appointment.status),
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 4),
+                              // Статус
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                                decoration: BoxDecoration(
+                                  color: _getStatusColor(appointment.status),
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: Text(
+                                  appointment.status.displayName,
+                                  style: AppTheme.bodySmall.copyWith(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.w500,
+                                    fontSize: 10,
+                                  ),
                                 ),
                               ),
                             ],
@@ -712,14 +691,8 @@ class DayScheduleView extends StatelessWidget {
         return const Color(0xFFFF9500); // Modern orange
       case AppointmentStatus.confirmed:
         return const Color(0xFF34C759); // Modern green
-      case AppointmentStatus.inProgress:
-        return const Color(0xFF007AFF); // Modern blue
-      case AppointmentStatus.completed:
-        return const Color(0xFF30D158); // Modern teal
       case AppointmentStatus.cancelled:
         return const Color(0xFFFF3B30); // Modern red
-      case AppointmentStatus.noShow:
-        return const Color(0xFF8E8E93); // Modern grey
     }
   }
 
@@ -729,5 +702,127 @@ class DayScheduleView extends StatelessWidget {
 
   String _formatPrice(double price) {
     return '${(price / 1000).toStringAsFixed(0)} тыс. сум';
+  }
+
+  Widget _buildEmptyState() {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.06),
+            blurRadius: 24,
+            offset: const Offset(0, 8),
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          // Compact Header
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+            decoration: BoxDecoration(
+              color: AppTheme.backgroundColor,
+              borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+              border: Border(
+                bottom: BorderSide(
+                  color: AppTheme.borderColor.withValues(alpha: 0.5),
+                  width: 1,
+                ),
+              ),
+            ),
+            child: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: AppTheme.textSecondaryColor.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Icon(
+                    Icons.event_available,
+                    color: AppTheme.textSecondaryColor,
+                    size: 16,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        _formatSelectedDate(),
+                        style: AppTheme.titleMedium.copyWith(
+                          color: AppTheme.textPrimaryColor,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      Text(
+                        'Свободный день',
+                        style: AppTheme.bodySmall.copyWith(
+                          color: AppTheme.textSecondaryColor,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+          
+          // Empty content
+          Expanded(
+            child: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(24),
+                    decoration: BoxDecoration(
+                      color: AppTheme.backgroundColor,
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Icon(
+                      Icons.event_available,
+                      size: 64,
+                      color: AppTheme.textSecondaryColor.withValues(alpha: 0.6),
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+                  Text(
+                    'Записей нет',
+                    style: AppTheme.titleLarge.copyWith(
+                      color: AppTheme.textPrimaryColor,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'На этот день записи отсутствуют.\nВремя свободно для новых клиентов.',
+                    style: AppTheme.bodyMedium.copyWith(
+                      color: AppTheme.textSecondaryColor,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  String _formatSelectedDate() {
+    const months = [
+      'января', 'февраля', 'марта', 'апреля', 'мая', 'июня',
+      'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря'
+    ];
+    const weekdays = [
+      'Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота', 'Воскресенье'
+    ];
+    
+    return '${weekdays[selectedDate.weekday - 1]}, ${selectedDate.day} ${months[selectedDate.month - 1]}';
   }
 }

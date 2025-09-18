@@ -106,27 +106,18 @@ class Appointment {
 enum AppointmentStatus {
   pending,
   confirmed,
-  inProgress,
-  completed,
   cancelled,
-  noShow,
 }
 
 extension AppointmentStatusExtension on AppointmentStatus {
   String get displayName {
     switch (this) {
       case AppointmentStatus.pending:
-        return 'Ожидает';
+        return 'Ожидает подтверждения';
       case AppointmentStatus.confirmed:
         return 'Подтверждено';
-      case AppointmentStatus.inProgress:
-        return 'В процессе';
-      case AppointmentStatus.completed:
-        return 'Завершено';
       case AppointmentStatus.cancelled:
         return 'Отменено';
-      case AppointmentStatus.noShow:
-        return 'Не явился';
     }
   }
 
@@ -136,14 +127,8 @@ extension AppointmentStatusExtension on AppointmentStatus {
         return '#FFA726'; // Orange
       case AppointmentStatus.confirmed:
         return '#66BB6A'; // Green
-      case AppointmentStatus.inProgress:
-        return '#42A5F5'; // Blue
-      case AppointmentStatus.completed:
-        return '#4CAF50'; // Dark Green
       case AppointmentStatus.cancelled:
         return '#EF5350'; // Red
-      case AppointmentStatus.noShow:
-        return '#BDBDBD'; // Grey
     }
   }
 }

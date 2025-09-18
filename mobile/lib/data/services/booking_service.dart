@@ -342,4 +342,18 @@ class BookingService {
       throw ServerFailure('Ошибка обновления заметок: $e');
     }
   }
+
+  /// Удалить запись (отменить)
+  Future<void> deleteBooking({
+    required String bookingId,
+  }) async {
+    try {
+      await _supabase
+          .from('bookings')
+          .delete()
+          .eq('id', bookingId);
+    } catch (e) {
+      throw ServerFailure('Ошибка удаления записи: $e');
+    }
+  }
 }

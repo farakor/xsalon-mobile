@@ -245,10 +245,9 @@ class _AppointmentDetailsBottomSheetState
             ),
             child: Column(
               children: [
-                // Status change buttons
-                if (appointment.status != AppointmentStatus.completed &&
-                    appointment.status != AppointmentStatus.cancelled)
-                  _buildStatusActions(),
+                // Кнопка подтверждения для записей со статусом "pending"
+                if (appointment.status == AppointmentStatus.pending)
+                  _buildConfirmButton(),
                 
                 const SizedBox(height: 16),
                 
@@ -463,63 +462,24 @@ class _AppointmentDetailsBottomSheetState
     );
   }
 
-  Widget _buildStatusActions() {
-    final currentStatus = widget.appointment.status;
-    final availableStatuses = <AppointmentStatus>[];
 
-    // Определяем доступные статусы в зависимости от текущего
-    switch (currentStatus) {
-      case AppointmentStatus.pending:
-        availableStatuses.addAll([
-          AppointmentStatus.confirmed,
-          AppointmentStatus.cancelled,
-        ]);
-        break;
-      case AppointmentStatus.confirmed:
-        availableStatuses.addAll([
-          AppointmentStatus.inProgress,
-          AppointmentStatus.cancelled,
-        ]);
-        break;
-      case AppointmentStatus.inProgress:
-        availableStatuses.addAll([
-          AppointmentStatus.completed,
-          AppointmentStatus.cancelled,
-        ]);
-        break;
-      default:
-        break;
-    }
-
-    if (availableStatuses.isEmpty) return const SizedBox.shrink();
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'Изменить статус:',
-          style: AppTheme.bodySmall.copyWith(
-            color: Colors.grey[600],
-            fontWeight: FontWeight.w500,
+  Widget _buildConfirmButton() {
+    return Container(
+      width: double.infinity,
+      margin: const EdgeInsets.only(bottom: 16),
+      child: ElevatedButton.icon(
+        onPressed: () => _confirmAppointment(),
+        icon: const Icon(Icons.check_circle),
+        label: const Text('Подтвердить запись'),
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.green,
+          foregroundColor: Colors.white,
+          padding: const EdgeInsets.symmetric(vertical: 12),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8),
           ),
         ),
-        const SizedBox(height: 8),
-        Wrap(
-          spacing: 8,
-          children: availableStatuses.map((status) {
-            return ActionChip(
-              label: Text(status.displayName),
-              onPressed: () => _changeStatus(status),
-              backgroundColor: _getStatusColor(status).withOpacity(0.1),
-              side: BorderSide(color: _getStatusColor(status)),
-              labelStyle: TextStyle(
-                color: _getStatusColor(status),
-                fontWeight: FontWeight.w600,
-              ),
-            );
-          }).toList(),
-        ),
-      ],
+      ),
     );
   }
 
@@ -529,14 +489,8 @@ class _AppointmentDetailsBottomSheetState
         return Colors.orange;
       case AppointmentStatus.confirmed:
         return Colors.green;
-      case AppointmentStatus.inProgress:
-        return Colors.blue;
-      case AppointmentStatus.completed:
-        return Colors.green[700]!;
       case AppointmentStatus.cancelled:
         return Colors.red;
-      case AppointmentStatus.noShow:
-        return Colors.grey;
     }
   }
 
@@ -581,13 +535,6 @@ class _AppointmentDetailsBottomSheetState
     );
   }
 
-  void _changeStatus(AppointmentStatus newStatus) {
-    ref.read(appointmentsProvider.notifier).updateAppointmentStatus(
-      widget.appointment.id,
-      newStatus,
-    );
-    Navigator.pop(context);
-  }
 
   void _saveNotes() async {
     try {
@@ -619,13 +566,28 @@ class _AppointmentDetailsBottomSheetState
     }
   }
 
+  void _confirmAppointment() {
+    ref.read(appointmentsProvider.notifier).updateAppointmentStatus(
+      widget.appointment.id,
+      AppointmentStatus.confirmed,
+    );
+    Navigator.pop(context);
+  }
+
+  void _deleteAppointment() {
+    ref.read(appointmentsProvider.notifier).deleteAppointment(
+      widget.appointment.id,
+    );
+    Navigator.pop(context);
+  }
+
   void _showCancelDialog() {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Отменить запись?'),
         content: const Text(
-          'Вы уверены, что хотите отменить эту запись? Это действие нельзя отменить.',
+          'Вы уверены, что хотите отменить эту запись? Запись будет удалена и время освободится в расписании.',
         ),
         actions: [
           TextButton(
@@ -635,7 +597,7 @@ class _AppointmentDetailsBottomSheetState
           ElevatedButton(
             onPressed: () {
               Navigator.pop(context); // Close dialog
-              _changeStatus(AppointmentStatus.cancelled);
+              _deleteAppointment();
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.red,

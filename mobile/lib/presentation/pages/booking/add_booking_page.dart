@@ -9,7 +9,7 @@ import '../../theme/app_theme.dart';
 import '../../providers/booking_provider.dart';
 import '../../providers/schedule_provider.dart';
 import 'widgets/client_selector.dart';
-import 'widgets/service_selector.dart';
+import 'widgets/master_service_selector.dart';
 import 'widgets/time_selector.dart';
 
 class AddBookingPage extends ConsumerStatefulWidget {
@@ -321,7 +321,7 @@ class _AddBookingPageState extends ConsumerState<AddBookingPage> {
           ),
           const SizedBox(height: 8),
           Text(
-            'Выберите услугу из доступных категорий',
+            'Выберите услугу из ваших доступных услуг',
             style: AppTheme.bodyMedium.copyWith(
               color: AppTheme.textSecondaryColor,
             ),
@@ -345,7 +345,7 @@ class _AddBookingPageState extends ConsumerState<AddBookingPage> {
                 ),
               ],
             ),
-            child: ServiceSelector(
+            child: MasterServiceSelector(
               selectedServices: _selectedServices,
               onServicesChanged: (services) {
                 setState(() {

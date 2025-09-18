@@ -46,78 +46,70 @@ class MonthScheduleView extends StatelessWidget {
 
   Widget _buildModernMonthSummary() {
     final totalAppointments = appointments.length;
-    final totalRevenue = appointments.fold<double>(
-      0,
-      (sum, appointment) => sum + appointment.price,
-    );
     final workingDays = _getWorkingDaysInMonth();
 
     return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            Color(0xFF667EEA),
-            Color(0xFF764BA2),
-          ],
-        ),
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      child: Column(
-        children: [
-          Row(
-            children: [
-              Expanded(
-                child: _buildSummaryCard(
-                  'Записей в месяце',
-                  '$totalAppointments',
-                  Icons.event_note,
-                ),
-              ),
-              const SizedBox(width: 16),
-              Container(
-                width: 1,
-                height: 50,
-                color: Colors.white.withValues(alpha: 0.3),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: _buildSummaryCard(
-                  'Доход за месяц',
-                  _formatPrice(totalRevenue),
-                  Icons.attach_money,
-                ),
-              ),
-            ],
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+      decoration: BoxDecoration(
+        color: AppTheme.backgroundColor,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+        border: Border(
+          bottom: BorderSide(
+            color: AppTheme.borderColor.withValues(alpha: 0.5),
+            width: 1,
           ),
-          const SizedBox(height: 16),
+        ),
+      ),
+      child: Row(
+        children: [
           Container(
-            padding: const EdgeInsets.all(12),
+            padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.15),
-              borderRadius: BorderRadius.circular(12),
+              color: AppTheme.primaryColor.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(8),
             ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
+            child: Icon(
+              Icons.calendar_month,
+              color: AppTheme.primaryColor,
+              size: 16,
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Icon(
-                  Icons.work_outline,
-                  color: Colors.white.withValues(alpha: 0.8),
-                  size: 16,
-                ),
-                const SizedBox(width: 8),
                 Text(
-                  'Рабочих дней: $workingDays',
-                  style: AppTheme.bodyMedium.copyWith(
-                    color: Colors.white.withValues(alpha: 0.9),
-                    fontWeight: FontWeight.w500,
+                  '${_getMonthName(selectedDate.month)} ${selectedDate.year}',
+                  style: AppTheme.titleMedium.copyWith(
+                    color: AppTheme.textPrimaryColor,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                Text(
+                  '$totalAppointments записей • $workingDays рабочих дней',
+                  style: AppTheme.bodySmall.copyWith(
+                    color: AppTheme.textSecondaryColor,
                   ),
                 ),
               ],
             ),
           ),
+          if (totalAppointments > 0)
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              decoration: BoxDecoration(
+                color: AppTheme.primaryColor,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Text(
+                '$totalAppointments',
+                style: AppTheme.bodyMedium.copyWith(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
         ],
       ),
     );
@@ -681,14 +673,8 @@ class MonthScheduleView extends StatelessWidget {
         return const Color(0xFFFF9500); // Modern orange
       case AppointmentStatus.confirmed:
         return const Color(0xFF34C759); // Modern green
-      case AppointmentStatus.inProgress:
-        return const Color(0xFF007AFF); // Modern blue
-      case AppointmentStatus.completed:
-        return const Color(0xFF30D158); // Modern teal
       case AppointmentStatus.cancelled:
         return const Color(0xFFFF3B30); // Modern red
-      case AppointmentStatus.noShow:
-        return const Color(0xFF8E8E93); // Modern grey
     }
   }
 
@@ -702,5 +688,13 @@ class MonthScheduleView extends StatelessWidget {
 
   bool _isSameDay(DateTime a, DateTime b) {
     return a.year == b.year && a.month == b.month && a.day == b.day;
+  }
+
+  String _getMonthName(int month) {
+    const months = [
+      'Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь',
+      'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'
+    ];
+    return months[month - 1];
   }
 }

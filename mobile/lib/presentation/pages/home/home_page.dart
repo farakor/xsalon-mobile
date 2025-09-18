@@ -617,7 +617,7 @@ class _TodayStatsRow extends ConsumerWidget {
     
     // Подсчитываем доход на сегодня
     final todayRevenue = todayAppointments
-        .where((appointment) => appointment.status == AppointmentStatus.completed)
+        .where((appointment) => appointment.status == AppointmentStatus.confirmed)
         .fold<double>(0, (sum, appointment) => sum + appointment.price);
 
     return Row(
@@ -1121,31 +1121,19 @@ class _TodayAppointmentCard extends StatelessWidget {
         return Colors.orange;
       case AppointmentStatus.confirmed:
         return Colors.green;
-      case AppointmentStatus.inProgress:
-        return Colors.blue;
-      case AppointmentStatus.completed:
-        return Colors.purple;
       case AppointmentStatus.cancelled:
         return Colors.red;
-      case AppointmentStatus.noShow:
-        return Colors.grey;
     }
   }
 
   String _getStatusText(AppointmentStatus status) {
     switch (status) {
       case AppointmentStatus.pending:
-        return 'Ожидает';
+        return 'Ожидает подтверждения';
       case AppointmentStatus.confirmed:
         return 'Подтверждено';
-      case AppointmentStatus.inProgress:
-        return 'В процессе';
-      case AppointmentStatus.completed:
-        return 'Завершено';
       case AppointmentStatus.cancelled:
         return 'Отменено';
-      case AppointmentStatus.noShow:
-        return 'Не пришел';
     }
   }
 }

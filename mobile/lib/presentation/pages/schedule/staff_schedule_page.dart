@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../core/constants/app_constants.dart';
 import '../../../data/models/appointment.dart';
 import '../../theme/app_theme.dart';
 import '../../providers/appointments_provider.dart';
-import '../../widgets/modern_app_header.dart';
 import 'widgets/day_schedule_view.dart';
 import 'widgets/week_schedule_view.dart';
 import 'widgets/month_schedule_view.dart';
@@ -58,72 +56,52 @@ class _StaffSchedulePageState extends ConsumerState<StaffSchedulePage> {
       backgroundColor: AppTheme.backgroundColor,
       body: CustomScrollView(
         slivers: [
-          // Modern App Bar
+          // Modern App Bar like Profile
           SliverToBoxAdapter(
             child: Container(
-              constraints: const BoxConstraints(minHeight: 120),
               decoration: BoxDecoration(
                 color: Colors.white,
+                borderRadius: const BorderRadius.only(
+                  bottomLeft: Radius.circular(24),
+                  bottomRight: Radius.circular(24),
+                ),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.08),
-                    offset: const Offset(0, 2),
-                    blurRadius: 8,
-                    spreadRadius: 0,
+                    color: Colors.black.withValues(alpha: 0.04),
+                    blurRadius: 12,
+                    offset: const Offset(0, 4),
                   ),
                 ],
               ),
               child: SafeArea(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                  child: Row(
-                    children: [
-                      // Title section
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Text(
-                              'Расписание',
-                              style: AppTheme.titleLarge.copyWith(
-                                color: AppTheme.textPrimaryColor,
-                                fontWeight: FontWeight.w800,
-                                letterSpacing: -0.6,
-                                fontSize: 24,
-                              ),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
+                child: Column(
+                  children: [
+                    // Header with title and actions
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
+                      child: Row(
+                        children: [
+                          Text(
+                            'Расписание',
+                            style: AppTheme.headlineSmall.copyWith(
+                              fontWeight: FontWeight.w700,
+                              color: AppTheme.textPrimaryColor,
                             ),
-                            const SizedBox(height: 2),
-                            Text(
-                              _getSubtitleText(),
-                              style: AppTheme.bodySmall.copyWith(
-                                color: AppTheme.textSecondaryColor,
-                                fontWeight: FontWeight.w500,
-                              ),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ],
-                        ),
+                          ),
+                          const Spacer(),
+                          _buildHeaderActions(),
+                        ],
                       ),
-                      
-                      // Actions
-                      _buildHeaderActions(),
-                    ],
-                  ),
+                    ),
+                    
+                    // View Selector (Tab Bar)
+                    Container(
+                      margin: const EdgeInsets.fromLTRB(20, 0, 20, 20),
+                      child: _buildModernViewSelector(),
+                    ),
+                  ],
                 ),
               ),
-            ),
-          ),
-          
-          // Modern View Selector
-          SliverToBoxAdapter(
-            child: Container(
-              margin: const EdgeInsets.fromLTRB(20, 20, 20, 0),
-              child: _buildModernViewSelector(),
             ),
           ),
           
@@ -148,29 +126,38 @@ class _StaffSchedulePageState extends ConsumerState<StaffSchedulePage> {
       // Modern Floating Action Button
       floatingActionButton: Container(
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(20),
+          gradient: AppTheme.primaryGradient,
           boxShadow: [
             BoxShadow(
-              color: AppTheme.primaryColor.withValues(alpha: 0.3),
-              blurRadius: 20,
-              offset: const Offset(0, 8),
+              color: AppTheme.primaryColor.withValues(alpha: 0.4),
+              blurRadius: 24,
+              offset: const Offset(0, 12),
             ),
           ],
         ),
         child: FloatingActionButton.extended(
           onPressed: _addAppointment,
-          backgroundColor: AppTheme.primaryColor,
+          backgroundColor: Colors.transparent,
           foregroundColor: Colors.white,
           elevation: 0,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(20),
           ),
-          icon: const Icon(Icons.add, size: 24),
+          icon: Container(
+            padding: const EdgeInsets.all(2),
+            decoration: BoxDecoration(
+              color: Colors.white.withValues(alpha: 0.2),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: const Icon(Icons.add, size: 20),
+          ),
           label: Text(
             'Новая запись',
             style: AppTheme.labelLarge.copyWith(
               color: Colors.white,
               fontWeight: FontWeight.w600,
+              letterSpacing: 0.5,
             ),
           ),
         ),
@@ -178,21 +165,6 @@ class _StaffSchedulePageState extends ConsumerState<StaffSchedulePage> {
     );
   }
 
-  String _getSubtitleText() {
-    final appointmentsState = ref.watch(appointmentsProvider);
-    final todayAppointments = appointmentsState.appointments
-        .where((app) => _isSameDay(app.startTime, DateTime.now()))
-        .length;
-    
-    switch (_currentView) {
-      case ScheduleViewType.day:
-        return 'Сегодня $todayAppointments записей';
-      case ScheduleViewType.week:
-        return 'Неделя • ${appointmentsState.appointments.length} записей';
-      case ScheduleViewType.month:
-        return 'Месяц • ${appointmentsState.appointments.length} записей';
-    }
-  }
 
   Widget _buildHeaderActions() {
     return Row(
@@ -203,19 +175,19 @@ class _StaffSchedulePageState extends ConsumerState<StaffSchedulePage> {
           margin: const EdgeInsets.only(right: 8),
           child: IconButton(
             icon: Container(
-              padding: const EdgeInsets.all(12),
+              padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
                 color: AppTheme.backgroundColor,
-                borderRadius: BorderRadius.circular(14),
+                borderRadius: BorderRadius.circular(12),
                 border: Border.all(
                   color: AppTheme.borderColor,
-                  width: 1,
+                  width: 0.5,
                 ),
               ),
               child: Icon(
                 Icons.search,
                 color: AppTheme.textSecondaryColor,
-                size: 20,
+                size: 18,
               ),
             ),
             onPressed: () {
@@ -225,51 +197,58 @@ class _StaffSchedulePageState extends ConsumerState<StaffSchedulePage> {
         ),
         
         // Menu button
-        Container(
-          margin: const EdgeInsets.only(right: 8),
-          child: PopupMenuButton<String>(
-            icon: Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: AppTheme.backgroundColor,
-                borderRadius: BorderRadius.circular(14),
-                border: Border.all(
-                  color: AppTheme.borderColor,
-                  width: 1,
-                ),
-              ),
-              child: Icon(
-                Icons.more_vert,
-                color: AppTheme.textSecondaryColor,
-                size: 20,
+        PopupMenuButton<String>(
+          icon: Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: AppTheme.backgroundColor,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: AppTheme.borderColor,
+                width: 0.5,
               ),
             ),
-            onSelected: (value) {
-              // TODO: Implement menu actions
-            },
-            itemBuilder: (context) => [
-              const PopupMenuItem(
-                value: 'settings',
-                child: Row(
-                  children: [
-                    Icon(Icons.settings),
-                    SizedBox(width: 8),
-                    Text('Настройки'),
-                  ],
-                ),
-              ),
-              const PopupMenuItem(
-                value: 'export',
-                child: Row(
-                  children: [
-                    Icon(Icons.download),
-                    SizedBox(width: 8),
-                    Text('Экспорт'),
-                  ],
-                ),
-              ),
-            ],
+            child: Icon(
+              Icons.more_vert,
+              color: AppTheme.textSecondaryColor,
+              size: 18,
+            ),
           ),
+          onSelected: (value) {
+            switch (value) {
+              case 'today':
+                setState(() {
+                  _selectedDate = DateTime.now();
+                });
+                _loadAppointments();
+                break;
+              case 'refresh':
+                _loadAppointments();
+                break;
+            }
+          },
+          itemBuilder: (context) => [
+            const PopupMenuItem(
+              value: 'today',
+              child: Row(
+                children: [
+                  Icon(Icons.today),
+                  SizedBox(width: 8),
+                  Text('Сегодня'),
+                ],
+              ),
+            ),
+            const PopupMenuItem(
+              value: 'refresh',
+              child: Row(
+                children: [
+                  Icon(Icons.refresh),
+                  SizedBox(width: 8),
+                  Text('Обновить'),
+                ],
+              ),
+            ),
+          ],
         ),
       ],
     );
@@ -450,55 +429,6 @@ class _StaffSchedulePageState extends ConsumerState<StaffSchedulePage> {
     );
   }
 
-  Widget _buildDateNavigation() {
-    String dateText;
-    switch (_currentView) {
-      case ScheduleViewType.day:
-        dateText = _formatDate(_selectedDate);
-        break;
-      case ScheduleViewType.week:
-        final weekStart = _getWeekStart(_selectedDate);
-        final weekEnd = weekStart.add(const Duration(days: 6));
-        dateText = '${_formatDate(weekStart)} - ${_formatDate(weekEnd)}';
-        break;
-      case ScheduleViewType.month:
-        dateText = _formatMonth(_selectedDate);
-        break;
-    }
-
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        IconButton(
-          onPressed: _previousPeriod,
-          icon: const Icon(Icons.chevron_left),
-        ),
-        Expanded(
-          child: GestureDetector(
-            onTap: _selectDate,
-            child: Container(
-              padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-              decoration: BoxDecoration(
-                color: AppTheme.primaryColor.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Text(
-                dateText,
-                style: AppTheme.titleMedium.copyWith(
-                  color: AppTheme.primaryColor,
-                ),
-                textAlign: TextAlign.center,
-              ),
-            ),
-          ),
-        ),
-        IconButton(
-          onPressed: _nextPeriod,
-          icon: const Icon(Icons.chevron_right),
-        ),
-      ],
-    );
-  }
 
   Widget _buildScheduleView() {
     final appointmentsState = ref.watch(appointmentsProvider);
@@ -710,4 +640,7 @@ class _StaffSchedulePageState extends ConsumerState<StaffSchedulePage> {
     ];
     return days[date.weekday - 1];
   }
+
+
+
 }

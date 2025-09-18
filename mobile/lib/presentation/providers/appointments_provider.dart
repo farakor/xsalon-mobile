@@ -208,6 +208,27 @@ class AppointmentsNotifier extends StateNotifier<AppointmentsState> {
     }
   }
 
+  /// Удалить запись (отменить)
+  Future<void> deleteAppointment(String appointmentId) async {
+    try {
+      // Удаляем запись из базы данных
+      await _bookingService.deleteBooking(
+        bookingId: appointmentId,
+      );
+
+      // Удаляем из локального состояния
+      final updatedAppointments = state.appointments
+          .where((appointment) => appointment.id != appointmentId)
+          .toList();
+
+      state = state.copyWith(appointments: updatedAppointments);
+    } catch (e) {
+      state = state.copyWith(
+        errorMessage: e is ServerFailure ? e.message : 'Ошибка удаления записи: $e',
+      );
+    }
+  }
+
   /// Очистить ошибку
   void clearError() {
     state = state.copyWith(errorMessage: null);

@@ -49,47 +49,71 @@ class WeekScheduleView extends StatelessWidget {
 
   Widget _buildModernWeekSummary() {
     final totalAppointments = appointments.length;
-    final totalRevenue = appointments.fold<double>(
-      0,
-      (sum, appointment) => sum + appointment.price,
-    );
+    final weekStart = _getWeekStart(selectedDate);
+    final weekEnd = weekStart.add(const Duration(days: 6));
 
     return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            Color(0xFF667EEA),
-            Color(0xFF764BA2),
-          ],
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+      decoration: BoxDecoration(
+        color: AppTheme.backgroundColor,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+        border: Border(
+          bottom: BorderSide(
+            color: AppTheme.borderColor.withValues(alpha: 0.5),
+            width: 1,
+          ),
         ),
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       child: Row(
         children: [
-          Expanded(
-            child: _buildSummaryCard(
-              'Записей на неделю',
-              '$totalAppointments',
-              Icons.event_note,
-            ),
-          ),
-          const SizedBox(width: 16),
           Container(
-            width: 1,
-            height: 50,
-            color: Colors.white.withValues(alpha: 0.3),
-          ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: _buildSummaryCard(
-              'Доход за неделю',
-              _formatPrice(totalRevenue),
-              Icons.attach_money,
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: AppTheme.primaryColor.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Icon(
+              Icons.view_week,
+              color: AppTheme.primaryColor,
+              size: 16,
             ),
           ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  '${weekStart.day} - ${weekEnd.day} ${_getMonthName(weekEnd.month)}',
+                  style: AppTheme.titleMedium.copyWith(
+                    color: AppTheme.textPrimaryColor,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                Text(
+                  '$totalAppointments записей на неделю',
+                  style: AppTheme.bodySmall.copyWith(
+                    color: AppTheme.textSecondaryColor,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          if (totalAppointments > 0)
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              decoration: BoxDecoration(
+                color: AppTheme.primaryColor,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Text(
+                '$totalAppointments',
+                style: AppTheme.bodyMedium.copyWith(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
         ],
       ),
     );
@@ -610,14 +634,8 @@ class WeekScheduleView extends StatelessWidget {
         return const Color(0xFFFF9500); // Modern orange
       case AppointmentStatus.confirmed:
         return const Color(0xFF34C759); // Modern green
-      case AppointmentStatus.inProgress:
-        return const Color(0xFF007AFF); // Modern blue
-      case AppointmentStatus.completed:
-        return const Color(0xFF30D158); // Modern teal
       case AppointmentStatus.cancelled:
         return const Color(0xFFFF3B30); // Modern red
-      case AppointmentStatus.noShow:
-        return const Color(0xFF8E8E93); // Modern grey
     }
   }
 
@@ -640,5 +658,13 @@ class WeekScheduleView extends StatelessWidget {
 
   bool _isSameDay(DateTime a, DateTime b) {
     return a.year == b.year && a.month == b.month && a.day == b.day;
+  }
+
+  String _getMonthName(int month) {
+    const months = [
+      'января', 'февраля', 'марта', 'апреля', 'мая', 'июня',
+      'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря'
+    ];
+    return months[month - 1];
   }
 }

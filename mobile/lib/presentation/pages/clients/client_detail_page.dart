@@ -34,7 +34,7 @@ class _ClientDetailPageState extends ConsumerState<ClientDetailPage>
       serviceName: 'Женская стрижка',
       startTime: DateTime.now().subtract(const Duration(days: 7)),
       endTime: DateTime.now().subtract(const Duration(days: 7, hours: -1, minutes: -30)),
-      status: AppointmentStatus.completed,
+      status: AppointmentStatus.confirmed,
       price: 150000,
       notes: 'Клиент доволен результатом',
     ),
@@ -47,7 +47,7 @@ class _ClientDetailPageState extends ConsumerState<ClientDetailPage>
       serviceName: 'Окрашивание волос',
       startTime: DateTime.now().subtract(const Duration(days: 21)),
       endTime: DateTime.now().subtract(const Duration(days: 21, hours: -2, minutes: -30)),
-      status: AppointmentStatus.completed,
+      status: AppointmentStatus.confirmed,
       price: 300000,
     ),
     Appointment(
@@ -59,7 +59,7 @@ class _ClientDetailPageState extends ConsumerState<ClientDetailPage>
       serviceName: 'Укладка',
       startTime: DateTime.now().subtract(const Duration(days: 35)),
       endTime: DateTime.now().subtract(const Duration(days: 35, hours: -1)),
-      status: AppointmentStatus.completed,
+      status: AppointmentStatus.confirmed,
       price: 80000,
     ),
   ];
@@ -935,14 +935,8 @@ class _ClientDetailPageState extends ConsumerState<ClientDetailPage>
         return Colors.orange;
       case AppointmentStatus.confirmed:
         return Colors.green;
-      case AppointmentStatus.inProgress:
-        return Colors.blue;
-      case AppointmentStatus.completed:
-        return Colors.teal;
       case AppointmentStatus.cancelled:
         return Colors.red;
-      case AppointmentStatus.noShow:
-        return Colors.grey;
     }
   }
 

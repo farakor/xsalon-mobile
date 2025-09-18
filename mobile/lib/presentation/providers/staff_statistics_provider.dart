@@ -49,14 +49,14 @@ final staffStatisticsProvider = FutureProvider<StaffStatistics>((ref) async {
     // Вычисляем статистику
     final totalAppointments = appointments.length;
     final completedAppointments = appointments
-        .where((a) => a.status == AppointmentStatus.completed)
+        .where((a) => a.status == AppointmentStatus.confirmed)
         .length;
     final cancelledAppointments = appointments
         .where((a) => a.status == AppointmentStatus.cancelled)
         .length;
     
     final totalRevenue = appointments
-        .where((a) => a.status == AppointmentStatus.completed)
+        .where((a) => a.status == AppointmentStatus.confirmed)
         .fold<double>(0, (sum, appointment) => sum + appointment.price);
     
     // Уникальные клиенты
@@ -69,7 +69,7 @@ final staffStatisticsProvider = FutureProvider<StaffStatistics>((ref) async {
     // Статистика по услугам
     final serviceStats = <String, int>{};
     for (final appointment in appointments) {
-      if (appointment.status == AppointmentStatus.completed) {
+      if (appointment.status == AppointmentStatus.confirmed) {
         serviceStats[appointment.serviceName] = 
             (serviceStats[appointment.serviceName] ?? 0) + 1;
       }
@@ -88,7 +88,7 @@ final staffStatisticsProvider = FutureProvider<StaffStatistics>((ref) async {
       
       final monthRevenue = appointments
           .where((a) => 
-              a.status == AppointmentStatus.completed &&
+              a.status == AppointmentStatus.confirmed &&
               a.startTime.year == monthDate.year &&
               a.startTime.month == monthDate.month)
           .fold<double>(0, (sum, appointment) => sum + appointment.price);
