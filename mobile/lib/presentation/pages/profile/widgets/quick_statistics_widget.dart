@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
@@ -144,7 +145,7 @@ class _QuickStatisticsWidgetState extends ConsumerState<QuickStatisticsWidget>
             ],
           ),
           child: const Icon(
-            Icons.analytics_outlined,
+            LucideIcons.barChart3,
             color: Colors.white,
             size: 24,
           ),
@@ -186,7 +187,7 @@ class _QuickStatisticsWidgetState extends ConsumerState<QuickStatisticsWidget>
                 title: 'Записей сегодня',
                 value: '${todayStats['totalToday'] ?? 0}',
                 subtitle: 'Завершено: ${todayStats['completedToday'] ?? 0}',
-                icon: Icons.event_available,
+                icon: LucideIcons.calendarCheck,
                 color: Colors.blue,
                 trend: _getTrendIcon(todayStats['totalToday'] ?? 0, 5),
               ),
@@ -197,7 +198,7 @@ class _QuickStatisticsWidgetState extends ConsumerState<QuickStatisticsWidget>
                 title: 'Рейтинг',
                 value: statistics.averageRating.toStringAsFixed(1),
                 subtitle: '⭐ Отличный сервис',
-                icon: Icons.star_rounded,
+                icon: LucideIcons.star,
                 color: Colors.orange,
                 trend: _getTrendIcon(statistics.averageRating, 4.5),
               ),
@@ -223,7 +224,7 @@ class _QuickStatisticsWidgetState extends ConsumerState<QuickStatisticsWidget>
                 title: 'Клиентов',
                 value: '${statistics.totalClients}',
                 subtitle: 'Постоянных: ${statistics.repeatClients}',
-                icon: Icons.people_rounded,
+                icon: LucideIcons.users,
                 color: Colors.purple,
                 trend: _getTrendIcon(statistics.totalClients, 20),
               ),
@@ -471,7 +472,7 @@ class _QuickStatisticsWidgetState extends ConsumerState<QuickStatisticsWidget>
       child: Column(
         children: [
           Icon(
-            Icons.error_outline,
+            LucideIcons.alertCircle,
             color: Colors.red[600],
             size: 48,
           ),

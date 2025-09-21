@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../data/models/appointment.dart';
@@ -76,7 +77,7 @@ class _AppointmentDetailsBottomSheetState
                     ),
                     IconButton(
                       onPressed: () => Navigator.pop(context),
-                      icon: const Icon(Icons.close),
+                      icon: const Icon(LucideIcons.x),
                       style: IconButton.styleFrom(
                         backgroundColor: Colors.grey[100],
                         foregroundColor: Colors.grey[600],
@@ -119,7 +120,7 @@ class _AppointmentDetailsBottomSheetState
                 children: [
                   // Client info
                   _buildInfoSection(
-                    icon: Icons.person,
+                    icon: LucideIcons.userCheck,
                     title: 'Клиент',
                     content: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -134,7 +135,7 @@ class _AppointmentDetailsBottomSheetState
                         Row(
                           children: [
                             Icon(
-                              Icons.phone,
+                              LucideIcons.phone,
                               size: 16,
                               color: Colors.grey[600],
                             ),
@@ -155,7 +156,7 @@ class _AppointmentDetailsBottomSheetState
                   
                   // Service info
                   _buildInfoSection(
-                    icon: Icons.design_services,
+                    icon: LucideIcons.sparkles,
                     title: 'Услуга',
                     content: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -181,7 +182,7 @@ class _AppointmentDetailsBottomSheetState
                   
                   // Time info
                   _buildInfoSection(
-                    icon: Icons.schedule,
+                    icon: LucideIcons.calendarCheck,
                     title: 'Время',
                     content: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -260,7 +261,7 @@ class _AppointmentDetailsBottomSheetState
                           // TODO: Implement edit appointment
                           Navigator.pop(context);
                         },
-                        icon: const Icon(Icons.edit),
+                        icon: const Icon(LucideIcons.edit),
                         label: const Text('Редактировать'),
                         style: OutlinedButton.styleFrom(
                           padding: const EdgeInsets.symmetric(vertical: 12),
@@ -391,7 +392,7 @@ class _AppointmentDetailsBottomSheetState
             if (!_isEditingNotes)
               IconButton(
                 onPressed: () => setState(() => _isEditingNotes = true),
-                icon: const Icon(Icons.edit, size: 20),
+                icon: const Icon(LucideIcons.edit, size: 20),
                 style: IconButton.styleFrom(
                   backgroundColor: Colors.grey[100],
                   foregroundColor: Colors.grey[600],
@@ -469,7 +470,7 @@ class _AppointmentDetailsBottomSheetState
       margin: const EdgeInsets.only(bottom: 16),
       child: ElevatedButton.icon(
         onPressed: () => _confirmAppointment(),
-        icon: const Icon(Icons.check_circle),
+        icon: const Icon(LucideIcons.checkCircle),
         label: const Text('Подтвердить запись'),
         style: ElevatedButton.styleFrom(
           backgroundColor: Colors.green,

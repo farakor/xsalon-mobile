@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 import '../../../../domain/entities/service.dart';
 import '../../../theme/app_theme.dart';
 
@@ -109,7 +110,7 @@ class ServiceCard extends StatelessWidget {
                               }
                             },
                             icon: Icon(
-                              Icons.more_vert,
+                              LucideIcons.moreVertical,
                               size: 16,
                               color: AppTheme.textSecondaryColor,
                             ),
@@ -119,7 +120,7 @@ class ServiceCard extends StatelessWidget {
                                 value: 'edit',
                                 child: Row(
                                   children: [
-                                    Icon(Icons.edit_outlined, size: 16),
+                                    Icon(LucideIcons.edit, size: 16),
                                     SizedBox(width: 8),
                                     Text('Редактировать'),
                                   ],
@@ -129,7 +130,7 @@ class ServiceCard extends StatelessWidget {
                                 value: 'delete',
                                 child: Row(
                                   children: [
-                                    Icon(Icons.delete_outline, size: 16, color: Colors.red),
+                                    Icon(LucideIcons.trash2, size: 16, color: Colors.red),
                                     SizedBox(width: 8),
                                     Text('Удалить', style: TextStyle(color: Colors.red)),
                                   ],
@@ -157,13 +158,13 @@ class ServiceCard extends StatelessWidget {
                 Row(
                   children: [
                     _buildInfoChip(
-                      Icons.attach_money,
+                      LucideIcons.dollarSign,
                       service.formattedPrice,
                       AppTheme.primaryColor,
                     ),
                     const SizedBox(width: 12),
                     _buildInfoChip(
-                      Icons.access_time,
+                      LucideIcons.clock,
                       service.formattedDuration,
                       AppTheme.textSecondaryColor,
                     ),

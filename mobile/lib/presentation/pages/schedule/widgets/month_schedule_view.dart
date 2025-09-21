@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 
 import '../../../../data/models/appointment.dart';
 import '../../../theme/app_theme.dart';
@@ -69,7 +70,7 @@ class MonthScheduleView extends StatelessWidget {
               borderRadius: BorderRadius.circular(8),
             ),
             child: Icon(
-              Icons.calendar_month,
+              LucideIcons.calendar,
               color: AppTheme.primaryColor,
               size: 16,
             ),
@@ -462,7 +463,7 @@ class MonthScheduleView extends StatelessWidget {
             ),
             child: Row(
               children: [
-                const Icon(Icons.calendar_month, color: Colors.purple),
+                const Icon(LucideIcons.calendar, color: Colors.purple),
                 const SizedBox(width: 8),
                 Text(
                   'Календарь месяца',

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../data/models/appointment.dart';
@@ -122,46 +123,6 @@ class _StaffSchedulePageState extends ConsumerState<StaffSchedulePage> {
           ),
         ],
       ),
-      
-      // Modern Floating Action Button
-      floatingActionButton: Container(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(20),
-          gradient: AppTheme.primaryGradient,
-          boxShadow: [
-            BoxShadow(
-              color: AppTheme.primaryColor.withValues(alpha: 0.4),
-              blurRadius: 24,
-              offset: const Offset(0, 12),
-            ),
-          ],
-        ),
-        child: FloatingActionButton.extended(
-          onPressed: _addAppointment,
-          backgroundColor: Colors.transparent,
-          foregroundColor: Colors.white,
-          elevation: 0,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20),
-          ),
-          icon: Container(
-            padding: const EdgeInsets.all(2),
-            decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.2),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: const Icon(Icons.add, size: 20),
-          ),
-          label: Text(
-            'Новая запись',
-            style: AppTheme.labelLarge.copyWith(
-              color: Colors.white,
-              fontWeight: FontWeight.w600,
-              letterSpacing: 0.5,
-            ),
-          ),
-        ),
-      ),
     );
   }
 
@@ -185,7 +146,7 @@ class _StaffSchedulePageState extends ConsumerState<StaffSchedulePage> {
                 ),
               ),
               child: Icon(
-                Icons.search,
+                LucideIcons.search,
                 color: AppTheme.textSecondaryColor,
                 size: 18,
               ),
@@ -209,7 +170,7 @@ class _StaffSchedulePageState extends ConsumerState<StaffSchedulePage> {
               ),
             ),
             child: Icon(
-              Icons.more_vert,
+              LucideIcons.moreVertical,
               color: AppTheme.textSecondaryColor,
               size: 18,
             ),
@@ -232,7 +193,7 @@ class _StaffSchedulePageState extends ConsumerState<StaffSchedulePage> {
               value: 'today',
               child: Row(
                 children: [
-                  Icon(Icons.today),
+                  Icon(LucideIcons.calendar),
                   SizedBox(width: 8),
                   Text('Сегодня'),
                 ],
@@ -242,7 +203,7 @@ class _StaffSchedulePageState extends ConsumerState<StaffSchedulePage> {
               value: 'refresh',
               child: Row(
                 children: [
-                  Icon(Icons.refresh),
+                  Icon(LucideIcons.refreshCw),
                   SizedBox(width: 8),
                   Text('Обновить'),
                 ],
@@ -272,19 +233,19 @@ class _StaffSchedulePageState extends ConsumerState<StaffSchedulePage> {
         children: [
           _buildViewButton(
             'День',
-            Icons.today,
+            LucideIcons.calendar,
             ScheduleViewType.day,
             _currentView == ScheduleViewType.day,
           ),
           _buildViewButton(
             'Неделя',
-            Icons.view_week,
+            LucideIcons.calendar,
             ScheduleViewType.week,
             _currentView == ScheduleViewType.week,
           ),
           _buildViewButton(
             'Месяц',
-            Icons.calendar_month,
+            LucideIcons.calendar,
             ScheduleViewType.month,
             _currentView == ScheduleViewType.month,
           ),
@@ -314,14 +275,14 @@ class _StaffSchedulePageState extends ConsumerState<StaffSchedulePage> {
             children: [
               Icon(
                 icon,
-                color: isSelected ? Colors.white : AppTheme.textSecondaryColor,
+                color: isSelected ? Colors.black : AppTheme.textSecondaryColor,
                 size: 18,
               ),
               const SizedBox(width: 6),
               Text(
                 label,
                 style: AppTheme.labelMedium.copyWith(
-                  color: isSelected ? Colors.white : AppTheme.textSecondaryColor,
+                  color: isSelected ? Colors.black : AppTheme.textSecondaryColor,
                   fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
                 ),
               ),
@@ -371,7 +332,7 @@ class _StaffSchedulePageState extends ConsumerState<StaffSchedulePage> {
             child: IconButton(
               onPressed: _previousPeriod,
               icon: const Icon(
-                Icons.chevron_left,
+                LucideIcons.chevronLeft,
                 color: AppTheme.textPrimaryColor,
               ),
             ),
@@ -391,21 +352,11 @@ class _StaffSchedulePageState extends ConsumerState<StaffSchedulePage> {
                     Text(
                       dateText,
                       style: AppTheme.titleMedium.copyWith(
-                        color: AppTheme.primaryColor,
+                        color: Colors.black,
                         fontWeight: FontWeight.w600,
                       ),
                       textAlign: TextAlign.center,
                     ),
-                    if (_currentView == ScheduleViewType.day) ...[
-                      const SizedBox(height: 4),
-                      Text(
-                        _isToday(_selectedDate) ? 'Сегодня' : _getDayOfWeek(_selectedDate),
-                        style: AppTheme.bodySmall.copyWith(
-                          color: AppTheme.primaryColor.withValues(alpha: 0.7),
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                    ],
                   ],
                 ),
               ),
@@ -419,7 +370,7 @@ class _StaffSchedulePageState extends ConsumerState<StaffSchedulePage> {
             child: IconButton(
               onPressed: _nextPeriod,
               icon: const Icon(
-                Icons.chevron_right,
+                LucideIcons.chevronRight,
                 color: AppTheme.textPrimaryColor,
               ),
             ),
@@ -447,7 +398,7 @@ class _StaffSchedulePageState extends ConsumerState<StaffSchedulePage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(
-              Icons.error_outline,
+              LucideIcons.alertCircle,
               size: 64,
               color: Colors.red[300],
             ),

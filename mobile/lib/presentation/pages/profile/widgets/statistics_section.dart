@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 
 import '../../../../data/models/staff_statistics.dart';
 import '../../../theme/app_theme.dart';
@@ -194,7 +195,7 @@ class _StatisticsSectionState extends State<StatisticsSection> {
                 child: _buildStatCard(
                   'Общий доход',
                   _formatPrice(widget.statistics.totalRevenue),
-                  Icons.attach_money,
+                  LucideIcons.dollarSign,
                   Colors.green,
                 ),
               ),
@@ -203,7 +204,7 @@ class _StatisticsSectionState extends State<StatisticsSection> {
                 child: _buildStatCard(
                   'Записей',
                   '${widget.statistics.totalAppointments}',
-                  Icons.event,
+                  LucideIcons.calendar,
                   Colors.blue,
                 ),
               ),
@@ -216,7 +217,7 @@ class _StatisticsSectionState extends State<StatisticsSection> {
                 child: _buildStatCard(
                   'Клиентов',
                   '${widget.statistics.totalClients}',
-                  Icons.people,
+                  LucideIcons.userCheck,
                   Colors.purple,
                 ),
               ),
@@ -225,7 +226,7 @@ class _StatisticsSectionState extends State<StatisticsSection> {
                 child: _buildStatCard(
                   'Рейтинг',
                   '${widget.statistics.averageRating}',
-                  Icons.star,
+                  LucideIcons.star,
                   Colors.orange,
                 ),
               ),
@@ -337,7 +338,7 @@ class _StatisticsSectionState extends State<StatisticsSection> {
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Icon(
-                  Icons.design_services,
+                  LucideIcons.sparkles,
                   color: AppTheme.primaryColor,
                   size: 18,
                 ),
@@ -589,7 +590,7 @@ class _StatisticsSectionState extends State<StatisticsSection> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Icon(
-                Icons.error_outline,
+                LucideIcons.alertCircle,
                 size: 48,
                 color: Colors.grey[400],
               ),

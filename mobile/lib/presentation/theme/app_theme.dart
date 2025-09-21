@@ -4,8 +4,8 @@ import 'package:google_fonts/google_fonts.dart';
 
 class AppTheme {
   // Modern Colors - Professional Palette
-  static const Color primaryColor = Color(0xFF667EEA);
-  static const Color secondaryColor = Color(0xFF764BA2);
+  static const Color primaryColor = Color(0xFFFFB900);
+  static const Color secondaryColor = Color(0xFFE67E00);
   static const Color accentColor = Color(0xFFFF6B6B);
   static const Color backgroundColor = Color(0xFFF8FAFC);
   static const Color surfaceColor = Color(0xFFFFFFFF);
@@ -40,75 +40,89 @@ class AppTheme {
     end: Alignment.bottomRight,
   );
   
+  // Golden accent gradient
+  static const LinearGradient goldenGradient = LinearGradient(
+    colors: [Color(0xFFFFB900), Color(0xFFFFD700)],
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+  );
+  
+  // Warm background gradient
+  static const LinearGradient warmBackgroundGradient = LinearGradient(
+    colors: [Color(0xFFFFFBEB), Color(0xFFFEF3C7)],
+    begin: Alignment.topCenter,
+    end: Alignment.bottomCenter,
+  );
+  
   // Text Styles
-  static TextStyle get headlineLarge => GoogleFonts.montserrat(
+  static TextStyle get headlineLarge => GoogleFonts.onest(
+    fontSize: 36,
+    fontWeight: FontWeight.bold,
+    color: textPrimaryColor,
+  );
+
+  static TextStyle get headlineMedium => GoogleFonts.onest(
     fontSize: 32,
     fontWeight: FontWeight.bold,
     color: textPrimaryColor,
   );
-  
-  static TextStyle get headlineMedium => GoogleFonts.montserrat(
+
+  static TextStyle get headlineSmall => GoogleFonts.onest(
     fontSize: 28,
-    fontWeight: FontWeight.bold,
+    fontWeight: FontWeight.w600,
     color: textPrimaryColor,
   );
-  
-  static TextStyle get headlineSmall => GoogleFonts.montserrat(
+
+  static TextStyle get titleLarge => GoogleFonts.onest(
     fontSize: 24,
     fontWeight: FontWeight.w600,
     color: textPrimaryColor,
   );
-  
-  static TextStyle get titleLarge => GoogleFonts.montserrat(
+
+  static TextStyle get titleMedium => GoogleFonts.onest(
     fontSize: 20,
-    fontWeight: FontWeight.w600,
+    fontWeight: FontWeight.w500,
     color: textPrimaryColor,
   );
-  
-  static TextStyle get titleMedium => GoogleFonts.montserrat(
+
+  static TextStyle get titleSmall => GoogleFonts.onest(
     fontSize: 18,
     fontWeight: FontWeight.w500,
     color: textPrimaryColor,
   );
-  
-  static TextStyle get titleSmall => GoogleFonts.montserrat(
+
+  static TextStyle get bodyLarge => GoogleFonts.onest(
+    fontSize: 18,
+    fontWeight: FontWeight.normal,
+    color: textPrimaryColor,
+  );
+
+  static TextStyle get bodyMedium => GoogleFonts.onest(
+    fontSize: 16,
+    fontWeight: FontWeight.normal,
+    color: textPrimaryColor,
+  );
+
+  static TextStyle get bodySmall => GoogleFonts.onest(
+    fontSize: 14,
+    fontWeight: FontWeight.normal,
+    color: textSecondaryColor,
+  );
+
+  static TextStyle get labelLarge => GoogleFonts.onest(
     fontSize: 16,
     fontWeight: FontWeight.w500,
     color: textPrimaryColor,
   );
-  
-  static TextStyle get bodyLarge => GoogleFonts.montserrat(
-    fontSize: 16,
-    fontWeight: FontWeight.normal,
-    color: textPrimaryColor,
-  );
-  
-  static TextStyle get bodyMedium => GoogleFonts.montserrat(
+
+  static TextStyle get labelMedium => GoogleFonts.onest(
     fontSize: 14,
-    fontWeight: FontWeight.normal,
-    color: textPrimaryColor,
-  );
-  
-  static TextStyle get bodySmall => GoogleFonts.montserrat(
-    fontSize: 12,
-    fontWeight: FontWeight.normal,
-    color: textSecondaryColor,
-  );
-  
-  static TextStyle get labelLarge => GoogleFonts.montserrat(
-    fontSize: 14,
-    fontWeight: FontWeight.w500,
-    color: textPrimaryColor,
-  );
-  
-  static TextStyle get labelMedium => GoogleFonts.montserrat(
-    fontSize: 12,
     fontWeight: FontWeight.w500,
     color: textSecondaryColor,
   );
-  
-  static TextStyle get labelSmall => GoogleFonts.montserrat(
-    fontSize: 10,
+
+  static TextStyle get labelSmall => GoogleFonts.onest(
+    fontSize: 12,
     fontWeight: FontWeight.w500,
     color: textSecondaryColor,
   );
@@ -124,7 +138,7 @@ class AppTheme {
         tertiary: accentColor,
         surface: surfaceColor,
         error: errorColor,
-        onPrimary: Colors.white,
+        onPrimary: Colors.black,
         onSecondary: Colors.white,
         onSurface: textPrimaryColor,
         onError: Colors.white,
@@ -154,14 +168,14 @@ class AppTheme {
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
           backgroundColor: primaryColor,
-          foregroundColor: Colors.white,
+          foregroundColor: Colors.black,
           elevation: 0,
           shadowColor: Colors.transparent,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
           ),
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-          textStyle: labelLarge.copyWith(color: Colors.white),
+          textStyle: labelLarge.copyWith(color: Colors.black),
         ),
       ),
       

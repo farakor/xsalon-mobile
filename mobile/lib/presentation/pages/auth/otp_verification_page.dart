@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:pinput/pinput.dart';
@@ -172,7 +173,7 @@ class _OtpVerificationPageState extends ConsumerState<OtpVerificationPage> {
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
+          icon: const Icon(LucideIcons.arrowLeft),
           onPressed: () => context.go(AppConstants.phoneAuthRoute),
         ),
       ),
@@ -227,7 +228,7 @@ class _OtpVerificationPageState extends ConsumerState<OtpVerificationPage> {
                 onPressed: _isLoading ? null : _verifyOTP,
                 isLoading: _isLoading,
                 backgroundColor: AppTheme.primaryColor,
-                textColor: Colors.white,
+                textColor: Colors.black,
               ),
               
               const SizedBox(height: 24),

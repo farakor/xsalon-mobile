@@ -4,28 +4,32 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../theme/app_theme.dart';
 import '../../../providers/schedule_provider.dart';
+import '../../../../domain/entities/master.dart';
+import '../../../../domain/entities/service.dart';
 
-class TimeSelector extends ConsumerStatefulWidget {
+class ClientTimeSelector extends ConsumerStatefulWidget {
   final DateTime? selectedDate;
   final TimeOfDay? selectedTime;
-  final Duration? serviceDuration;
+  final MasterEntity? selectedMaster;
+  final ServiceEntity? selectedService;
   final Function(DateTime) onDateSelected;
   final Function(TimeOfDay) onTimeSelected;
 
-  const TimeSelector({
+  const ClientTimeSelector({
     super.key,
     this.selectedDate,
     this.selectedTime,
-    this.serviceDuration,
+    this.selectedMaster,
+    this.selectedService,
     required this.onDateSelected,
     required this.onTimeSelected,
   });
 
   @override
-  ConsumerState<TimeSelector> createState() => _TimeSelectorState();
+  ConsumerState<ClientTimeSelector> createState() => _ClientTimeSelectorState();
 }
 
-class _TimeSelectorState extends ConsumerState<TimeSelector> {
+class _ClientTimeSelectorState extends ConsumerState<ClientTimeSelector> {
   late DateTime _currentMonth;
 
   @override
@@ -33,22 +37,30 @@ class _TimeSelectorState extends ConsumerState<TimeSelector> {
     super.initState();
     _currentMonth = widget.selectedDate ?? DateTime.now();
     
-    // Загружаем расписание мастера при инициализации
+    // Загружаем расписание выбранного мастера при инициализации
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      print('TimeSelector: Loading master schedule...');
-      ref.read(scheduleProvider.notifier).loadMasterSchedule();
-      
-      // Если уже есть выбранная дата, загружаем для неё слоты
-      if (widget.selectedDate != null) {
-        print('TimeSelector: Loading slots for initial selected date: ${widget.selectedDate}');
-        _loadSlotsForDate(widget.selectedDate!);
+      if (widget.selectedMaster != null) {
+        print('ClientTimeSelector: Loading master schedule for ${widget.selectedMaster!.fullName}...');
+        ref.read(scheduleProvider.notifier).loadMasterScheduleById(widget.selectedMaster!.id);
+        
+        // Если уже есть выбранная дата, загружаем для неё слоты
+        if (widget.selectedDate != null) {
+          print('ClientTimeSelector: Loading slots for initial selected date: ${widget.selectedDate}');
+          _loadSlotsForDate(widget.selectedDate!);
+        }
       }
     });
   }
 
   @override
-  void didUpdateWidget(TimeSelector oldWidget) {
+  void didUpdateWidget(ClientTimeSelector oldWidget) {
     super.didUpdateWidget(oldWidget);
+    
+    // Если изменился мастер, загружаем его расписание
+    if (widget.selectedMaster?.id != oldWidget.selectedMaster?.id && widget.selectedMaster != null) {
+      print('ClientTimeSelector: Master changed, loading new schedule...');
+      ref.read(scheduleProvider.notifier).loadMasterScheduleById(widget.selectedMaster!.id);
+    }
     
     // Если изменилась выбранная дата, загружаем слоты для новой даты
     if (widget.selectedDate != oldWidget.selectedDate && widget.selectedDate != null) {
@@ -57,11 +69,18 @@ class _TimeSelectorState extends ConsumerState<TimeSelector> {
   }
 
   void _loadSlotsForDate(DateTime date) {
-    print('TimeSelector: Loading slots for date: $date');
-    print('TimeSelector: Service duration: ${widget.serviceDuration}');
-    ref.read(scheduleProvider.notifier).loadAvailableSlots(
+    if (widget.selectedMaster == null || widget.selectedService == null) {
+      print('ClientTimeSelector: Cannot load slots - master or service not selected');
+      return;
+    }
+    
+    print('ClientTimeSelector: Loading slots for date: $date');
+    print('ClientTimeSelector: Service duration: ${Duration(minutes: widget.selectedService!.durationMinutes)}');
+    
+    ref.read(scheduleProvider.notifier).loadAvailableSlotsForMaster(
       date,
-      serviceDuration: widget.serviceDuration,
+      masterId: widget.selectedMaster!.id,
+      serviceDuration: Duration(minutes: widget.selectedService!.durationMinutes),
     );
   }
 
@@ -117,10 +136,10 @@ class _TimeSelectorState extends ConsumerState<TimeSelector> {
                             fontWeight: FontWeight.w600,
                           ),
                         ),
-                      if (widget.serviceDuration != null && widget.selectedTime != null) ...[
+                      if (widget.selectedService != null && widget.selectedTime != null) ...[
                         const SizedBox(height: 2),
                         Text(
-                          'Окончание: ${_formatTime(_addDuration(widget.selectedTime!, widget.serviceDuration!))}',
+                          'Окончание: ${_formatTime(_addDuration(widget.selectedTime!, Duration(minutes: widget.selectedService!.durationMinutes)))}',
                           style: AppTheme.bodySmall.copyWith(
                             color: const Color(0xFF000000),
                           ),
@@ -141,7 +160,7 @@ class _TimeSelectorState extends ConsumerState<TimeSelector> {
         const SizedBox(height: 24),
         
         // Time Slots
-        if (widget.selectedDate != null) ...[
+        if (widget.selectedDate != null && widget.selectedMaster != null && widget.selectedService != null) ...[
           Row(
             children: [
               Container(
@@ -193,6 +212,7 @@ class _TimeSelectorState extends ConsumerState<TimeSelector> {
               ],
             ),
             child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Container(
                   width: 48,
@@ -209,14 +229,22 @@ class _TimeSelectorState extends ConsumerState<TimeSelector> {
                 ),
                 const SizedBox(height: 12),
                 Text(
-                  'Выберите дату',
+                  widget.selectedDate == null 
+                      ? 'Выберите дату'
+                      : widget.selectedMaster == null
+                          ? 'Выберите мастера'
+                          : 'Выберите услугу',
                   style: AppTheme.titleSmall.copyWith(
                     fontWeight: FontWeight.w600,
                     color: AppTheme.textPrimaryColor,
                   ),
                 ),
                 Text(
-                  'Сначала выберите дату для записи',
+                  widget.selectedDate == null
+                      ? 'Сначала выберите дату для записи'
+                      : widget.selectedMaster == null
+                          ? 'Вернитесь и выберите мастера'
+                          : 'Вернитесь и выберите услугу',
                   style: AppTheme.bodySmall.copyWith(
                     color: AppTheme.textSecondaryColor,
                   ),
@@ -371,19 +399,20 @@ class _TimeSelectorState extends ConsumerState<TimeSelector> {
   }
 
   Widget _buildTimeSlots() {
-    if (widget.selectedDate == null) {
+    if (widget.selectedDate == null || widget.selectedMaster == null || widget.selectedService == null) {
       return Container(
         height: 300,
         child: const Center(
-          child: Text('Выберите дату'),
+          child: Text('Выберите дату, мастера и услугу'),
         ),
       );
     }
 
     return FutureBuilder<List<Map<String, dynamic>>>(
-      future: ref.read(scheduleProvider.notifier).loadSlotsWithOccupancy(
+      future: ref.read(scheduleProvider.notifier).loadSlotsWithOccupancyForMaster(
         widget.selectedDate!,
-        serviceDuration: widget.serviceDuration,
+        masterId: widget.selectedMaster!.id,
+        serviceDuration: Duration(minutes: widget.selectedService!.durationMinutes),
       ),
       builder: (context, snapshot) {
         final isLoading = ref.watch(isScheduleLoadingProvider);
@@ -466,7 +495,7 @@ class _TimeSelectorState extends ConsumerState<TimeSelector> {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'На выбранную дату нет свободных слотов',
+                    'На выбранную дату у мастера нет свободных слотов',
                     style: AppTheme.bodySmall.copyWith(
                       color: Colors.grey[500],
                     ),
@@ -506,7 +535,7 @@ class _TimeSelectorState extends ConsumerState<TimeSelector> {
               final isDisabled = isPast || isOccupied;
 
               return GestureDetector(
-                onTap: isDisabled ? null : () => widget.onTimeSelected?.call(timeSlot),
+                onTap: isDisabled ? null : () => widget.onTimeSelected(timeSlot),
                 child: Container(
                   decoration: BoxDecoration(
                     color: isSelected

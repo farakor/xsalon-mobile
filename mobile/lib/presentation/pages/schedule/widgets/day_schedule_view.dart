@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 
 import '../../../../data/models/appointment.dart';
 import '../../../theme/app_theme.dart';
@@ -70,7 +71,7 @@ class DayScheduleView extends StatelessWidget {
               borderRadius: BorderRadius.circular(8),
             ),
             child: Icon(
-              Icons.calendar_today,
+              LucideIcons.calendarDays,
               color: AppTheme.primaryColor,
               size: 16,
             ),
@@ -313,7 +314,7 @@ class DayScheduleView extends StatelessWidget {
             ),
             child: Row(
               children: [
-                const Icon(Icons.schedule, color: AppTheme.primaryColor),
+                const Icon(LucideIcons.calendarCheck, color: AppTheme.primaryColor),
                 const SizedBox(width: 8),
                 Text(
                   'Временная шкала',
@@ -541,7 +542,7 @@ class DayScheduleView extends StatelessWidget {
                               Row(
                                 children: [
                                   Icon(
-                                    Icons.access_time,
+                                    LucideIcons.clock,
                                     size: 12,
                                     color: _getStatusColor(appointment.status),
                                   ),
@@ -741,7 +742,7 @@ class DayScheduleView extends StatelessWidget {
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Icon(
-                    Icons.event_available,
+                    LucideIcons.calendarCheck,
                     color: AppTheme.textSecondaryColor,
                     size: 16,
                   ),
@@ -784,7 +785,7 @@ class DayScheduleView extends StatelessWidget {
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: Icon(
-                      Icons.event_available,
+                      LucideIcons.calendarCheck,
                       size: 64,
                       color: AppTheme.textSecondaryColor.withValues(alpha: 0.6),
                     ),

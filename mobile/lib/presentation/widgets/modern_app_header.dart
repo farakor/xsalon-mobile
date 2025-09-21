@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 import '../theme/app_theme.dart';
 import '../providers/auth_provider.dart';
 
@@ -67,7 +68,7 @@ class ModernAppHeader extends ConsumerWidget implements PreferredSizeWidget {
                           ),
                         ),
                         child: Icon(
-                          Icons.arrow_back_ios_new,
+                          LucideIcons.arrowLeft,
                           color: AppTheme.textPrimaryColor,
                           size: 18,
                         ),
@@ -145,7 +146,7 @@ class ModernAppHeader extends ConsumerWidget implements PreferredSizeWidget {
                                 ),
                               ),
                               child: Icon(
-                                Icons.notifications_outlined,
+                                LucideIcons.bell,
                                 color: AppTheme.textSecondaryColor,
                                 size: 20,
                               ),
@@ -287,6 +288,7 @@ class WelcomeAppHeader extends ConsumerWidget implements PreferredSizeWidget {
   final List<Widget>? actions;
   final VoidCallback? onProfileTap;
   final VoidCallback? onNotificationTap;
+  final bool showProfile;
 
   const WelcomeAppHeader({
     super.key,
@@ -296,6 +298,7 @@ class WelcomeAppHeader extends ConsumerWidget implements PreferredSizeWidget {
     this.actions,
     this.onProfileTap,
     this.onNotificationTap,
+    this.showProfile = true,
   });
 
   @override
@@ -385,7 +388,7 @@ class WelcomeAppHeader extends ConsumerWidget implements PreferredSizeWidget {
                               ),
                             ),
                             child: Icon(
-                              Icons.notifications_outlined,
+                              LucideIcons.bell,
                               color: AppTheme.textSecondaryColor,
                               size: 22,
                             ),
@@ -421,7 +424,7 @@ class WelcomeAppHeader extends ConsumerWidget implements PreferredSizeWidget {
                   ),
                   
                   // Профиль пользователя
-                  if (profile != null)
+                  if (showProfile && profile != null)
                     GestureDetector(
                       onTap: onProfileTap ?? () {
                         // TODO: Navigate to profile

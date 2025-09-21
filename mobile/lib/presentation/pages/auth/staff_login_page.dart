@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -121,7 +122,7 @@ class _StaffLoginPageState extends ConsumerState<StaffLoginPage> {
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
+          icon: const Icon(LucideIcons.arrowLeft),
           onPressed: () => context.go(AppConstants.authRoute),
         ),
       ),
@@ -146,7 +147,7 @@ class _StaffLoginPageState extends ConsumerState<StaffLoginPage> {
                         borderRadius: BorderRadius.circular(40),
                       ),
                       child: const Icon(
-                        Icons.work,
+                        LucideIcons.briefcase,
                         size: 40,
                         color: AppTheme.primaryColor,
                       ),
@@ -180,7 +181,7 @@ class _StaffLoginPageState extends ConsumerState<StaffLoginPage> {
                   decoration: InputDecoration(
                     labelText: 'Email',
                     hintText: 'example@salon.uz',
-                    prefixIcon: const Icon(Icons.email),
+                    prefixIcon: const Icon(LucideIcons.mail),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(AppConstants.borderRadius),
                     ),
@@ -200,10 +201,10 @@ class _StaffLoginPageState extends ConsumerState<StaffLoginPage> {
                   validator: _validatePassword,
                   decoration: InputDecoration(
                     labelText: 'Пароль',
-                    prefixIcon: const Icon(Icons.lock),
+                    prefixIcon: const Icon(LucideIcons.lock),
                     suffixIcon: IconButton(
                       icon: Icon(
-                        _obscurePassword ? Icons.visibility : Icons.visibility_off,
+                        _obscurePassword ? LucideIcons.eye : LucideIcons.eyeOff,
                       ),
                       onPressed: () {
                         setState(() => _obscurePassword = !_obscurePassword);
@@ -227,7 +228,7 @@ class _StaffLoginPageState extends ConsumerState<StaffLoginPage> {
                   onPressed: _isLoading ? null : _handleLogin,
                   isLoading: _isLoading,
                   backgroundColor: AppTheme.primaryColor,
-                  textColor: Colors.white,
+                  textColor: Colors.black,
                 ),
                 
                 const SizedBox(height: 24),
@@ -263,7 +264,7 @@ class _StaffLoginPageState extends ConsumerState<StaffLoginPage> {
                   child: Column(
                     children: [
                       const Icon(
-                        Icons.info_outline,
+                        LucideIcons.info,
                         color: Colors.blue,
                         size: 24,
                       ),

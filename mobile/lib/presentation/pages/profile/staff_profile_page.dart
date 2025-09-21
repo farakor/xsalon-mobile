@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -135,7 +136,7 @@ class _StaffProfilePageState extends ConsumerState<StaffProfilePage>
                         ),
                       ),
                       child: Icon(
-                        Icons.more_vert,
+                        LucideIcons.moreVertical,
                         color: AppTheme.textSecondaryColor,
                         size: 18,
                       ),
@@ -158,7 +159,7 @@ class _StaffProfilePageState extends ConsumerState<StaffProfilePage>
                         value: 'help',
                         child: Row(
                           children: [
-                            Icon(Icons.help_outline),
+                            Icon(LucideIcons.helpCircle),
                             SizedBox(width: 8),
                             Text('Помощь'),
                           ],
@@ -168,7 +169,7 @@ class _StaffProfilePageState extends ConsumerState<StaffProfilePage>
                         value: 'about',
                         child: Row(
                           children: [
-                            Icon(Icons.info_outline),
+                            Icon(LucideIcons.info),
                             SizedBox(width: 8),
                             Text('О приложении'),
                           ],
@@ -178,7 +179,7 @@ class _StaffProfilePageState extends ConsumerState<StaffProfilePage>
                         value: 'logout',
                         child: Row(
                           children: [
-                            Icon(Icons.logout, color: Colors.red),
+                            Icon(LucideIcons.logOut, color: Colors.red),
                             SizedBox(width: 8),
                             Text('Выйти'),
                           ],
@@ -213,7 +214,7 @@ class _StaffProfilePageState extends ConsumerState<StaffProfilePage>
                 ),
                 indicatorSize: TabBarIndicatorSize.tab,
                 dividerColor: Colors.transparent,
-                labelColor: Colors.white,
+                labelColor: Colors.black,
                 unselectedLabelColor: AppTheme.textSecondaryColor,
                 labelStyle: AppTheme.bodyMedium.copyWith(
                   fontWeight: FontWeight.w500,
@@ -272,7 +273,7 @@ class _StaffProfilePageState extends ConsumerState<StaffProfilePage>
               child: Column(
                 children: [
                   Icon(
-                    Icons.error_outline,
+                    LucideIcons.alertCircle,
                     size: 64,
                     color: Colors.red[400],
                   ),
@@ -334,7 +335,7 @@ class _StaffProfilePageState extends ConsumerState<StaffProfilePage>
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Icon(
-                  Icons.info_outline,
+                  LucideIcons.info,
                   color: AppTheme.primaryColor,
                   size: 18,
                 ),
@@ -350,13 +351,13 @@ class _StaffProfilePageState extends ConsumerState<StaffProfilePage>
             ],
           ),
           const SizedBox(height: 16),
-          _buildInfoRow(Icons.email, 'Email', profile.email ?? 'Не указан'),
-          _buildInfoRow(Icons.phone, 'Телефон', profile.phone ?? 'Не указан'),
-          _buildInfoRow(Icons.work, 'Роль', _getRoleDisplayName(profile.role)),
-          _buildInfoRow(Icons.business, 'Организация', 'Beauty Studio Элегант'),
-          _buildInfoRow(Icons.calendar_today, 'Дата регистрации', _formatDate(profile.createdAt)),
+          _buildInfoRow(LucideIcons.mail, 'Email', profile.email ?? 'Не указан'),
+          _buildInfoRow(LucideIcons.phone, 'Телефон', profile.phone ?? 'Не указан'),
+          _buildInfoRow(LucideIcons.briefcase, 'Роль', _getRoleDisplayName(profile.role)),
+          _buildInfoRow(LucideIcons.building, 'Организация', 'Beauty Studio Элегант'),
+          _buildInfoRow(LucideIcons.calendarDays, 'Дата регистрации', _formatDate(profile.createdAt)),
           if (profile.lastLoginAt != null)
-            _buildInfoRow(Icons.login, 'Последний вход', _formatDateTime(profile.lastLoginAt)),
+            _buildInfoRow(LucideIcons.logIn, 'Последний вход', _formatDateTime(profile.lastLoginAt)),
         ],
       ),
     );
@@ -393,7 +394,7 @@ class _StaffProfilePageState extends ConsumerState<StaffProfilePage>
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Icon(
-                  Icons.schedule,
+                  LucideIcons.calendarCheck,
                   color: AppTheme.primaryColor,
                   size: 18,
                 ),
@@ -485,7 +486,7 @@ class _StaffProfilePageState extends ConsumerState<StaffProfilePage>
           ),
           child: OutlinedButton.icon(
             onPressed: _logout,
-            icon: const Icon(Icons.logout, color: Colors.red, size: 18),
+            icon: const Icon(LucideIcons.logOut, color: Colors.red, size: 18),
             label: Text(
               'Выйти из аккаунта',
               style: AppTheme.bodyMedium.copyWith(
@@ -709,7 +710,7 @@ class _StaffProfilePageState extends ConsumerState<StaffProfilePage>
                 borderRadius: BorderRadius.circular(8),
               ),
               child: const Icon(
-                Icons.logout,
+                LucideIcons.logOut,
                 color: Colors.red,
                 size: 18,
               ),

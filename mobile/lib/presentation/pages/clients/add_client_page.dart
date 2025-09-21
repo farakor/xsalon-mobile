@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -204,7 +205,7 @@ class _AddClientPageState extends ConsumerState<AddClientPage> {
                     radius: 50,
                     backgroundColor: AppTheme.primaryColor.withValues(alpha: 0.1),
                     child: Icon(
-                      Icons.person,
+                      LucideIcons.userCheck,
                       size: 50,
                       color: AppTheme.primaryColor,
                     ),
@@ -219,7 +220,7 @@ class _AddClientPageState extends ConsumerState<AddClientPage> {
                         border: Border.all(color: Colors.white, width: 2),
                       ),
                       child: IconButton(
-                        icon: const Icon(Icons.camera_alt, color: Colors.white, size: 20),
+                        icon: const Icon(LucideIcons.camera, color: Colors.white, size: 20),
                         onPressed: _pickAvatar,
                         constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
                         padding: EdgeInsets.zero,
@@ -237,7 +238,7 @@ class _AddClientPageState extends ConsumerState<AddClientPage> {
               decoration: const InputDecoration(
                 labelText: 'Имя *',
                 border: OutlineInputBorder(),
-                prefixIcon: Icon(Icons.person_outline),
+                prefixIcon: Icon(LucideIcons.user),
               ),
               textCapitalization: TextCapitalization.words,
               validator: (value) {
@@ -258,7 +259,7 @@ class _AddClientPageState extends ConsumerState<AddClientPage> {
               decoration: const InputDecoration(
                 labelText: 'Фамилия *',
                 border: OutlineInputBorder(),
-                prefixIcon: Icon(Icons.person_outline),
+                prefixIcon: Icon(LucideIcons.user),
               ),
               textCapitalization: TextCapitalization.words,
               validator: (value) {
@@ -279,7 +280,7 @@ class _AddClientPageState extends ConsumerState<AddClientPage> {
               decoration: const InputDecoration(
                 labelText: 'Телефон *',
                 border: OutlineInputBorder(),
-                prefixIcon: Icon(Icons.phone),
+                prefixIcon: Icon(LucideIcons.phone),
                 hintText: '+998 90 123 45 67',
               ),
               keyboardType: TextInputType.phone,
@@ -306,7 +307,7 @@ class _AddClientPageState extends ConsumerState<AddClientPage> {
               decoration: const InputDecoration(
                 labelText: 'Email (необязательно)',
                 border: OutlineInputBorder(),
-                prefixIcon: Icon(Icons.email_outlined),
+                prefixIcon: Icon(LucideIcons.mail),
                 hintText: 'example@mail.com',
               ),
               keyboardType: TextInputType.emailAddress,
@@ -358,11 +359,11 @@ class _AddClientPageState extends ConsumerState<AddClientPage> {
           Row(
             children: [
               Expanded(
-                child: _buildGenderButton('female', 'Женский', Icons.female),
+                child: _buildGenderButton('female', 'Женский', LucideIcons.user),
               ),
               const SizedBox(width: 12),
               Expanded(
-                child: _buildGenderButton('male', 'Мужской', Icons.male),
+                child: _buildGenderButton('male', 'Мужской', LucideIcons.user),
               ),
             ],
           ),
@@ -386,7 +387,7 @@ class _AddClientPageState extends ConsumerState<AddClientPage> {
               ),
               child: Row(
                 children: [
-                  const Icon(Icons.calendar_today, color: Colors.grey),
+                  const Icon(LucideIcons.calendarDays, color: Colors.grey),
                   const SizedBox(width: 12),
                   Expanded(
                     child: Text(
@@ -401,7 +402,7 @@ class _AddClientPageState extends ConsumerState<AddClientPage> {
                   if (_birthDate != null)
                     GestureDetector(
                       onTap: () => setState(() => _birthDate = null),
-                      child: const Icon(Icons.clear, color: Colors.grey),
+                      child: const Icon(LucideIcons.x, color: Colors.grey),
                     ),
                 ],
               ),
@@ -417,7 +418,7 @@ class _AddClientPageState extends ConsumerState<AddClientPage> {
               labelText: 'Заметки (необязательно)',
               hintText: 'Дополнительная информация о клиенте...',
               border: OutlineInputBorder(),
-              prefixIcon: Icon(Icons.note_outlined),
+              prefixIcon: Icon(LucideIcons.fileText),
             ),
           ),
         ],
@@ -541,7 +542,7 @@ class _AddClientPageState extends ConsumerState<AddClientPage> {
         children: [
           Row(
             children: [
-              const Icon(Icons.person, color: AppTheme.primaryColor),
+              const Icon(LucideIcons.userCheck, color: AppTheme.primaryColor),
               const SizedBox(width: 8),
               Text(
                 'Данные клиента',
@@ -553,25 +554,25 @@ class _AddClientPageState extends ConsumerState<AddClientPage> {
           ),
           const SizedBox(height: 16),
 
-          _buildSummaryRow(Icons.person, 'Имя', fullName),
-          _buildSummaryRow(Icons.phone, 'Телефон', _phoneController.text),
+          _buildSummaryRow(LucideIcons.userCheck, 'Имя', fullName),
+          _buildSummaryRow(LucideIcons.phone, 'Телефон', _phoneController.text),
           if (_emailController.text.isNotEmpty)
-            _buildSummaryRow(Icons.email, 'Email', _emailController.text),
+            _buildSummaryRow(LucideIcons.mail, 'Email', _emailController.text),
           _buildSummaryRow(
-            _selectedGender == 'female' ? Icons.female : Icons.male,
+            _selectedGender == 'female' ? LucideIcons.user : LucideIcons.user,
             'Пол',
             _selectedGender == 'female' ? 'Женский' : 'Мужской',
           ),
           if (_birthDate != null)
-            _buildSummaryRow(Icons.cake, 'Дата рождения', _formatDate(_birthDate!)),
+            _buildSummaryRow(LucideIcons.cake, 'Дата рождения', _formatDate(_birthDate!)),
           if (_selectedServices.isNotEmpty)
             _buildSummaryRow(
-              Icons.design_services,
+              LucideIcons.sparkles,
               'Предпочитаемые услуги',
               _selectedServices.map((s) => s.name).join(', '),
             ),
           if (_notesController.text.isNotEmpty)
-            _buildSummaryRow(Icons.note, 'Заметки', _notesController.text),
+            _buildSummaryRow(LucideIcons.fileText, 'Заметки', _notesController.text),
         ],
       ),
     );

@@ -32,6 +32,11 @@ class SupabaseConfig {
       url: supabaseUrl,
       anonKey: supabaseAnonKey,
       debug: true, // Включить в development режиме
+      authOptions: const FlutterAuthClientOptions(
+        authFlowType: AuthFlowType.pkce,
+        // Включаем автоматическое обновление токенов
+        autoRefreshToken: true,
+      ),
     );
     
     print('✅ Supabase инициализирован успешно');

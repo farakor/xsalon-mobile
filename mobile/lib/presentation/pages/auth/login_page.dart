@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 // Removed form_builder dependencies for MVP
@@ -83,7 +84,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                         borderRadius: BorderRadius.circular(20),
                       ),
                       child: const Icon(
-                        Icons.content_cut,
+                        LucideIcons.scissors,
                         size: 40,
                         color: Colors.white,
                       ),
@@ -118,7 +119,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                       decoration: const InputDecoration(
                         labelText: 'Email',
                         hintText: 'Введите ваш email',
-                        prefixIcon: Icon(Icons.email_outlined),
+                        prefixIcon: Icon(LucideIcons.mail),
                       ),
                       validator: (value) {
                         if (value == null || value.isEmpty) {
@@ -140,12 +141,12 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                       decoration: InputDecoration(
                         labelText: 'Пароль',
                         hintText: 'Введите ваш пароль',
-                        prefixIcon: const Icon(Icons.lock_outline),
+                        prefixIcon: const Icon(LucideIcons.lock),
                         suffixIcon: IconButton(
                           icon: Icon(
                             _obscurePassword
-                                ? Icons.visibility_outlined
-                                : Icons.visibility_off_outlined,
+                                ? LucideIcons.eye
+                                : LucideIcons.eyeOff,
                           ),
                           onPressed: () {
                             setState(() {

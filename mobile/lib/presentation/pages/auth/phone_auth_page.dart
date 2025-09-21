@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
@@ -95,7 +96,7 @@ class _PhoneAuthPageState extends ConsumerState<PhoneAuthPage> {
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
+          icon: const Icon(LucideIcons.arrowLeft),
           onPressed: () => context.go(AppConstants.authRoute),
         ),
       ),
@@ -139,7 +140,7 @@ class _PhoneAuthPageState extends ConsumerState<PhoneAuthPage> {
                   decoration: InputDecoration(
                     labelText: 'Номер телефона',
                     hintText: '+998 ## ### ## ##',
-                    prefixIcon: const Icon(Icons.phone),
+                    prefixIcon: const Icon(LucideIcons.phone),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(AppConstants.borderRadius),
                     ),
@@ -158,7 +159,7 @@ class _PhoneAuthPageState extends ConsumerState<PhoneAuthPage> {
                   onPressed: _isLoading ? null : _sendOTP,
                   isLoading: _isLoading,
                   backgroundColor: AppTheme.primaryColor,
-                  textColor: Colors.white,
+                  textColor: Colors.black,
                 ),
                 
                 const Spacer(),

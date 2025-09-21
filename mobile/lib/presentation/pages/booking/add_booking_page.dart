@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 
-import '../../../core/constants/app_constants.dart';
 import '../../../core/utils/timezone_utils.dart';
 import '../../../data/models/client.dart';
 import '../../../data/models/service.dart';
@@ -36,10 +36,6 @@ class _AddBookingPageState extends ConsumerState<AddBookingPage> {
   DateTime? _selectedDate;
   TimeOfDay? _selectedTime;
   final TextEditingController _notesController = TextEditingController();
-  final TextEditingController _clientNameController = TextEditingController();
-  final TextEditingController _clientPhoneController = TextEditingController();
-
-  bool _isNewClient = false;
   bool _isLoading = false;
 
   final List<String> _stepTitles = [
@@ -60,8 +56,6 @@ class _AddBookingPageState extends ConsumerState<AddBookingPage> {
   void dispose() {
     _pageController.dispose();
     _notesController.dispose();
-    _clientNameController.dispose();
-    _clientPhoneController.dispose();
     super.dispose();
   }
 
@@ -171,9 +165,7 @@ class _AddBookingPageState extends ConsumerState<AddBookingPage> {
                 child: Text(
                   _stepTitles[index],
                   style: AppTheme.bodySmall.copyWith(
-                    color: isCompleted || isCurrent
-                        ? AppTheme.primaryColor
-                        : AppTheme.textSecondaryColor,
+                    color: isCurrent ? AppTheme.primaryColor : const Color(0xFF000000),
                     fontWeight: isCurrent ? FontWeight.w600 : FontWeight.normal,
                   ),
                   textAlign: TextAlign.center,
@@ -203,7 +195,7 @@ class _AddBookingPageState extends ConsumerState<AddBookingPage> {
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: const Icon(
-                  Icons.person,
+                  LucideIcons.user,
                   color: AppTheme.primaryColor,
                   size: 18,
                 ),
@@ -227,7 +219,7 @@ class _AddBookingPageState extends ConsumerState<AddBookingPage> {
           ),
           const SizedBox(height: 16),
           
-          // Toggle between existing and new client в карточке
+          // Client Selector
           Container(
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
@@ -245,41 +237,13 @@ class _AddBookingPageState extends ConsumerState<AddBookingPage> {
                 ),
               ],
             ),
-            child: Column(
-              children: [
-                Row(
-                  children: [
-                    Expanded(
-                      child: _buildToggleButton(
-                        'Существующий клиент',
-                        !_isNewClient,
-                        () => setState(() => _isNewClient = false),
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: _buildToggleButton(
-                        'Новый клиент',
-                        _isNewClient,
-                        () => setState(() => _isNewClient = true),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 20),
-                
-                if (_isNewClient)
-                  _buildNewClientForm()
-                else
-                  ClientSelector(
-                    selectedClient: _selectedClient,
-                    onClientSelected: (client) {
-                      setState(() {
-                        _selectedClient = client;
-                      });
-                    },
-                  ),
-              ],
+            child: ClientSelector(
+              selectedClient: _selectedClient,
+              onClientSelected: (client) {
+                setState(() {
+                  _selectedClient = client;
+                });
+              },
             ),
           ),
         ],
@@ -304,7 +268,7 @@ class _AddBookingPageState extends ConsumerState<AddBookingPage> {
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: const Icon(
-                  Icons.design_services,
+                  LucideIcons.scissors,
                   color: AppTheme.primaryColor,
                   size: 18,
                 ),
@@ -376,7 +340,7 @@ class _AddBookingPageState extends ConsumerState<AddBookingPage> {
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: const Icon(
-                  Icons.schedule,
+                  LucideIcons.clock,
                   color: AppTheme.primaryColor,
                   size: 18,
                 ),
@@ -455,7 +419,7 @@ class _AddBookingPageState extends ConsumerState<AddBookingPage> {
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: const Icon(
-                  Icons.check_circle,
+                  LucideIcons.checkCircle,
                   color: AppTheme.primaryColor,
                   size: 18,
                 ),
@@ -514,7 +478,7 @@ class _AddBookingPageState extends ConsumerState<AddBookingPage> {
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: const Icon(
-                        Icons.note_add,
+                        LucideIcons.edit,
                         color: AppTheme.primaryColor,
                         size: 18,
                       ),
@@ -567,65 +531,9 @@ class _AddBookingPageState extends ConsumerState<AddBookingPage> {
     );
   }
 
-  Widget _buildNewClientForm() {
-    return Column(
-      children: [
-        TextField(
-          controller: _clientNameController,
-          decoration: const InputDecoration(
-            labelText: 'Имя клиента *',
-            border: OutlineInputBorder(),
-            prefixIcon: Icon(Icons.person),
-          ),
-        ),
-        const SizedBox(height: 16),
-        TextField(
-          controller: _clientPhoneController,
-          decoration: const InputDecoration(
-            labelText: 'Телефон *',
-            border: OutlineInputBorder(),
-            prefixIcon: Icon(Icons.phone),
-          ),
-          keyboardType: TextInputType.phone,
-        ),
-      ],
-    );
-  }
-
-  Widget _buildToggleButton(String text, bool isSelected, VoidCallback onTap) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(12),
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-        decoration: BoxDecoration(
-          color: isSelected ? AppTheme.primaryColor : Colors.grey.withValues(alpha: 0.1),
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(
-            color: isSelected ? AppTheme.primaryColor : AppTheme.borderColor,
-            width: 0.5,
-          ),
-        ),
-        child: Text(
-          text,
-          style: AppTheme.bodyMedium.copyWith(
-            color: isSelected ? Colors.white : AppTheme.textSecondaryColor,
-            fontWeight: isSelected ? FontWeight.w500 : FontWeight.normal,
-          ),
-          textAlign: TextAlign.center,
-        ),
-      ),
-    );
-  }
-
-  Widget _buildBookingSummary() {
-    final clientName = _isNewClient 
-        ? _clientNameController.text
-        : _selectedClient?.fullName ?? 'Не выбран';
-    
-    final clientPhone = _isNewClient 
-        ? _clientPhoneController.text
-        : _selectedClient?.phone ?? '';
+Widget _buildBookingSummary() {
+    final clientName = _selectedClient?.fullName ?? 'Не выбран';
+    final clientPhone = _selectedClient?.phone ?? '';
 
     final startTime = _selectedDate != null && _selectedTime != null
         ? DateTime(
@@ -672,7 +580,7 @@ class _AddBookingPageState extends ConsumerState<AddBookingPage> {
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: const Icon(
-                  Icons.event,
+                  LucideIcons.calendar,
                   color: AppTheme.primaryColor,
                   size: 18,
                 ),
@@ -689,11 +597,11 @@ class _AddBookingPageState extends ConsumerState<AddBookingPage> {
           ),
           const SizedBox(height: 16),
           
-          _buildSummaryRow(Icons.person, 'Клиент', clientName),
+          _buildSummaryRow(LucideIcons.userCheck, 'Клиент', clientName),
           if (clientPhone.isNotEmpty)
-            _buildSummaryRow(Icons.phone, 'Телефон', clientPhone),
+            _buildSummaryRow(LucideIcons.phone, 'Телефон', clientPhone),
           _buildSummaryRow(
-            Icons.design_services, 
+            LucideIcons.scissors, 
             'Услуги', 
             _selectedServices.isEmpty 
                 ? 'Не выбраны' 
@@ -705,31 +613,31 @@ class _AddBookingPageState extends ConsumerState<AddBookingPage> {
             // Показываем все услуги, если их больше одной
             if (_selectedServices.length > 1) ...[
               ..._selectedServices.map((service) => _buildSummaryRow(
-                Icons.arrow_right, 
+                LucideIcons.arrowRight, 
                 '', 
                 service.name
               )).toList(),
             ],
             _buildSummaryRow(
-              Icons.schedule, 
+              LucideIcons.clock, 
               'Общая длительность', 
               _formatTotalDuration()
             ),
             _buildSummaryRow(
-              Icons.attach_money, 
+              LucideIcons.dollarSign, 
               'Общая стоимость', 
               _formatTotalPrice()
             ),
           ],
           if (startTime != null)
             _buildSummaryRow(
-              Icons.calendar_today, 
+              LucideIcons.calendar, 
               'Дата и время', 
               '${_formatDate(startTime)} в ${_formatTime(TimeOfDay.fromDateTime(startTime))}'
             ),
           if (endTime != null)
             _buildSummaryRow(
-              Icons.schedule, 
+              LucideIcons.clock, 
               'Окончание', 
               _formatTime(TimeOfDay.fromDateTime(endTime))
             ),
@@ -750,7 +658,7 @@ class _AddBookingPageState extends ConsumerState<AddBookingPage> {
             child: Text(
               label,
               style: AppTheme.bodyMedium.copyWith(
-                color: Colors.grey[600],
+                color: const Color(0xFF000000),
               ),
             ),
           ),
@@ -760,6 +668,7 @@ class _AddBookingPageState extends ConsumerState<AddBookingPage> {
               value,
               style: AppTheme.bodyMedium.copyWith(
                 fontWeight: FontWeight.w500,
+                color: const Color(0xFF000000),
               ),
             ),
           ),
@@ -817,17 +726,13 @@ class _AddBookingPageState extends ConsumerState<AddBookingPage> {
           Expanded(
             flex: 2,
             child: Container(
-              height: 48,
-              decoration: BoxDecoration(
-                gradient: _canProceed() ? AppTheme.primaryGradient : null,
-                color: !_canProceed() ? Colors.grey.withValues(alpha: 0.3) : null,
-                borderRadius: BorderRadius.circular(12),
-              ),
+              height: 56,
               child: ElevatedButton(
                 onPressed: _canProceed() ? _nextStep : null,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.transparent,
+                  backgroundColor: _canProceed() ? AppTheme.primaryColor : Colors.grey.withValues(alpha: 0.3),
                   shadowColor: Colors.transparent,
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
@@ -838,13 +743,13 @@ class _AddBookingPageState extends ConsumerState<AddBookingPage> {
                         height: 20,
                         child: CircularProgressIndicator(
                           strokeWidth: 2,
-                          valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                          valueColor: AlwaysStoppedAnimation<Color>(Colors.black),
                         ),
                       )
                     : Text(
                         _currentStep == 3 ? 'Создать запись' : 'Далее',
                         style: AppTheme.bodyMedium.copyWith(
-                          color: Colors.white,
+                          color: _canProceed() ? Colors.black : Colors.grey,
                           fontWeight: FontWeight.w500,
                         ),
                       ),
@@ -859,9 +764,7 @@ class _AddBookingPageState extends ConsumerState<AddBookingPage> {
   bool _canProceed() {
     switch (_currentStep) {
       case 0:
-        return _isNewClient 
-            ? _clientNameController.text.isNotEmpty && _clientPhoneController.text.isNotEmpty
-            : _selectedClient != null;
+        return _selectedClient != null;
       case 1:
         return _selectedServices.isNotEmpty;
       case 2:

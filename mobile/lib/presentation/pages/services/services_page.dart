@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../providers/services_provider.dart';
@@ -66,6 +67,7 @@ class _ServicesPageState extends ConsumerState<ServicesPage> {
       appBar: ModernAppHeader(
         title: 'Услуги',
         subtitle: 'Управление услугами салона',
+        showProfile: false,
       ),
       backgroundColor: AppTheme.backgroundColor,
       body: Column(
@@ -103,7 +105,7 @@ class _ServicesPageState extends ConsumerState<ServicesPage> {
                         color: AppTheme.textSecondaryColor,
                       ),
                       prefixIcon: Icon(
-                        Icons.search,
+                        LucideIcons.search,
                         color: AppTheme.textSecondaryColor,
                         size: 20,
                       ),
@@ -149,34 +151,37 @@ class _ServicesPageState extends ConsumerState<ServicesPage> {
         ],
       ),
       floatingActionButton: Container(
-        width: 56,
-        height: 56,
-        decoration: BoxDecoration(
-          gradient: AppTheme.primaryGradient,
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: [
-            BoxShadow(
-              color: AppTheme.primaryColor.withValues(alpha: 0.3),
-              blurRadius: 12,
-              offset: const Offset(0, 4),
-            ),
-          ],
-        ),
-        child: Material(
-          color: Colors.transparent,
-          child: InkWell(
-            onTap: () {
-              Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (context) => const AddServicePage(),
-                ),
-              );
-            },
+        margin: const EdgeInsets.only(bottom: 86), // Отступ для floating menu bar (70px высота + 16px margin)
+        child: Container(
+          width: 56,
+          height: 56,
+          decoration: BoxDecoration(
+            color: AppTheme.primaryColor, // Убрали градиент, оставили только основной желтый цвет
             borderRadius: BorderRadius.circular(16),
-            child: const Icon(
-              Icons.add,
-              color: Colors.white,
-              size: 24,
+            boxShadow: [
+              BoxShadow(
+                color: AppTheme.primaryColor.withValues(alpha: 0.3),
+                blurRadius: 12,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+          child: Material(
+            color: Colors.transparent,
+            child: InkWell(
+              onTap: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => const AddServicePage(),
+                  ),
+                );
+              },
+              borderRadius: BorderRadius.circular(16),
+              child: const Icon(
+                LucideIcons.plus,
+                color: Colors.black, // Изменили цвет иконки на черный
+                size: 24,
+              ),
             ),
           ),
         ),
@@ -201,7 +206,7 @@ class _ServicesPageState extends ConsumerState<ServicesPage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             const Icon(
-              Icons.error_outline,
+              LucideIcons.alertCircle,
               size: 64,
               color: Colors.red,
             ),
@@ -243,7 +248,7 @@ class _ServicesPageState extends ConsumerState<ServicesPage> {
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Icon(
-                  Icons.design_services_outlined,
+                  LucideIcons.scissors,
                   size: 40,
                   color: AppTheme.primaryColor,
                 ),
@@ -272,11 +277,7 @@ class _ServicesPageState extends ConsumerState<ServicesPage> {
                 const SizedBox(height: 32),
                 Container(
                   width: double.infinity,
-                  height: 48,
-                  decoration: BoxDecoration(
-                    gradient: AppTheme.primaryGradient,
-                    borderRadius: BorderRadius.circular(12),
-                  ),
+                  height: 56,
                   child: ElevatedButton(
                     onPressed: () {
                       Navigator.of(context).push(
@@ -286,8 +287,9 @@ class _ServicesPageState extends ConsumerState<ServicesPage> {
                       );
                     },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.transparent,
+                      backgroundColor: AppTheme.primaryColor,
                       shadowColor: Colors.transparent,
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
@@ -295,7 +297,7 @@ class _ServicesPageState extends ConsumerState<ServicesPage> {
                     child: Text(
                       'Добавить услугу',
                       style: AppTheme.bodyMedium.copyWith(
-                        color: Colors.white,
+                        color: Colors.black,
                         fontWeight: FontWeight.w500,
                       ),
                     ),
@@ -383,7 +385,7 @@ class _ServicesPageState extends ConsumerState<ServicesPage> {
                     child: _buildInfoCard(
                       'Цена',
                       service.formattedPrice,
-                      Icons.attach_money,
+                      LucideIcons.dollarSign,
                     ),
                   ),
                   const SizedBox(width: 12),
@@ -391,7 +393,7 @@ class _ServicesPageState extends ConsumerState<ServicesPage> {
                     child: _buildInfoCard(
                       'Длительность',
                       service.formattedDuration,
-                      Icons.schedule,
+                      LucideIcons.calendarCheck,
                     ),
                   ),
                 ],

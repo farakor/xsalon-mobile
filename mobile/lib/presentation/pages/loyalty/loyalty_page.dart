@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../theme/app_theme.dart';
@@ -17,7 +18,7 @@ class LoyaltyPage extends ConsumerWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(
-              Icons.card_giftcard_outlined,
+              LucideIcons.gift,
               size: 64,
               color: AppTheme.primaryColor,
             ),

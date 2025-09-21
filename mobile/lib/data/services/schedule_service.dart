@@ -137,6 +137,25 @@ class ScheduleService {
          throw ServerFailure('Мастер не найден');
        }
 
+       return await getAvailableTimeSlotsForMaster(
+         date,
+         masterId: masterId,
+         serviceDuration: serviceDuration,
+       );
+     } catch (e) {
+       if (e is ServerFailure) rethrow;
+       throw ServerFailure('Ошибка получения доступных слотов: $e');
+     }
+   }
+
+   /// Получить доступные временные слоты для указанного мастера и даты
+   Future<List<TimeOfDay>> getAvailableTimeSlotsForMaster(
+     DateTime date, {
+     required String masterId,
+     Duration? serviceDuration,
+   }) async {
+     print('ScheduleService: Getting available slots for master $masterId on $date');
+     try {
        final schedules = await getMasterSchedule(masterId);
        print('ScheduleService: Got ${schedules.length} schedule entries');
        
@@ -196,9 +215,9 @@ class ScheduleService {
        return slots;
      } catch (e) {
        if (e is ServerFailure) rethrow;
-       throw ServerFailure('Ошибка получения доступных слотов: $e');
+       throw ServerFailure('Ошибка получения доступных слотов для мастера: $e');
      }
-     }
+   }
 
   /// Получить слоты с информацией о занятости
   Future<List<Map<String, dynamic>>> getAvailableSlotsWithOccupancy(
@@ -207,14 +226,36 @@ class ScheduleService {
   }) async {
     print('ScheduleService: Getting slots with occupancy for $date');
     try {
-      // Получаем все доступные слоты
-      final allSlots = await getAvailableTimeSlots(date, serviceDuration: serviceDuration);
-      
-      // Получаем ID мастера
       final masterId = await getCurrentMasterId();
       if (masterId == null) {
         throw ServerFailure('Мастер не найден');
       }
+
+      return await getAvailableSlotsWithOccupancyForMaster(
+        date,
+        masterId: masterId,
+        serviceDuration: serviceDuration,
+      );
+    } catch (e) {
+      print('ScheduleService: Error getting slots with occupancy: $e');
+      return [];
+    }
+  }
+
+  /// Получить слоты с информацией о занятости для конкретного мастера
+  Future<List<Map<String, dynamic>>> getAvailableSlotsWithOccupancyForMaster(
+    DateTime date, {
+    required String masterId,
+    Duration? serviceDuration,
+  }) async {
+    print('ScheduleService: Getting slots with occupancy for master $masterId on $date');
+    try {
+      // Получаем все доступные слоты для мастера
+      final allSlots = await getAvailableTimeSlotsForMaster(
+        date, 
+        masterId: masterId, 
+        serviceDuration: serviceDuration,
+      );
 
       // Получаем существующие записи на эту дату
       final existingBookings = await getBookingsForDate(masterId, date);
@@ -257,7 +298,7 @@ class ScheduleService {
       print('ScheduleService: Returning ${slotsWithOccupancy.length} slots with occupancy info');
       return slotsWithOccupancy;
     } catch (e) {
-      print('ScheduleService: Error getting slots with occupancy: $e');
+      print('ScheduleService: Error getting slots with occupancy for master: $e');
       return [];
     }
   }

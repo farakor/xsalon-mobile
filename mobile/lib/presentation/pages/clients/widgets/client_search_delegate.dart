@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 
 import '../../../../data/models/client.dart';
 import '../../../theme/app_theme.dart';
@@ -28,7 +29,7 @@ class ClientSearchDelegate extends SearchDelegate<Client?> {
   @override
   Widget buildLeading(BuildContext context) {
     return IconButton(
-      icon: const Icon(Icons.arrow_back),
+      icon: const Icon(LucideIcons.arrowLeft),
       onPressed: () => close(context, null),
     );
   }
@@ -43,7 +44,7 @@ class ClientSearchDelegate extends SearchDelegate<Client?> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(
-              Icons.search_off,
+              LucideIcons.searchX,
               size: 64,
               color: Colors.grey[400],
             ),
@@ -84,7 +85,7 @@ class ClientSearchDelegate extends SearchDelegate<Client?> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(
-              Icons.search,
+              LucideIcons.search,
               size: 64,
               color: Colors.grey[400],
             ),
@@ -152,7 +153,7 @@ class ClientSearchDelegate extends SearchDelegate<Client?> {
             const SizedBox(height: 2),
             Row(
               children: [
-                Icon(Icons.event, size: 14, color: Colors.grey[600]),
+                Icon(LucideIcons.calendar, size: 14, color: Colors.grey[600]),
                 const SizedBox(width: 4),
                 Text(
                   '${client.totalVisits} визитов',
@@ -161,7 +162,7 @@ class ClientSearchDelegate extends SearchDelegate<Client?> {
                   ),
                 ),
                 const SizedBox(width: 12),
-                Icon(Icons.attach_money, size: 14, color: Colors.grey[600]),
+                Icon(LucideIcons.dollarSign, size: 14, color: Colors.grey[600]),
                 const SizedBox(width: 4),
                 Text(
                   _formatPrice(client.totalSpent),

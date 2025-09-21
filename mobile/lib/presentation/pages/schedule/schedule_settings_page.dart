@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -126,7 +127,7 @@ class _ScheduleSettingsPageState extends ConsumerState<ScheduleSettingsPage> {
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: const Icon(
-                          Icons.schedule,
+                          LucideIcons.calendarCheck,
                           color: AppTheme.primaryColor,
                           size: 18,
                         ),
@@ -182,7 +183,7 @@ class _ScheduleSettingsPageState extends ConsumerState<ScheduleSettingsPage> {
                                 borderRadius: BorderRadius.circular(8),
                               ),
                               child: const Icon(
-                                Icons.calendar_view_week,
+                                LucideIcons.calendar,
                                 color: AppTheme.primaryColor,
                                 size: 18,
                               ),
@@ -227,9 +228,7 @@ class _ScheduleSettingsPageState extends ConsumerState<ScheduleSettingsPage> {
                                   width: 32,
                                   height: 32,
                                   decoration: BoxDecoration(
-                                    color: isWorking 
-                                        ? AppTheme.primaryColor 
-                                        : Colors.grey.withValues(alpha: 0.3),
+                                    color: Colors.black,
                                     borderRadius: BorderRadius.circular(8),
                                   ),
                                   child: Center(
@@ -237,7 +236,7 @@ class _ScheduleSettingsPageState extends ConsumerState<ScheduleSettingsPage> {
                                       dayKey.toUpperCase(),
                                       style: AppTheme.bodySmall.copyWith(
                                         fontWeight: FontWeight.w600,
-                                        color: isWorking ? Colors.white : Colors.grey,
+                                        color: Colors.white,
                                       ),
                                     ),
                                   ),
@@ -258,10 +257,10 @@ class _ScheduleSettingsPageState extends ConsumerState<ScheduleSettingsPage> {
                                               vertical: 8,
                                             ),
                                             decoration: BoxDecoration(
-                                              color: AppTheme.primaryColor.withValues(alpha: 0.1),
+                                              color: Colors.white,
                                               borderRadius: BorderRadius.circular(8),
                                               border: Border.all(
-                                                color: AppTheme.primaryColor.withValues(alpha: 0.3),
+                                                color: AppTheme.borderColor,
                                                 width: 0.5,
                                               ),
                                             ),
@@ -269,15 +268,15 @@ class _ScheduleSettingsPageState extends ConsumerState<ScheduleSettingsPage> {
                                               mainAxisSize: MainAxisSize.min,
                                               children: [
                                                 const Icon(
-                                                  Icons.access_time,
+                                                  LucideIcons.clock,
                                                   size: 14,
-                                                  color: AppTheme.primaryColor,
+                                                  color: Colors.black,
                                                 ),
                                                 const SizedBox(width: 4),
                                                 Text(
                                                   _formatTime(hours['start']!),
                                                   style: AppTheme.bodyMedium.copyWith(
-                                                    color: AppTheme.primaryColor,
+                                                    color: Colors.black,
                                                     fontWeight: FontWeight.w500,
                                                   ),
                                                 ),
@@ -302,10 +301,10 @@ class _ScheduleSettingsPageState extends ConsumerState<ScheduleSettingsPage> {
                                               vertical: 8,
                                             ),
                                             decoration: BoxDecoration(
-                                              color: AppTheme.primaryColor.withValues(alpha: 0.1),
+                                              color: Colors.white,
                                               borderRadius: BorderRadius.circular(8),
                                               border: Border.all(
-                                                color: AppTheme.primaryColor.withValues(alpha: 0.3),
+                                                color: AppTheme.borderColor,
                                                 width: 0.5,
                                               ),
                                             ),
@@ -313,15 +312,15 @@ class _ScheduleSettingsPageState extends ConsumerState<ScheduleSettingsPage> {
                                               mainAxisSize: MainAxisSize.min,
                                               children: [
                                                 const Icon(
-                                                  Icons.access_time,
+                                                  LucideIcons.clock,
                                                   size: 14,
-                                                  color: AppTheme.primaryColor,
+                                                  color: Colors.black,
                                                 ),
                                                 const SizedBox(width: 4),
                                                 Text(
                                                   _formatTime(hours['end']!),
                                                   style: AppTheme.bodyMedium.copyWith(
-                                                    color: AppTheme.primaryColor,
+                                                    color: Colors.black,
                                                     fontWeight: FontWeight.w500,
                                                   ),
                                                 ),
@@ -352,7 +351,8 @@ class _ScheduleSettingsPageState extends ConsumerState<ScheduleSettingsPage> {
                                       workingDays[dayKey] = value;
                                     });
                                   },
-                                  activeColor: AppTheme.primaryColor,
+                                  activeColor: Colors.white,
+                                  activeTrackColor: AppTheme.primaryColor,
                                   materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
                                 ),
                               ],
@@ -378,7 +378,7 @@ class _ScheduleSettingsPageState extends ConsumerState<ScheduleSettingsPage> {
                 onPressed: _isLoading ? null : _saveSchedule,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppTheme.primaryColor,
-                  foregroundColor: Colors.white,
+                  foregroundColor: Colors.black,
                   padding: const EdgeInsets.symmetric(vertical: 16),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
@@ -398,6 +398,7 @@ class _ScheduleSettingsPageState extends ConsumerState<ScheduleSettingsPage> {
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
+                          color: Colors.black,
                         ),
                       ),
               ),

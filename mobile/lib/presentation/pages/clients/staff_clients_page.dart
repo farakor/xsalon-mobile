@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/constants/app_constants.dart';
@@ -63,6 +64,7 @@ class _StaffClientsPageState extends ConsumerState<StaffClientsPage> {
       appBar: ModernAppHeader(
         title: 'Клиенты',
         subtitle: 'База данных клиентов салона',
+        showProfile: false,
         actions: [
           Container(
             margin: const EdgeInsets.only(right: 8),
@@ -78,7 +80,7 @@ class _StaffClientsPageState extends ConsumerState<StaffClientsPage> {
                   ),
                 ),
                 child: Icon(
-                  Icons.search,
+                  LucideIcons.search,
                   color: AppTheme.textSecondaryColor,
                   size: 18,
                 ),
@@ -101,7 +103,7 @@ class _StaffClientsPageState extends ConsumerState<StaffClientsPage> {
                   ),
                 ),
                 child: Icon(
-                  Icons.more_vert,
+                  LucideIcons.moreVertical,
                   color: AppTheme.textSecondaryColor,
                   size: 18,
                 ),
@@ -118,7 +120,7 @@ class _StaffClientsPageState extends ConsumerState<StaffClientsPage> {
                   value: 'add_client',
                   child: Row(
                     children: [
-                      Icon(Icons.person_add),
+                      Icon(LucideIcons.userPlus),
                       SizedBox(width: 8),
                       Text('Добавить клиента'),
                     ],
@@ -128,7 +130,7 @@ class _StaffClientsPageState extends ConsumerState<StaffClientsPage> {
                   value: 'export',
                   child: Row(
                     children: [
-                      Icon(Icons.download),
+                      Icon(LucideIcons.download),
                       SizedBox(width: 8),
                       Text('Экспорт списка'),
                     ],
@@ -173,7 +175,7 @@ class _StaffClientsPageState extends ConsumerState<StaffClientsPage> {
                         color: AppTheme.textSecondaryColor,
                       ),
                       prefixIcon: Icon(
-                        Icons.search,
+                        LucideIcons.search,
                         color: AppTheme.textSecondaryColor,
                         size: 20,
                       ),
@@ -220,28 +222,31 @@ class _StaffClientsPageState extends ConsumerState<StaffClientsPage> {
         ],
       ),
       floatingActionButton: Container(
-        width: 56,
-        height: 56,
-        decoration: BoxDecoration(
-          gradient: AppTheme.primaryGradient,
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: [
-            BoxShadow(
-              color: AppTheme.primaryColor.withValues(alpha: 0.3),
-              blurRadius: 12,
-              offset: const Offset(0, 4),
-            ),
-          ],
-        ),
-        child: Material(
-          color: Colors.transparent,
-          child: InkWell(
-            onTap: _addClient,
+        margin: const EdgeInsets.only(bottom: 86), // Отступ для floating menu bar (70px высота + 16px margin)
+        child: Container(
+          width: 56,
+          height: 56,
+          decoration: BoxDecoration(
+            color: AppTheme.primaryColor,
             borderRadius: BorderRadius.circular(16),
-            child: const Icon(
-              Icons.person_add,
-              color: Colors.white,
-              size: 24,
+            boxShadow: [
+              BoxShadow(
+                color: AppTheme.primaryColor.withValues(alpha: 0.3),
+                blurRadius: 12,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+          child: Material(
+            color: Colors.transparent,
+            child: InkWell(
+              onTap: _addClient,
+              borderRadius: BorderRadius.circular(16),
+              child: const Icon(
+                LucideIcons.userPlus,
+                color: Color(0xFF000000),
+                size: 24,
+              ),
             ),
           ),
         ),
@@ -285,7 +290,7 @@ class _StaffClientsPageState extends ConsumerState<StaffClientsPage> {
                   _getFilterLabel(filter),
                   style: AppTheme.bodyMedium.copyWith(
                     color: isSelected 
-                        ? Colors.white 
+                        ? const Color(0xFF000000)
                         : AppTheme.textSecondaryColor,
                     fontWeight: isSelected 
                         ? FontWeight.w500 
@@ -321,7 +326,7 @@ class _StaffClientsPageState extends ConsumerState<StaffClientsPage> {
               const Spacer(),
               if (_sortType == sortType)
                 Icon(
-                  _sortAscending ? Icons.arrow_upward : Icons.arrow_downward,
+                  _sortAscending ? LucideIcons.arrowUp : LucideIcons.arrowDown,
                   size: 16,
                   color: AppTheme.primaryColor,
                 ),
@@ -341,7 +346,7 @@ class _StaffClientsPageState extends ConsumerState<StaffClientsPage> {
           ),
         ),
         child: Icon(
-          Icons.tune,
+          LucideIcons.settings,
           size: 20,
           color: AppTheme.textSecondaryColor,
         ),
@@ -364,7 +369,7 @@ class _StaffClientsPageState extends ConsumerState<StaffClientsPage> {
                 borderRadius: BorderRadius.circular(20),
               ),
               child: Icon(
-                Icons.people_outline,
+                LucideIcons.users,
                 size: 40,
                 color: AppTheme.primaryColor,
               ),
@@ -388,24 +393,21 @@ class _StaffClientsPageState extends ConsumerState<StaffClientsPage> {
             const SizedBox(height: 32),
             Container(
               width: double.infinity,
-              height: 48,
-              decoration: BoxDecoration(
-                gradient: AppTheme.primaryGradient,
-                borderRadius: BorderRadius.circular(12),
-              ),
+              height: 56,
               child: ElevatedButton.icon(
                 onPressed: _addClient,
-                icon: const Icon(Icons.person_add, color: Colors.white),
+                icon: const Icon(LucideIcons.userPlus, color: Colors.black),
                 label: Text(
                   'Добавить клиента',
                   style: AppTheme.bodyMedium.copyWith(
-                    color: Colors.white,
+                    color: Colors.black,
                     fontWeight: FontWeight.w500,
                   ),
                 ),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.transparent,
+                  backgroundColor: AppTheme.primaryColor,
                   shadowColor: Colors.transparent,
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
@@ -560,7 +562,7 @@ class _StaffClientsPageState extends ConsumerState<StaffClientsPage> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Icon(
-            Icons.error_outline,
+            LucideIcons.alertCircle,
             size: 64,
             color: Colors.red[400],
           ),
@@ -588,7 +590,7 @@ class _StaffClientsPageState extends ConsumerState<StaffClientsPage> {
               ref.read(clientsProvider.notifier).clearError();
               ref.read(clientsProvider.notifier).loadClients();
             },
-            icon: const Icon(Icons.refresh),
+            icon: const Icon(LucideIcons.refreshCw),
             label: const Text('Повторить'),
           ),
         ],

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/constants/app_constants.dart';
@@ -95,7 +96,7 @@ class _ClientDetailPageState extends ConsumerState<ClientDetailPage>
           ),
           child: IconButton(
             icon: Icon(
-              Icons.arrow_back_ios_new,
+              LucideIcons.arrowLeft,
               color: AppTheme.textPrimaryColor,
               size: 18,
             ),
@@ -133,7 +134,7 @@ class _ClientDetailPageState extends ConsumerState<ClientDetailPage>
                   ),
                 ),
                 child: Icon(
-                  Icons.more_vert,
+                  LucideIcons.moreVertical,
                   color: AppTheme.textSecondaryColor,
                   size: 18,
                 ),
@@ -143,7 +144,7 @@ class _ClientDetailPageState extends ConsumerState<ClientDetailPage>
                   value: 'call',
                   child: Row(
                     children: [
-                      Icon(Icons.phone, color: Colors.green),
+                      Icon(LucideIcons.phone, color: Colors.green),
                       SizedBox(width: 8),
                       Text('Позвонить'),
                     ],
@@ -153,7 +154,7 @@ class _ClientDetailPageState extends ConsumerState<ClientDetailPage>
                   value: 'edit',
                   child: Row(
                     children: [
-                      Icon(Icons.edit),
+                      Icon(LucideIcons.edit),
                       SizedBox(width: 8),
                       Text('Редактировать'),
                     ],
@@ -163,7 +164,7 @@ class _ClientDetailPageState extends ConsumerState<ClientDetailPage>
                   value: 'block',
                   child: Row(
                     children: [
-                      Icon(Icons.block, color: Colors.orange),
+                      Icon(LucideIcons.ban, color: Colors.orange),
                       SizedBox(width: 8),
                       Text('Заблокировать'),
                     ],
@@ -173,7 +174,7 @@ class _ClientDetailPageState extends ConsumerState<ClientDetailPage>
                   value: 'delete',
                   child: Row(
                     children: [
-                      Icon(Icons.delete, color: Colors.red),
+                      Icon(LucideIcons.trash2, color: Colors.red),
                       SizedBox(width: 8),
                       Text('Удалить'),
                     ],
@@ -254,7 +255,7 @@ class _ClientDetailPageState extends ConsumerState<ClientDetailPage>
             onTap: _bookAppointment,
             borderRadius: BorderRadius.circular(16),
             child: const Icon(
-              Icons.add,
+              LucideIcons.plus,
               color: Colors.white,
               size: 24,
             ),
@@ -410,7 +411,7 @@ class _ClientDetailPageState extends ConsumerState<ClientDetailPage>
             children: [
               Expanded(
                 child: _buildQuickStat(
-                  Icons.event_outlined,
+                  LucideIcons.calendar,
                   '${widget.client.totalVisits}',
                   'визитов',
                 ),
@@ -422,7 +423,7 @@ class _ClientDetailPageState extends ConsumerState<ClientDetailPage>
               ),
               Expanded(
                 child: _buildQuickStat(
-                  Icons.access_time,
+                  LucideIcons.clock,
                   widget.client.lastVisit != null 
                       ? _formatDateShort(widget.client.lastVisit!)
                       : 'Никогда',
@@ -466,11 +467,11 @@ class _ClientDetailPageState extends ConsumerState<ClientDetailPage>
   Widget _buildContactInfo() {
     return _buildSection(
       'Контактная информация',
-      Icons.contact_phone,
+      LucideIcons.phone,
       [
-        _buildInfoRow(Icons.phone, 'Телефон', widget.client.displayPhone),
+        _buildInfoRow(LucideIcons.phone, 'Телефон', widget.client.displayPhone),
         if (widget.client.email != null)
-          _buildInfoRow(Icons.email, 'Email', widget.client.displayEmail),
+          _buildInfoRow(LucideIcons.mail, 'Email', widget.client.displayEmail),
       ],
     );
   }
@@ -478,20 +479,20 @@ class _ClientDetailPageState extends ConsumerState<ClientDetailPage>
   Widget _buildPersonalInfo() {
     return _buildSection(
       'Личная информация',
-      Icons.person,
+      LucideIcons.userCheck,
       [
         if (widget.client.dateOfBirth != null) ...[
           _buildInfoRow(
-            Icons.cake,
+            LucideIcons.cake,
             'Дата рождения',
             '${_formatDate(widget.client.dateOfBirth!)} (${widget.client.age} лет)',
           ),
         ],
         if (widget.client.gender != null)
-          _buildInfoRow(Icons.wc, 'Пол', widget.client.gender!),
+          _buildInfoRow(LucideIcons.user, 'Пол', widget.client.gender!),
         if (widget.client.lastVisit != null)
           _buildInfoRow(
-            Icons.schedule,
+            LucideIcons.calendarCheck,
             'Последний визит',
             _formatDate(widget.client.lastVisit!),
           ),
@@ -649,7 +650,7 @@ class _ClientDetailPageState extends ConsumerState<ClientDetailPage>
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Icon(
-                  Icons.history,
+                  LucideIcons.clock,
                   size: 40,
                   color: AppTheme.primaryColor,
                 ),
@@ -739,7 +740,7 @@ class _ClientDetailPageState extends ConsumerState<ClientDetailPage>
           Row(
             children: [
               Icon(
-                Icons.access_time,
+                LucideIcons.clock,
                 size: 16,
                 color: AppTheme.textSecondaryColor,
               ),
@@ -772,7 +773,7 @@ class _ClientDetailPageState extends ConsumerState<ClientDetailPage>
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Icon(
-                    Icons.note_outlined,
+                    LucideIcons.fileText,
                     size: 16,
                     color: AppTheme.textSecondaryColor,
                   ),
@@ -811,7 +812,7 @@ class _ClientDetailPageState extends ConsumerState<ClientDetailPage>
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Icon(
-                  Icons.note_outlined,
+                  LucideIcons.fileText,
                   color: AppTheme.primaryColor,
                   size: 18,
                 ),
@@ -839,7 +840,7 @@ class _ClientDetailPageState extends ConsumerState<ClientDetailPage>
                 ),
                 child: IconButton(
                   icon: Icon(
-                    Icons.edit_outlined,
+                    LucideIcons.edit,
                     size: 18,
                     color: AppTheme.textSecondaryColor,
                   ),
@@ -879,7 +880,7 @@ class _ClientDetailPageState extends ConsumerState<ClientDetailPage>
                 : Column(
                     children: [
                       Icon(
-                        Icons.note_add_outlined,
+                        LucideIcons.edit,
                         size: 48,
                         color: AppTheme.textSecondaryColor.withValues(alpha: 0.5),
                       ),

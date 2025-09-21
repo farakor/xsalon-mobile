@@ -55,14 +55,18 @@ class AuthNotifier extends StateNotifier<AuthState> {
 
   // Инициализация аутентификации
   void _initializeAuth() {
+    print('🔧 Инициализация аутентификации...');
     final session = _supabase.auth.currentSession;
+    
     if (session != null) {
+      print('✅ Найдена сохраненная сессия для пользователя: ${session.user.id}');
       state = state.copyWith(
         status: AuthStatus.authenticated,
         user: session.user,
       );
       _loadUserProfile();
     } else {
+      print('❌ Сохраненная сессия не найдена');
       state = state.copyWith(status: AuthStatus.unauthenticated);
     }
 

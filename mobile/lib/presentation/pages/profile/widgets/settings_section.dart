@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 
 import '../../../theme/app_theme.dart';
 
@@ -50,7 +51,7 @@ class _SettingsSectionState extends State<SettingsSection> {
   Widget _buildNotificationSettings() {
     return _buildSettingsCard(
       'Уведомления',
-      Icons.notifications,
+      LucideIcons.bell,
       [
         _buildSwitchTile(
           'Включить уведомления',
@@ -129,13 +130,13 @@ class _SettingsSectionState extends State<SettingsSection> {
         _buildListTile(
           'Валюта',
           _currency,
-          Icons.attach_money,
+          LucideIcons.dollarSign,
           () => _showCurrencyDialog(),
         ),
         _buildListTile(
           'Часовой пояс',
           'UTC+5 (Ташкент)',
-          Icons.schedule,
+          LucideIcons.calendarCheck,
           () => _showTimezoneDialog(),
         ),
       ],
@@ -150,7 +151,7 @@ class _SettingsSectionState extends State<SettingsSection> {
         _buildListTile(
           'Сменить пароль',
           'Последнее изменение: 30 дней назад',
-          Icons.lock,
+          LucideIcons.lock,
           () => _changePassword(),
         ),
         _buildListTile(
@@ -183,7 +184,7 @@ class _SettingsSectionState extends State<SettingsSection> {
         _buildListTile(
           'Экспорт данных',
           'Скачать копию ваших данных',
-          Icons.download,
+          LucideIcons.download,
           () => _exportData(),
         ),
         _buildListTile(
@@ -210,7 +211,7 @@ class _SettingsSectionState extends State<SettingsSection> {
         _buildListTile(
           'Справка',
           'Часто задаваемые вопросы',
-          Icons.help_outline,
+          LucideIcons.helpCircle,
           () => _showHelp(),
         ),
         _buildListTile(
@@ -222,7 +223,7 @@ class _SettingsSectionState extends State<SettingsSection> {
         _buildListTile(
           'О приложении',
           'Версия 1.0.0',
-          Icons.info,
+          LucideIcons.info,
           () => _showAbout(),
         ),
         _buildListTile(
@@ -383,7 +384,7 @@ class _SettingsSectionState extends State<SettingsSection> {
                 ),
               ),
               Icon(
-                Icons.chevron_right,
+                LucideIcons.chevronRight,
                 color: AppTheme.textSecondaryColor,
                 size: 18,
               ),

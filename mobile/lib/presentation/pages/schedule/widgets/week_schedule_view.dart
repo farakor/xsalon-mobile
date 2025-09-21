@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 
 import '../../../../data/models/appointment.dart';
 import '../../../theme/app_theme.dart';
@@ -73,7 +74,7 @@ class WeekScheduleView extends StatelessWidget {
               borderRadius: BorderRadius.circular(8),
             ),
             child: Icon(
-              Icons.view_week,
+              LucideIcons.calendar,
               color: AppTheme.primaryColor,
               size: 16,
             ),
@@ -240,7 +241,7 @@ class WeekScheduleView extends StatelessWidget {
                               borderRadius: BorderRadius.circular(8),
                             ),
                             child: Icon(
-                              Icons.free_breakfast,
+                              LucideIcons.coffee,
                               color: AppTheme.textSecondaryColor,
                               size: 16,
                             ),
@@ -314,7 +315,7 @@ class WeekScheduleView extends StatelessWidget {
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: const Icon(
-                    Icons.check,
+                    LucideIcons.check,
                     color: Colors.white,
                     size: 16,
                   ),
@@ -467,7 +468,7 @@ class WeekScheduleView extends StatelessWidget {
             ),
             child: Row(
               children: [
-                const Icon(Icons.view_week, color: Colors.blue),
+                const Icon(LucideIcons.calendar, color: Colors.blue),
                 const SizedBox(width: 8),
                 Text(
                   'Недельное расписание',
@@ -577,7 +578,7 @@ class WeekScheduleView extends StatelessWidget {
                         borderRadius: BorderRadius.circular(4),
                       ),
                       child: const Icon(
-                        Icons.check,
+                        LucideIcons.check,
                         color: Colors.white,
                         size: 16,
                       ),

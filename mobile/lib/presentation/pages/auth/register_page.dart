@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -19,7 +20,7 @@ class RegisterPage extends ConsumerWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(
-              Icons.person_add_outlined,
+              LucideIcons.userPlus,
               size: 64,
               color: AppTheme.primaryColor,
             ),
@@ -39,7 +40,7 @@ class RegisterPage extends ConsumerWidget {
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => context.go(AppConstants.loginRoute),
         label: const Text('К входу'),
-        icon: const Icon(Icons.arrow_back),
+        icon: const Icon(LucideIcons.arrowLeft),
       ),
     );
   }

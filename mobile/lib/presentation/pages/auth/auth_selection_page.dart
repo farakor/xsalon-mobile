@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/constants/app_constants.dart';
 import '../../theme/app_theme.dart';
@@ -28,7 +29,7 @@ class AuthSelectionPage extends StatelessWidget {
                       borderRadius: BorderRadius.circular(60),
                     ),
                     child: const Icon(
-                      Icons.content_cut,
+                      LucideIcons.scissors,
                       size: 60,
                       color: AppTheme.primaryColor,
                     ),
@@ -61,8 +62,8 @@ class AuthSelectionPage extends StatelessWidget {
                     text: 'Я клиент',
                     onPressed: () => context.go(AppConstants.phoneAuthRoute),
                     backgroundColor: AppTheme.primaryColor,
-                    textColor: Colors.white,
-                    icon: Icons.person,
+                    textColor: Colors.black,
+                    icon: LucideIcons.user,
                   ),
                   
                   const SizedBox(height: 16),
@@ -72,9 +73,9 @@ class AuthSelectionPage extends StatelessWidget {
                     text: 'Я сотрудник салона',
                     onPressed: () => context.go(AppConstants.staffLoginRoute),
                     backgroundColor: Colors.white,
-                    textColor: AppTheme.primaryColor,
-                    borderColor: AppTheme.primaryColor,
-                    icon: Icons.work,
+                    textColor: Colors.black,
+                    borderColor: Colors.black,
+                    icon: LucideIcons.briefcase,
                   ),
                 ],
               ),

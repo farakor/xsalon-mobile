@@ -34,7 +34,7 @@ class CustomButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final effectiveBackgroundColor = backgroundColor ?? AppTheme.primaryColor;
-    final effectiveTextColor = textColor ?? Colors.white;
+    final effectiveTextColor = textColor ?? Colors.black;
     final effectiveBorderRadius = borderRadius ?? BorderRadius.circular(12);
     final effectivePadding = padding ?? const EdgeInsets.symmetric(
       horizontal: 24,
@@ -136,7 +136,7 @@ class PrimaryButton extends StatelessWidget {
       icon: icon,
       isLoading: isLoading,
       backgroundColor: AppTheme.primaryColor,
-      textColor: Colors.white,
+      textColor: Colors.black,
     );
   }
 }

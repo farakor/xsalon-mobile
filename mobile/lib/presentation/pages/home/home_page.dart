@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 
 import '../../../core/constants/app_constants.dart';
 import '../../theme/app_theme.dart';
@@ -14,6 +15,11 @@ import '../services/services_page.dart';
 import '../profile/staff_profile_page.dart';
 import '../booking/add_booking_page.dart';
 import '../../widgets/modern_app_header.dart';
+import '../../widgets/floating_menu_bar.dart';
+import '../../widgets/modern_floating_menu.dart';
+import '../../widgets/glassmorphic_floating_menu.dart';
+import '../../widgets/liquid_glass_menu.dart';
+import '../../widgets/simple_floating_menu.dart';
 
 class HomePage extends ConsumerStatefulWidget {
   const HomePage({super.key});
@@ -29,6 +35,19 @@ class _HomePageState extends ConsumerState<HomePage> {
   Widget build(BuildContext context) {
     final authState = ref.watch(authProvider);
     final profile = authState.profile;
+
+    // Проверяем статус аутентификации
+    if (authState.status == AuthStatus.unauthenticated) {
+      // Если пользователь не авторизован, перенаправляем на авторизацию
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        context.go(AppConstants.authRoute);
+      });
+      return const Scaffold(
+        body: Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
+    }
 
     // Если профиль еще не загружен, показываем загрузку
     if (profile == null) {
@@ -75,31 +94,35 @@ class _ClientInterface extends StatelessWidget {
     ];
 
     return Scaffold(
-      body: pages[selectedIndex],
-      bottomNavigationBar: BottomNavigationBar(
-        type: BottomNavigationBarType.fixed,
-        currentIndex: selectedIndex,
-        onTap: onIndexChanged,
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home_outlined),
-            activeIcon: Icon(Icons.home),
-            label: 'Главная',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.calendar_today_outlined),
-            activeIcon: Icon(Icons.calendar_today),
-            label: 'Запись',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.history_outlined),
-            activeIcon: Icon(Icons.history),
-            label: 'История',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person_outline),
-            activeIcon: Icon(Icons.person),
-            label: 'Профиль',
+      body: Stack(
+        children: [
+          pages[selectedIndex],
+          Positioned(
+            left: 0,
+            right: 0,
+            bottom: 0,
+            child: SimpleFloatingMenu(
+              selectedIndex: selectedIndex,
+              onIndexChanged: onIndexChanged,
+              items: const [
+                SimpleMenuBarItem(
+                  icon: LucideIcons.home,
+                  activeIcon: LucideIcons.home,
+                ),
+                SimpleMenuBarItem(
+                  icon: LucideIcons.calendar,
+                  activeIcon: LucideIcons.calendarDays,
+                ),
+                SimpleMenuBarItem(
+                  icon: LucideIcons.clock,
+                  activeIcon: LucideIcons.clock,
+                ),
+                SimpleMenuBarItem(
+                  icon: LucideIcons.user,
+                  activeIcon: LucideIcons.userCheck,
+                ),
+              ],
+            ),
           ),
         ],
       ),
@@ -133,38 +156,39 @@ class _StaffInterface extends StatelessWidget {
     ];
 
     return Scaffold(
-      body: pages[selectedIndex],
-      bottomNavigationBar: BottomNavigationBar(
-        type: BottomNavigationBarType.fixed,
-        currentIndex: selectedIndex,
-        onTap: onIndexChanged,
-        selectedItemColor: AppTheme.primaryColor,
-        unselectedItemColor: Colors.grey,
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.dashboard_outlined),
-            activeIcon: Icon(Icons.dashboard),
-            label: 'Панель',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.schedule_outlined),
-            activeIcon: Icon(Icons.schedule),
-            label: 'Расписание',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.people_outlined),
-            activeIcon: Icon(Icons.people),
-            label: 'Клиенты',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.design_services_outlined),
-            activeIcon: Icon(Icons.design_services),
-            label: 'Услуги',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person_outline),
-            activeIcon: Icon(Icons.person),
-            label: 'Профиль',
+      body: Stack(
+        children: [
+          pages[selectedIndex],
+          Positioned(
+            left: 0,
+            right: 0,
+            bottom: 0,
+            child: SimpleFloatingMenu(
+              selectedIndex: selectedIndex,
+              onIndexChanged: onIndexChanged,
+              items: const [
+                SimpleMenuBarItem(
+                  icon: LucideIcons.layoutDashboard,
+                  activeIcon: LucideIcons.layoutGrid,
+                ),
+                SimpleMenuBarItem(
+                  icon: LucideIcons.calendar,
+                  activeIcon: LucideIcons.calendarCheck,
+                ),
+                SimpleMenuBarItem(
+                  icon: LucideIcons.users,
+                  activeIcon: LucideIcons.userCheck,
+                ),
+                SimpleMenuBarItem(
+                  icon: LucideIcons.scissors,
+                  activeIcon: LucideIcons.sparkles,
+                ),
+                SimpleMenuBarItem(
+                  icon: LucideIcons.user,
+                  activeIcon: LucideIcons.userCircle,
+                ),
+              ],
+            ),
           ),
         ],
       ),
@@ -200,7 +224,7 @@ class _ClientHomeTab extends StatelessWidget {
               children: [
                 Expanded(
                   child: _QuickActionCard(
-                    icon: Icons.calendar_today,
+                    icon: LucideIcons.calendar,
                     title: 'Записаться',
                     subtitle: 'На услугу',
                     onTap: () => context.go(AppConstants.clientBookingRoute),
@@ -209,7 +233,7 @@ class _ClientHomeTab extends StatelessWidget {
                 const SizedBox(width: 12),
                 Expanded(
                   child: _QuickActionCard(
-                    icon: Icons.card_giftcard,
+                    icon: LucideIcons.gift,
                     title: 'Бонусы',
                     subtitle: 'Программа',
                     onTap: () => context.go(AppConstants.loyaltyRoute),
@@ -343,7 +367,7 @@ class _RecentBookingCard extends StatelessWidget {
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Icon(
-                  Icons.history,
+                  LucideIcons.clock,
                   color: AppTheme.primaryColor,
                   size: 18,
                 ),
@@ -368,7 +392,7 @@ class _RecentBookingCard extends StatelessWidget {
                   color: AppTheme.primaryColor,
                   borderRadius: BorderRadius.circular(10),
                 ),
-                child: const Icon(Icons.content_cut, color: Colors.white, size: 20),
+                child: const Icon(LucideIcons.scissors, color: Colors.white, size: 20),
               ),
               const SizedBox(width: 12),
               Expanded(
@@ -440,7 +464,7 @@ class _BookingTab extends StatelessWidget {
                 borderRadius: BorderRadius.circular(60),
               ),
               child: const Icon(
-                Icons.calendar_today,
+                LucideIcons.calendar,
                 size: 60,
                 color: AppTheme.primaryColor,
               ),
@@ -525,6 +549,7 @@ class _StaffHomeTab extends StatelessWidget {
         subtitle: profile.isMaster 
             ? 'Мастер салона'
             : 'Администратор салона',
+        showProfile: false,
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.fromLTRB(20, 20, 20, 100),
@@ -554,7 +579,7 @@ class _StaffHomeTab extends StatelessWidget {
               children: [
                 Expanded(
                   child: _StaffActionCard(
-                    icon: Icons.add_circle,
+                    icon: LucideIcons.plusCircle,
                     title: 'Новая запись',
                     subtitle: 'Добавить',
                     onTap: () {
@@ -570,7 +595,7 @@ class _StaffHomeTab extends StatelessWidget {
                 const SizedBox(width: 12),
                 Expanded(
                   child: _StaffActionCard(
-                    icon: Icons.schedule,
+                    icon: LucideIcons.clock,
                     title: 'Расписание',
                     subtitle: 'Настроить',
                     onTap: () => context.go(AppConstants.scheduleSettingsRoute),
@@ -624,7 +649,7 @@ class _TodayStatsRow extends ConsumerWidget {
       children: [
         Expanded(
           child: _StatsCard(
-            icon: Icons.event,
+            icon: LucideIcons.calendar,
             title: todayAppointments.length.toString(),
             subtitle: 'Записей',
             color: Colors.blue,
@@ -634,7 +659,7 @@ class _TodayStatsRow extends ConsumerWidget {
         const SizedBox(width: 12),
         Expanded(
           child: _StatsCard(
-            icon: Icons.attach_money,
+            icon: LucideIcons.dollarSign,
             title: todayRevenue > 0 ? '₽${_formatPrice(todayRevenue)}' : '₽0',
             subtitle: 'Доход',
             color: Colors.orange,
@@ -849,7 +874,7 @@ class _TodayAppointmentsListState extends ConsumerState<_TodayAppointmentsList> 
           child: Column(
             children: [
               Icon(
-                Icons.error_outline,
+                LucideIcons.alertCircle,
                 color: Colors.red,
                 size: 32,
               ),
@@ -901,7 +926,7 @@ class _TodayAppointmentsListState extends ConsumerState<_TodayAppointmentsList> 
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Icon(
-                Icons.event_available,
+                LucideIcons.calendarCheck,
                 color: Colors.grey,
                 size: 24,
               ),
@@ -923,11 +948,7 @@ class _TodayAppointmentsListState extends ConsumerState<_TodayAppointmentsList> 
             const SizedBox(height: 16),
             Container(
               width: double.infinity,
-              height: 44,
-              decoration: BoxDecoration(
-                gradient: AppTheme.primaryGradient,
-                borderRadius: BorderRadius.circular(12),
-              ),
+              height: 56,
               child: ElevatedButton.icon(
                 onPressed: () {
                   Navigator.push(
@@ -942,17 +963,18 @@ class _TodayAppointmentsListState extends ConsumerState<_TodayAppointmentsList> 
                     }
                   });
                 },
-                icon: const Icon(Icons.add, color: Colors.white, size: 18),
+                icon: const Icon(LucideIcons.plus, color: Colors.black, size: 18),
                 label: Text(
                   'Добавить запись',
                   style: AppTheme.bodyMedium.copyWith(
-                    color: Colors.white,
+                    color: Colors.black,
                     fontWeight: FontWeight.w500,
                   ),
                 ),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.transparent,
+                  backgroundColor: AppTheme.primaryColor,
                   shadowColor: Colors.transparent,
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
@@ -1079,7 +1101,7 @@ class _TodayAppointmentCard extends StatelessWidget {
               ),
               const SizedBox(width: 12),
               Icon(
-                Icons.arrow_forward_ios,
+                LucideIcons.chevronRight,
                 size: 16,
                 color: AppTheme.textSecondaryColor,
               ),
@@ -1150,7 +1172,7 @@ class _ClientProfileTab extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(
-              Icons.person,
+              LucideIcons.user,
               size: 64,
               color: Colors.grey,
             ),

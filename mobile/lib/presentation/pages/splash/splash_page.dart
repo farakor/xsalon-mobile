@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
@@ -70,23 +71,17 @@ class _SplashPageState extends ConsumerState<SplashPage>
       // Минимальное время показа splash
       await Future.delayed(const Duration(seconds: 2));
       
-      // В debug режиме всегда переходим на авторизацию
-      if (SupabaseConfig.debugSmsToConsole) {
-        if (mounted) {
-          context.go(AppConstants.authRoute);
-        }
-        return;
-      }
-      
-      // В production режиме проверяем сессию
+      // Проверяем сессию независимо от режима (debug/production)
       final session = SupabaseConfig.auth.currentSession;
       
       if (mounted) {
         if (session != null) {
-          // Пользователь авторизован
+          // Пользователь авторизован - переходим на главную
+          print('✅ Найдена активная сессия, переходим на главную страницу');
           context.go(AppConstants.homeRoute);
         } else {
-          // Пользователь не авторизован
+          // Пользователь не авторизован - переходим на авторизацию
+          print('❌ Активная сессия не найдена, переходим на авторизацию');
           context.go(AppConstants.authRoute);
         }
       }
@@ -139,7 +134,7 @@ class _SplashPageState extends ConsumerState<SplashPage>
                           ],
                         ),
                         child: const Icon(
-                          Icons.content_cut,
+                          LucideIcons.scissors,
                           size: 60,
                           color: AppTheme.primaryColor,
                         ),

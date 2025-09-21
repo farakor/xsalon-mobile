@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 
 import '../../../theme/app_theme.dart';
 
@@ -15,14 +16,7 @@ class ProfileHeader extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [
-            AppTheme.primaryColor,
-            AppTheme.primaryColor.withValues(alpha: 0.8),
-          ],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
+        color: AppTheme.primaryColor,
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
@@ -41,7 +35,7 @@ class ProfileHeader extends StatelessWidget {
                 children: [
                   CircleAvatar(
                     radius: 40,
-                    backgroundColor: Colors.white.withValues(alpha: 0.2),
+                    backgroundColor: Colors.white.withValues(alpha: 0.8),
                     backgroundImage: profile.avatarUrl != null 
                         ? NetworkImage(profile.avatarUrl!)
                         : null,
@@ -49,7 +43,7 @@ class ProfileHeader extends StatelessWidget {
                         ? Text(
                             _getInitials(profile.fullName ?? 'Сотрудник'),
                             style: AppTheme.headlineMedium.copyWith(
-                              color: Colors.white,
+                              color: Colors.black,
                               fontWeight: FontWeight.bold,
                             ),
                           )
@@ -67,7 +61,7 @@ class ProfileHeader extends StatelessWidget {
                       ),
                       child: Icon(
                         _getStatusIcon(),
-                        color: Colors.white,
+                        color: Colors.black,
                         size: 16,
                       ),
                     ),
@@ -82,7 +76,7 @@ class ProfileHeader extends StatelessWidget {
                     Text(
                       profile.fullName ?? 'Сотрудник',
                       style: AppTheme.headlineSmall.copyWith(
-                        color: Colors.white,
+                        color: Colors.black,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
@@ -93,13 +87,13 @@ class ProfileHeader extends StatelessWidget {
                         vertical: 4,
                       ),
                       decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.2),
+                        color: Colors.white.withValues(alpha: 0.8),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Text(
                         _getRoleDisplayName(profile.role),
                         style: AppTheme.bodyMedium.copyWith(
-                          color: Colors.white,
+                          color: Colors.black,
                           fontWeight: FontWeight.w500,
                         ),
                       ),
@@ -108,15 +102,15 @@ class ProfileHeader extends StatelessWidget {
                     Row(
                       children: [
                         Icon(
-                          Icons.star,
-                          color: Colors.white.withValues(alpha: 0.8),
+                          LucideIcons.star,
+                          color: Colors.black.withValues(alpha: 0.8),
                           size: 16,
                         ),
                         const SizedBox(width: 4),
                         Text(
                           'Топовый мастер',
                           style: AppTheme.bodySmall.copyWith(
-                            color: Colors.white.withValues(alpha: 0.8),
+                            color: Colors.black.withValues(alpha: 0.8),
                           ),
                         ),
                       ],
@@ -159,6 +153,6 @@ class ProfileHeader extends StatelessWidget {
   }
 
   IconData _getStatusIcon() {
-    return Icons.check; // Активен
+    return LucideIcons.check; // Активен
   }
 }

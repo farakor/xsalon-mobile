@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 
 import '../../../../data/models/client.dart';
 import '../../../theme/app_theme.dart';
@@ -123,7 +124,7 @@ class ClientCard extends StatelessWidget {
                       Row(
                         children: [
                           Icon(
-                            Icons.event_outlined,
+                            LucideIcons.calendar,
                             size: 14,
                             color: AppTheme.textSecondaryColor,
                           ),
@@ -137,7 +138,7 @@ class ClientCard extends StatelessWidget {
                           if (client.lastVisit != null) ...[
                             const SizedBox(width: 12),
                             Icon(
-                              Icons.access_time,
+                              LucideIcons.clock,
                               size: 14,
                               color: AppTheme.textSecondaryColor,
                             ),
@@ -165,9 +166,9 @@ class ClientCard extends StatelessWidget {
                   child: IconButton(
                     onPressed: onCall,
                     icon: Icon(
-                      Icons.phone_outlined,
+                      LucideIcons.phone,
                       size: 20,
-                      color: AppTheme.primaryColor,
+                      color: const Color(0xFF000000),
                     ),
                     padding: EdgeInsets.zero,
                   ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -11,6 +12,7 @@ import '../../widgets/common/custom_button.dart';
 import '../../../domain/entities/service.dart';
 import '../../../domain/entities/master.dart';
 import '../../../core/constants/app_constants.dart';
+import 'widgets/client_time_selector.dart';
 
 class ClientBookingPage extends ConsumerStatefulWidget {
   const ClientBookingPage({super.key});
@@ -161,7 +163,7 @@ class _ClientBookingPageState extends ConsumerState<ClientBookingPage> {
                   ),
                   child: Center(
                     child: isCompleted
-                        ? const Icon(Icons.check, color: Colors.white, size: 16)
+                        ? const Icon(LucideIcons.check, color: Colors.white, size: 16)
                         : Text(
                             '${index + 1}',
                             style: TextStyle(
@@ -228,7 +230,7 @@ class _ClientBookingPageState extends ConsumerState<ClientBookingPage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.person_search, size: 64, color: Colors.grey),
+            Icon(LucideIcons.search, size: 64, color: Colors.grey),
             SizedBox(height: 16),
             Text(
               'Сначала выберите мастера',
@@ -246,7 +248,7 @@ class _ClientBookingPageState extends ConsumerState<ClientBookingPage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.search_off, size: 64, color: Colors.grey),
+            Icon(LucideIcons.searchX, size: 64, color: Colors.grey),
             SizedBox(height: 16),
             Text(
               'У мастера нет услуг',
@@ -297,7 +299,7 @@ class _ClientBookingPageState extends ConsumerState<ClientBookingPage> {
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: const Icon(
-                      Icons.content_cut,
+                      LucideIcons.scissors,
                       color: AppTheme.primaryColor,
                       size: 30,
                     ),
@@ -328,7 +330,7 @@ class _ClientBookingPageState extends ConsumerState<ClientBookingPage> {
                         Row(
                           children: [
                             Icon(
-                              Icons.access_time,
+                              LucideIcons.clock,
                               size: 16,
                               color: Colors.grey.shade600,
                             ),
@@ -342,7 +344,7 @@ class _ClientBookingPageState extends ConsumerState<ClientBookingPage> {
                             ),
                             const SizedBox(width: 16),
                             Icon(
-                              Icons.attach_money,
+                              LucideIcons.dollarSign,
                               size: 16,
                               color: Colors.grey.shade600,
                             ),
@@ -362,7 +364,7 @@ class _ClientBookingPageState extends ConsumerState<ClientBookingPage> {
                   ),
                   if (isSelected)
                     const Icon(
-                      Icons.check_circle,
+                      LucideIcons.checkCircle,
                       color: AppTheme.primaryColor,
                       size: 24,
                     ),
@@ -417,7 +419,7 @@ class _ClientBookingPageState extends ConsumerState<ClientBookingPage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(Icons.error_outline, size: 64, color: Colors.red),
+            const Icon(LucideIcons.alertCircle, size: 64, color: Colors.red),
             const SizedBox(height: 16),
             Text(
               'Ошибка загрузки мастеров',
@@ -448,7 +450,7 @@ class _ClientBookingPageState extends ConsumerState<ClientBookingPage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(Icons.person_off, size: 64, color: Colors.grey),
+            const Icon(LucideIcons.userX, size: 64, color: Colors.grey),
             const SizedBox(height: 16),
             const Text(
               'Мастера не найдены',
@@ -545,7 +547,7 @@ class _ClientBookingPageState extends ConsumerState<ClientBookingPage> {
                         Row(
                           children: [
                             Icon(
-                              Icons.star,
+                              LucideIcons.star,
                               size: 16,
                               color: Colors.amber.shade600,
                             ),
@@ -559,7 +561,7 @@ class _ClientBookingPageState extends ConsumerState<ClientBookingPage> {
                             ),
                             const SizedBox(width: 16),
                             Icon(
-                              Icons.work_outline,
+                              LucideIcons.briefcase,
                               size: 16,
                               color: Colors.grey.shade600,
                             ),
@@ -578,7 +580,7 @@ class _ClientBookingPageState extends ConsumerState<ClientBookingPage> {
                   ),
                   if (isSelected)
                     const Icon(
-                      Icons.check_circle,
+                      LucideIcons.checkCircle,
                       color: AppTheme.primaryColor,
                       size: 24,
                     ),
@@ -592,87 +594,79 @@ class _ClientBookingPageState extends ConsumerState<ClientBookingPage> {
   }
 
   Widget _buildDateTimeSelection() {
-    return Padding(
-      padding: const EdgeInsets.all(20),
+    return SingleChildScrollView(
+      padding: const EdgeInsets.fromLTRB(20, 20, 20, 100),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'Выберите дату и время',
-            style: TextStyle(
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-            ),
+          // Заголовок секции с иконкой
+          Row(
+            children: [
+              Container(
+                width: 32,
+                height: 32,
+                decoration: BoxDecoration(
+                  color: AppTheme.primaryColor.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: const Icon(
+                  LucideIcons.clock,
+                  color: AppTheme.primaryColor,
+                  size: 18,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Text(
+                'Выберите дату и время',
+                style: AppTheme.titleMedium.copyWith(
+                  fontWeight: FontWeight.w600,
+                  color: AppTheme.textPrimaryColor,
+                ),
+              ),
+            ],
           ),
           const SizedBox(height: 8),
-          const Text(
-            'Когда вам удобно прийти?',
-            style: TextStyle(
+          Text(
+            'Выберите удобную дату и время для записи',
+            style: AppTheme.bodyMedium.copyWith(
               color: AppTheme.textSecondaryColor,
-              fontSize: 16,
             ),
           ),
-          const SizedBox(height: 24),
-          Expanded(
-            child: Column(
-              children: [
-                // Выбор даты
-                Card(
-                  child: ListTile(
-                    leading: const Icon(Icons.calendar_today),
-                    title: const Text('Дата'),
-                    subtitle: Text(
-                      selectedDate != null
-                          ? '${selectedDate!.day}.${selectedDate!.month}.${selectedDate!.year}'
-                          : 'Выберите дату',
-                    ),
-                    trailing: const Icon(Icons.arrow_forward_ios),
-                    onTap: _selectDate,
-                  ),
+          const SizedBox(height: 16),
+          
+          Container(
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(
+                color: AppTheme.borderColor,
+                width: 0.5,
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.02),
+                  blurRadius: 8,
+                  offset: const Offset(0, 2),
                 ),
-                const SizedBox(height: 16),
-                // Выбор времени
-                Card(
-                  child: ListTile(
-                    leading: const Icon(Icons.access_time),
-                    title: const Text('Время'),
-                    subtitle: Text(
-                      selectedTime != null
-                          ? '${selectedTime!.hour.toString().padLeft(2, '0')}:${selectedTime!.minute.toString().padLeft(2, '0')}'
-                          : 'Выберите время',
-                    ),
-                    trailing: const Icon(Icons.arrow_forward_ios),
-                    onTap: selectedDate != null ? _selectTime : null,
-                  ),
-                ),
-                const SizedBox(height: 24),
-                if (selectedDate != null && selectedTime != null)
-                  Container(
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: AppTheme.primaryColor.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Row(
-                      children: [
-                        const Icon(
-                          Icons.info_outline,
-                          color: AppTheme.primaryColor,
-                        ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: Text(
-                            'Запись на ${selectedDate!.day}.${selectedDate!.month}.${selectedDate!.year} в ${selectedTime!.hour.toString().padLeft(2, '0')}:${selectedTime!.minute.toString().padLeft(2, '0')}',
-                            style: const TextStyle(
-                              color: AppTheme.primaryColor,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
               ],
+            ),
+            child: ClientTimeSelector(
+              selectedDate: selectedDate,
+              selectedTime: selectedTime,
+              selectedMaster: selectedMaster,
+              selectedService: selectedService,
+              onDateSelected: (date) {
+                setState(() {
+                  selectedDate = date;
+                  selectedTime = null; // Сбрасываем время при смене даты
+                });
+              },
+              onTimeSelected: (time) {
+                setState(() {
+                  selectedTime = time;
+                });
+              },
             ),
           ),
         ],
@@ -709,7 +703,7 @@ class _ClientBookingPageState extends ConsumerState<ClientBookingPage> {
                   // Услуга
                   if (selectedService != null)
                     _buildConfirmationCard(
-                      icon: Icons.content_cut,
+                      icon: LucideIcons.scissors,
                       title: 'Услуга',
                       content: selectedService!.name,
                       subtitle: '${selectedService!.formattedDuration} • ${selectedService!.formattedPrice}',
@@ -718,7 +712,7 @@ class _ClientBookingPageState extends ConsumerState<ClientBookingPage> {
                   // Мастер
                   if (selectedMaster != null)
                     _buildConfirmationCard(
-                      icon: Icons.person,
+                      icon: LucideIcons.userCheck,
                       title: 'Мастер',
                       content: selectedMaster!.fullName,
                       subtitle: '${selectedMaster!.formattedRating} ⭐ • ${selectedMaster!.formattedExperience}',
@@ -727,7 +721,7 @@ class _ClientBookingPageState extends ConsumerState<ClientBookingPage> {
                   // Дата и время
                   if (selectedDate != null && selectedTime != null)
                     _buildConfirmationCard(
-                      icon: Icons.schedule,
+                      icon: LucideIcons.calendarCheck,
                       title: 'Дата и время',
                       content: '${selectedDate!.day}.${selectedDate!.month}.${selectedDate!.year}',
                       subtitle: '${selectedTime!.hour.toString().padLeft(2, '0')}:${selectedTime!.minute.toString().padLeft(2, '0')}',
@@ -876,39 +870,6 @@ class _ClientBookingPageState extends ConsumerState<ClientBookingPage> {
     );
   }
 
-  Future<void> _selectDate() async {
-    final now = DateTime.now();
-    final firstDate = now;
-    final lastDate = now.add(const Duration(days: 90));
-
-    final date = await showDatePicker(
-      context: context,
-      initialDate: selectedDate ?? now,
-      firstDate: firstDate,
-      lastDate: lastDate,
-      locale: const Locale('ru'),
-    );
-
-    if (date != null) {
-      setState(() {
-        selectedDate = date;
-        selectedTime = null; // Сбрасываем время при смене даты
-      });
-    }
-  }
-
-  Future<void> _selectTime() async {
-    final time = await showTimePicker(
-      context: context,
-      initialTime: selectedTime ?? const TimeOfDay(hour: 10, minute: 0),
-    );
-
-    if (time != null) {
-      setState(() {
-        selectedTime = time;
-      });
-    }
-  }
 
   Future<void> _confirmBooking() async {
     // Проверяем, что все данные заполнены

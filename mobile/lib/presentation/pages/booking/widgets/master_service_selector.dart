@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../data/models/service.dart';
@@ -87,7 +88,7 @@ class _MasterServiceSelectorState extends ConsumerState<MasterServiceSelector> {
                         borderRadius: BorderRadius.circular(6),
                       ),
                       child: const Icon(
-                        Icons.check,
+                        LucideIcons.check,
                         color: Colors.white,
                         size: 16,
                       ),
@@ -96,7 +97,7 @@ class _MasterServiceSelectorState extends ConsumerState<MasterServiceSelector> {
                     Text(
                       'Выбрано услуг: ${widget.selectedServices.length}',
                       style: AppTheme.titleSmall.copyWith(
-                        color: AppTheme.primaryColor,
+                        color: const Color(0xFF000000),
                         fontWeight: FontWeight.w600,
                       ),
                     ),
@@ -119,7 +120,7 @@ class _MasterServiceSelectorState extends ConsumerState<MasterServiceSelector> {
                           Text(
                             service.name,
                             style: AppTheme.bodySmall.copyWith(
-                              color: AppTheme.primaryColor,
+                              color: const Color(0xFF000000),
                               fontWeight: FontWeight.w500,
                             ),
                           ),
@@ -127,7 +128,7 @@ class _MasterServiceSelectorState extends ConsumerState<MasterServiceSelector> {
                           GestureDetector(
                             onTap: () => _removeService(service),
                           child: const Icon(
-                            Icons.close,
+                            LucideIcons.x,
                             size: 16,
                             color: AppTheme.primaryColor,
                           ),
@@ -141,7 +142,7 @@ class _MasterServiceSelectorState extends ConsumerState<MasterServiceSelector> {
                 Text(
                   'Общая длительность: ${_formatTotalDuration()} • Общая стоимость: ${_formatTotalPrice()}',
                   style: AppTheme.bodySmall.copyWith(
-                    color: AppTheme.primaryColor,
+                    color: const Color(0xFF000000),
                   ),
                 ),
               ],
@@ -161,7 +162,7 @@ class _MasterServiceSelectorState extends ConsumerState<MasterServiceSelector> {
                 borderRadius: BorderRadius.circular(8),
               ),
               child: const Icon(
-                Icons.design_services,
+                LucideIcons.sparkles,
                 color: AppTheme.primaryColor,
                 size: 18,
               ),
@@ -256,7 +257,7 @@ class _MasterServiceSelectorState extends ConsumerState<MasterServiceSelector> {
                           borderRadius: BorderRadius.circular(6),
                         ),
                         child: Icon(
-                          isSelected ? Icons.check : Icons.add,
+                          isSelected ? LucideIcons.check : LucideIcons.plus,
                           size: 16,
                           color: isSelected 
                               ? Colors.white 
@@ -287,7 +288,7 @@ class _MasterServiceSelectorState extends ConsumerState<MasterServiceSelector> {
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            const Icon(Icons.schedule, size: 14, color: Colors.blue),
+                            const Icon(LucideIcons.calendarCheck, size: 14, color: Colors.blue),
                             const SizedBox(width: 4),
                             Text(
                               service.formattedDuration,
@@ -312,7 +313,7 @@ class _MasterServiceSelectorState extends ConsumerState<MasterServiceSelector> {
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            const Icon(Icons.attach_money, size: 14, color: Colors.green),
+                            const Icon(LucideIcons.dollarSign, size: 14, color: Colors.green),
                             const SizedBox(width: 4),
                             Text(
                               service.formattedPrice,
@@ -364,7 +365,7 @@ class _MasterServiceSelectorState extends ConsumerState<MasterServiceSelector> {
               borderRadius: BorderRadius.circular(12),
             ),
             child: const Icon(
-              Icons.design_services_outlined,
+              LucideIcons.scissors,
               color: Colors.grey,
               size: 24,
             ),
@@ -412,7 +413,7 @@ class _MasterServiceSelectorState extends ConsumerState<MasterServiceSelector> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Icon(
-            Icons.error_outline,
+            LucideIcons.alertCircle,
             size: 48,
             color: Colors.red[400],
           ),

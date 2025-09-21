@@ -79,6 +79,32 @@ class ScheduleNotifier extends StateNotifier<ScheduleState> {
     }
   }
 
+  // Загрузка расписания конкретного мастера по ID
+  Future<void> loadMasterScheduleById(String masterId) async {
+    print('ScheduleProvider: Loading master schedule by ID: $masterId');
+    state = state.copyWith(status: ScheduleStatus.loading);
+
+    try {
+      final schedules = await _scheduleService.getMasterSchedule(masterId);
+      print('ScheduleProvider: Loaded ${schedules.length} schedules for master $masterId');
+      for (final schedule in schedules) {
+        print('  ${schedule.dayOfWeek}: ${schedule.isWorking ? '${schedule.startTime}-${schedule.endTime}' : 'не работает'}');
+      }
+      
+      state = state.copyWith(
+        status: ScheduleStatus.loaded,
+        masterSchedules: schedules,
+        errorMessage: null,
+      );
+    } catch (error) {
+      print('ScheduleProvider: Error loading master schedule by ID: $error');
+      state = state.copyWith(
+        status: ScheduleStatus.error,
+        errorMessage: error.toString(),
+      );
+    }
+  }
+
   // Сохранение расписания мастера
   Future<void> saveMasterSchedule(List<MasterSchedule> schedules) async {
     state = state.copyWith(status: ScheduleStatus.loading);
@@ -174,6 +200,64 @@ class ScheduleNotifier extends StateNotifier<ScheduleState> {
       return slotsWithOccupancy;
     } catch (error) {
       print('ScheduleProvider: Error loading slots with occupancy: $error');
+      return [];
+    }
+  }
+
+  // Загрузка доступных слотов для конкретного мастера
+  Future<void> loadAvailableSlotsForMaster(
+    DateTime date, {
+    required String masterId,
+    Duration? serviceDuration,
+  }) async {
+    print('ScheduleProvider: Loading available slots for master $masterId on $date with duration ${serviceDuration?.inMinutes} minutes');
+    try {
+      final slots = await _scheduleService.getAvailableTimeSlotsForMaster(
+        date,
+        masterId: masterId,
+        serviceDuration: serviceDuration,
+      );
+      
+      print('ScheduleProvider: Found ${slots.length} available slots for master: ${slots.map((s) => '${s.hour}:${s.minute.toString().padLeft(2, '0')}').join(', ')}');
+      
+      final updatedSlots = Map<DateTime, List<TimeOfDay>>.from(state.availableSlots);
+      final dateKey = DateTime(date.year, date.month, date.day);
+      updatedSlots[dateKey] = slots;
+      
+      print('ScheduleProvider: Saving ${slots.length} slots for dateKey: $dateKey');
+      print('ScheduleProvider: Current cache keys: ${updatedSlots.keys.toList()}');
+      
+      state = state.copyWith(
+        availableSlots: updatedSlots,
+        status: ScheduleStatus.loaded, // Принудительно обновляем статус
+      );
+    } catch (error) {
+      print('ScheduleProvider: Error loading available slots for master: $error');
+      state = state.copyWith(
+        status: ScheduleStatus.error,
+        errorMessage: error.toString(),
+      );
+    }
+  }
+
+  // Загрузка слотов с информацией о занятости для конкретного мастера
+  Future<List<Map<String, dynamic>>> loadSlotsWithOccupancyForMaster(
+    DateTime date, {
+    required String masterId,
+    Duration? serviceDuration,
+  }) async {
+    print('ScheduleProvider: Loading slots with occupancy for master $masterId on $date');
+    try {
+      final slotsWithOccupancy = await _scheduleService.getAvailableSlotsWithOccupancyForMaster(
+        date,
+        masterId: masterId,
+        serviceDuration: serviceDuration,
+      );
+      
+      print('ScheduleProvider: Found ${slotsWithOccupancy.length} slots with occupancy info for master');
+      return slotsWithOccupancy;
+    } catch (error) {
+      print('ScheduleProvider: Error loading slots with occupancy for master: $error');
       return [];
     }
   }
