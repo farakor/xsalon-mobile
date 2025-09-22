@@ -14,6 +14,8 @@ import '../clients/staff_clients_page.dart';
 import '../services/services_page.dart';
 import '../profile/staff_profile_page.dart';
 import '../booking/add_booking_page.dart';
+import '../history/history_page.dart';
+import '../profile/client_profile_page.dart';
 import '../../widgets/modern_app_header.dart';
 import '../../widgets/floating_menu_bar.dart';
 import '../../widgets/modern_floating_menu.dart';
@@ -90,7 +92,7 @@ class _ClientInterface extends StatelessWidget {
       const _ClientHomeTab(),
       const _BookingTab(),
       const _HistoryTab(),
-      const _ClientProfileTab(),
+      const ClientProfilePage(),
     ];
 
     return Scaffold(
@@ -227,7 +229,7 @@ class _ClientHomeTab extends StatelessWidget {
                     icon: LucideIcons.calendar,
                     title: 'Записаться',
                     subtitle: 'На услугу',
-                    onTap: () => context.go(AppConstants.clientBookingRoute),
+                    onTap: () => context.push(AppConstants.clientBookingRoute),
                   ),
                 ),
                 const SizedBox(width: 12),
@@ -490,7 +492,7 @@ class _BookingTab extends StatelessWidget {
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
-                onPressed: () => context.go(AppConstants.clientBookingRoute),
+                onPressed: () => context.push(AppConstants.clientBookingRoute),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppTheme.primaryColor,
                   foregroundColor: Colors.white,
@@ -520,11 +522,7 @@ class _HistoryTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
-      body: Center(
-        child: Text('История записей'),
-      ),
-    );
+    return const HistoryPage();
   }
 }
 
@@ -1160,35 +1158,3 @@ class _TodayAppointmentCard extends StatelessWidget {
   }
 }
 
-// Простой профиль для клиентов
-class _ClientProfileTab extends StatelessWidget {
-  const _ClientProfileTab();
-
-  @override
-  Widget build(BuildContext context) {
-    return const Scaffold(
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              LucideIcons.user,
-              size: 64,
-              color: Colors.grey,
-            ),
-            SizedBox(height: 16),
-            Text(
-              'Профиль клиента',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-            SizedBox(height: 8),
-            Text(
-              'Здесь будет профиль клиента',
-              style: TextStyle(color: Colors.grey),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}

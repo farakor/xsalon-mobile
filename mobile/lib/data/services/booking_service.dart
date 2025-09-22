@@ -356,4 +356,100 @@ class BookingService {
       throw ServerFailure('Ошибка удаления записи: $e');
     }
   }
+
+  /// Получить историю записей клиента
+  Future<List<Map<String, dynamic>>> getClientBookingHistory({
+    required String clientId,
+    int? limit,
+    DateTime? startDate,
+    DateTime? endDate,
+  }) async {
+    try {
+      print('BookingService: Getting client booking history...');
+      print('  Client ID: $clientId');
+      print('  Limit: $limit');
+      print('  Start date: $startDate');
+      print('  End date: $endDate');
+
+      dynamic queryBuilder = _supabase
+          .from('bookings')
+          .select('''
+            id,
+            client_id,
+            service_id,
+            start_time,
+            end_time,
+            status,
+            total_price,
+            final_price,
+            client_notes,
+            master_notes,
+            payment_status,
+            created_at,
+            clients!inner(full_name, phone),
+            master_services_new!inner(name, duration_minutes),
+            masters!inner(user_profiles!inner(full_name))
+          ''')
+          .eq('client_id', clientId);
+
+      // Применяем фильтры по датам если указаны
+      if (startDate != null) {
+        queryBuilder = queryBuilder.gte('start_time', TimezoneUtils.samarkandToUtc(startDate).toIso8601String());
+      }
+      if (endDate != null) {
+        final endOfDay = DateTime(endDate.year, endDate.month, endDate.day, 23, 59, 59);
+        queryBuilder = queryBuilder.lte('start_time', TimezoneUtils.samarkandToUtc(endOfDay).toIso8601String());
+      }
+
+      // Применяем сортировку и лимит
+      queryBuilder = queryBuilder.order('start_time', ascending: false);
+      if (limit != null) {
+        queryBuilder = queryBuilder.limit(limit);
+      }
+
+      final response = await queryBuilder;
+
+      // Конвертируем время обратно в самаркандское
+      final convertedResponse = response.map((booking) {
+        // Преобразуем booking в Map<String, dynamic>
+        final bookingMap = Map<String, dynamic>.from(booking as Map);
+        return {
+          ...bookingMap,
+          'start_time': TimezoneUtils.toSamarkandTime(DateTime.parse(bookingMap['start_time'])).toIso8601String(),
+          'end_time': TimezoneUtils.toSamarkandTime(DateTime.parse(bookingMap['end_time'])).toIso8601String(),
+        };
+      }).toList();
+
+      print('BookingService: Found ${convertedResponse.length} bookings for client');
+      return List<Map<String, dynamic>>.from(convertedResponse);
+    } catch (e) {
+      print('BookingService: Error getting client booking history: $e');
+      throw ServerFailure('Ошибка получения истории записей: $e');
+    }
+  }
+
+  /// Получить ID клиента по ID пользователя
+  Future<String?> getClientIdByUserId(String userId) async {
+    try {
+      print('BookingService: Getting client ID for user: $userId');
+      
+      final response = await _supabase
+          .from('clients')
+          .select('id')
+          .eq('user_profile_id', userId)
+          .maybeSingle();
+
+      if (response == null) {
+        print('BookingService: Client not found for user: $userId');
+        return null;
+      }
+
+      final clientId = response['id'] as String;
+      print('BookingService: Found client ID: $clientId');
+      return clientId;
+    } catch (e) {
+      print('BookingService: Error getting client ID: $e');
+      return null;
+    }
+  }
 }

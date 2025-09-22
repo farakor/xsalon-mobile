@@ -12,6 +12,7 @@ class Appointment {
   final String? notes; // client notes
   final String? masterNotes; // master notes
   final String? clientAvatarUrl;
+  final String? masterName; // master name
 
   const Appointment({
     required this.id,
@@ -27,6 +28,7 @@ class Appointment {
     this.notes,
     this.masterNotes,
     this.clientAvatarUrl,
+    this.masterName,
   });
 
   Duration get duration => endTime.difference(startTime);
@@ -49,6 +51,7 @@ class Appointment {
       notes: json['notes'] as String?,
       masterNotes: json['master_notes'] as String?,
       clientAvatarUrl: json['client_avatar_url'] as String?,
+      masterName: json['master_name'] as String?,
     );
   }
 
@@ -67,6 +70,7 @@ class Appointment {
       'notes': notes,
       'master_notes': masterNotes,
       'client_avatar_url': clientAvatarUrl,
+      'master_name': masterName,
     };
   }
 
@@ -84,6 +88,7 @@ class Appointment {
     String? notes,
     String? masterNotes,
     String? clientAvatarUrl,
+    String? masterName,
   }) {
     return Appointment(
       id: id ?? this.id,
@@ -99,6 +104,7 @@ class Appointment {
       notes: notes ?? this.notes,
       masterNotes: masterNotes ?? this.masterNotes,
       clientAvatarUrl: clientAvatarUrl ?? this.clientAvatarUrl,
+      masterName: masterName ?? this.masterName,
     );
   }
 }

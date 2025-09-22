@@ -93,6 +93,46 @@ class _ClientBookingPageState extends ConsumerState<ClientBookingPage> {
     }
   }
 
+  void _handleBackPress() {
+    // Если мы не на первом шаге, возвращаемся к предыдущему шагу
+    if (_currentStep > 0) {
+      _previousStep();
+    } else {
+      // Если на первом шаге, показываем диалог подтверждения выхода
+      _showExitConfirmationDialog();
+    }
+  }
+
+  void _showExitConfirmationDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Выйти из записи?'),
+          content: const Text(
+            'Вы уверены, что хотите выйти? Все введенные данные будут потеряны.',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('Отмена'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Закрываем диалог
+                context.pop(); // Возвращаемся на предыдущую страницу
+              },
+              child: const Text(
+                'Выйти',
+                style: TextStyle(color: Colors.red),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   bool get _canProceed {
     switch (_currentStep) {
       case 0:
@@ -116,6 +156,10 @@ class _ClientBookingPageState extends ConsumerState<ClientBookingPage> {
         backgroundColor: Colors.white,
         foregroundColor: Colors.black,
         elevation: 0,
+        leading: IconButton(
+          icon: const Icon(LucideIcons.arrowLeft),
+          onPressed: _handleBackPress,
+        ),
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(60),
           child: _buildStepIndicator(),

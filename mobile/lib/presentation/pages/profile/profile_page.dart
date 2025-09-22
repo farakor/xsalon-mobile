@@ -1,40 +1,31 @@
 import 'package:flutter/material.dart';
-import 'package:lucide_icons/lucide_icons.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../theme/app_theme.dart';
+import '../../providers/auth_provider.dart';
+import 'client_profile_page.dart';
+import 'staff_profile_page.dart';
 
 class ProfilePage extends ConsumerWidget {
   const ProfilePage({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Профиль'),
-      ),
-      body: const Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              LucideIcons.user,
-              size: 64,
-              color: AppTheme.primaryColor,
-            ),
-            SizedBox(height: 16),
-            Text(
-              'Профиль пользователя',
-              style: TextStyle(fontSize: 24),
-            ),
-            SizedBox(height: 8),
-            Text(
-              'В разработке...',
-              style: TextStyle(color: AppTheme.textSecondaryColor),
-            ),
-          ],
+    final authState = ref.watch(authProvider);
+    final profile = authState.profile;
+
+    if (profile == null) {
+      return const Scaffold(
+        body: Center(
+          child: CircularProgressIndicator(),
         ),
-      ),
-    );
+      );
+    }
+
+    // Определяем какой профиль показать в зависимости от роли
+    if (profile.isStaff) {
+      return const StaffProfilePage();
+    } else {
+      return const ClientProfilePage();
+    }
   }
 }
